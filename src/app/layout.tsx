@@ -1,42 +1,38 @@
 import type { Metadata } from 'next';
-import { Outfit, Playfair_Display } from 'next/font/google';
+import { Poppins, Inter } from 'next/font/google';
 import './globals.css';
-import NoticeBar from '@/components/layout/NoticeBar';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 
-const outfit = Outfit({
+const poppins = Poppins({
   subsets: ['latin'],
+  weight: ['400', '500', '600', '700', '800'],
+  variable: '--font-heading',
+  display: 'swap',
+});
+
+const inter = Inter({
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700'],
   variable: '--font-sans',
   display: 'swap',
 });
 
-const playfair = Playfair_Display({
-  subsets: ['latin'],
-  variable: '--font-serif',
-  display: 'swap',
-});
-
 export const metadata: Metadata = {
-  title: "Rippon Girls' College, Galle | Official Web Portal",
-  description: "Official website of Rippon Girls' College, Galle (est. 1871) — A premier 1AB National School in Sri Lanka nurturing empowered and enlightened young women.",
+  title: "Rippon Girl's College, Galle | Official Web Portal",
+  description: "Official website of Rippon Girl's College, Galle (est. 1871) — Oldest Girl's School in Southern Province of Sri Lanka.",
   keywords: [
-    "Rippon Girls' College",
+    "Rippon Girl's College",
     "Rippon College Galle",
     "Galle Girls Schools",
     "Southern Province Schools Sri Lanka",
-    "Richmond Hill Galle",
-    "Bradby House",
-    "Peake House",
-    "Rippon House",
-    "Westlake House",
-    "PPA Rippon Girls College"
+    "Richmond Hill Galle"
   ],
-  authors: [{ name: "Rippon Girls' College Media Unit" }],
+  authors: [{ name: "Rippon Girl's College Media Unit" }],
   openGraph: {
-    title: "Rippon Girls' College, Galle | 150+ Years of Excellence",
-    description: "Empowering young women to conquer global frontiers with timeless values and academic excellence.",
-    siteName: "Rippon Girls' College",
+    title: "Rippon Girl's College, Galle",
+    description: "Oldest Girl's School in Southern Province of Sri Lanka.",
+    siteName: "Rippon Girl's College",
     locale: "en_US",
     type: "website"
   }
@@ -48,9 +44,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`${outfit.variable} ${playfair.variable} scroll-smooth`}>
-      <body className="min-h-screen flex flex-col bg-[#f8fafc] text-[#0f172a] font-sans antialiased selection:bg-[#d4af37] selection:text-[#0a192f]">
-        <NoticeBar />
+    <html lang="en" className={`${poppins.variable} ${inter.variable} scroll-smooth`}>
+      <body className="min-h-screen flex flex-col bg-white text-[#111827] font-sans antialiased selection:bg-[#d4af37] selection:text-[#0a192f]">
         <Navbar />
         <main className="flex-1">{children}</main>
         <Footer />
