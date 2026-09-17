@@ -1,0 +1,28 @@
+/* ==========================================================================
+   StatsSection Component Stylesheet (StatsSection.css)
+   Applies to: src/components/home/StatsSection.tsx
+   ========================================================================== */
+
+.stats-section-container {
+  background-color: #0a192f;
+  color: #ffffff;
+  padding-top: 4rem;
+  padding-bottom: 4rem;
+  border-top: 1px solid rgba(212, 175, 55, 0.3);
+  border-bottom: 1px solid rgba(212, 175, 55, 0.3);
+}
+
+.stats-card {
+  text-align: center;
+  padding: 1.5rem;
+  border-radius: 1rem;
+  background-color: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  transition: all 0.3s ease;
+}
+
+.stats-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(212, 175, 55, 0.4);
+  background-color: rgba(255, 255, 255, 0.06);
+}

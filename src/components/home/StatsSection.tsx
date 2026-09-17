@@ -1,6 +1,7 @@
 import React from 'react';
 import { Award, Users, GraduationCap, Trophy } from 'lucide-react';
 import { SCHOOL_INFO } from '@/data/schoolData';
+import './StatsSection.css';
 
 export default function StatsSection() {
   const stats = [

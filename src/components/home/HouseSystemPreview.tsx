@@ -1,11 +1,12 @@
 import React from 'react';
 import Link from 'next/link';
-import { Shield, Flame, Crown, HeartHandshake, ArrowRight } from 'lucide-react';
+import { Shield, Flame, Crown, HeartHandshake, ArrowRight, LucideIcon } from 'lucide-react';
 import { HOUSES } from '@/data/schoolData';
 import SectionHeading from '@/components/shared/SectionHeading';
+import './HouseSystemPreview.css';
 
 export default function HouseSystemPreview() {
-  const houseIcons: Record<string, any> = {
+  const houseIcons: Record<string, LucideIcon> = {
     bradby: Shield,
     peake: Flame,
     rippon: Crown,

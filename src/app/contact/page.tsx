@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { SCHOOL_INFO } from '@/data/schoolData';
 import SectionHeading from '@/components/shared/SectionHeading';
+import './contact.css';
 
 export default function ContactPage() {
   const [submitted, setSubmitted] = useState(false);

@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import { ALUMNAE_BRANCHES, SCHOOL_INFO } from '@/data/schoolData';
 import SectionHeading from '@/components/shared/SectionHeading';
+import './alumnae.css';
 
 const ALUMNAE_LEADERS = [
   {

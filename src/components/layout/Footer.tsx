@@ -1,6 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { MapPin, Phone, Mail } from 'lucide-react';
+import './Footer.css';
 
 const QUICK_LINKS = [
   { name: 'Home', href: '/' },

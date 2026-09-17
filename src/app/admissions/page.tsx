@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import SectionHeading from '@/components/shared/SectionHeading';
 import { SCHOOL_INFO } from '@/data/schoolData';
+import './admissions.css';
 
 const FAQS = [
   {

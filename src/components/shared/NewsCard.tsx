@@ -1,8 +1,9 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Calendar, Clock, ArrowRight, X, BookOpen, Share2 } from 'lucide-react';
+import { Calendar, Clock, ArrowRight, X } from 'lucide-react';
 import { NewsArticle } from '@/data/eventsData';
+import './NewsCard.css';
 
 interface NewsCardProps {
   article: NewsArticle;

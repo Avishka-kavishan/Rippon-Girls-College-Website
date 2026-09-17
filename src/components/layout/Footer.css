@@ -1,0 +1,53 @@
+/* ==========================================================================
+   Footer Component Stylesheet (Footer.css)
+   Applies to: src/components/layout/Footer.tsx
+   ========================================================================== */
+
+.footer-container {
+  background-color: #d9d9d9;
+  color: #1f2937;
+  border-top: 1px solid #cbd5e1;
+}
+
+.footer-crest-badge {
+  position: relative;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 0.75rem;
+  background-color: #0a192f;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #d4af37;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+}
+
+.footer-link {
+  font-family: var(--font-heading-family);
+  font-size: 0.8125rem;
+  color: #334155;
+  transition: color 0.2s ease, transform 0.2s ease;
+  display: inline-block;
+}
+
+.footer-link:hover {
+  color: #0a192f;
+  transform: translateX(2px);
+}
+
+.footer-bottom-bar {
+  margin-top: 3rem;
+  padding-top: 2rem;
+  border-top: 1px solid rgba(148, 163, 184, 0.4);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+@media (min-width: 640px) {
+  .footer-bottom-bar {
+    flex-direction: row;
+  }
+}

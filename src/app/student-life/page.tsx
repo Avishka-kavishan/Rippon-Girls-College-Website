@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import { CLUBS_SOCIETIES, SPORTS_LIST } from '@/data/schoolData';
 import SectionHeading from '@/components/shared/SectionHeading';
+import './student-life.css';
 
 const CATEGORIES = ['All', 'Academic', 'Technology & Media', 'Cultural & Aesthetic', 'Leadership & Service'];
 

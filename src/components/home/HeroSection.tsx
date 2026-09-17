@@ -1,6 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
+import './HeroSection.css';
 
 export default function HeroSection() {
   return (

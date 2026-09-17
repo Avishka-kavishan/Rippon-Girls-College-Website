@@ -17,6 +17,7 @@ import { NEWS_ARTICLES, UPCOMING_EVENTS, NewsArticle, SchoolEvent } from '@/data
 import SectionHeading from '@/components/shared/SectionHeading';
 import NewsCard from '@/components/shared/NewsCard';
 import EventCard from '@/components/shared/EventCard';
+import './news-events.css';
 
 const NEWS_CATEGORIES = ['All', 'Academics', 'Sports', 'Culture', 'Achievements', 'Notices'];
 const EVENT_CATEGORIES = ['All', 'Sports', 'Academic', 'Aesthetic', 'Religious', 'Alumni'];

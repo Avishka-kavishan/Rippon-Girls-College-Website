@@ -1,4 +1,5 @@
 import React from 'react';
+import './home.css';
 import HeroSection from '@/components/home/HeroSection';
 import LatestNewsSection from '@/components/home/LatestNewsSection';
 import DiscoverSection from '@/components/home/DiscoverSection';

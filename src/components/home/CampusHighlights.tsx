@@ -1,8 +1,9 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Microscope, Cpu, Music, Trophy, BookOpen, Layers } from 'lucide-react';
+import { Microscope, Cpu, Music, Trophy, BookOpen } from 'lucide-react';
 import SectionHeading from '@/components/shared/SectionHeading';
+import './CampusHighlights.css';
 
 const HIGHLIGHTS = [
   {

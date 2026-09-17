@@ -1,0 +1,36 @@
+/* ==========================================================================
+   PrincipalMessage Component Stylesheet (PrincipalMessage.css)
+   Applies to: src/components/home/PrincipalMessage.tsx
+   ========================================================================== */
+
+.principal-message-section {
+  padding-top: 5rem;
+  padding-bottom: 5rem;
+  background-color: #ffffff;
+}
+
+@media (min-width: 640px) {
+  .principal-message-section {
+    padding-top: 7rem;
+    padding-bottom: 7rem;
+  }
+}
+
+.principal-image-frame {
+  position: relative;
+  border-radius: 2rem;
+  overflow: hidden;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e2e8f0;
+  aspect-ratio: 4 / 5;
+}
+
+.principal-quote-card {
+  position: relative;
+  background-color: #0a192f;
+  color: #ffffff;
+  border-radius: 2rem;
+  padding: 2.5rem;
+  border: 1px solid rgba(212, 175, 55, 0.3);
+  box-shadow: 0 25px 50px -12px rgba(10, 25, 47, 0.4);
+}

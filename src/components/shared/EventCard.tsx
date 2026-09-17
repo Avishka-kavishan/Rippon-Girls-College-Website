@@ -1,6 +1,6 @@
-import React from 'react';
-import { Calendar, Clock, MapPin, Tag } from 'lucide-react';
+import { Clock, MapPin } from 'lucide-react';
 import { SchoolEvent } from '@/data/eventsData';
+import './EventCard.css';
 
 interface EventCardProps {
   event: SchoolEvent;

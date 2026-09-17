@@ -12,10 +12,12 @@ import {
   History,
   Flame,
   Crown,
-  HeartHandshake
+  HeartHandshake,
+  LucideIcon
 } from 'lucide-react';
 import { SCHOOL_INFO, TIMELINE, HOUSES, SCHOOL_ANTHEM } from '@/data/schoolData';
 import SectionHeading from '@/components/shared/SectionHeading';
+import './about.css';
 
 export const metadata = {
   title: "About Rippon | 150+ Years of Noble Heritage",
@@ -23,7 +25,7 @@ export const metadata = {
 };
 
 export default function AboutPage() {
-  const houseIcons: Record<string, any> = {
+  const houseIcons: Record<string, LucideIcon> = {
     bradby: Shield,
     peake: Flame,
     rippon: Crown,

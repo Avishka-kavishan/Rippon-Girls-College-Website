@@ -1,6 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { Quote, ArrowRight, CheckCircle2, Award } from 'lucide-react';
+import './PrincipalMessage.css';
 import { SCHOOL_INFO } from '@/data/schoolData';
 import SectionHeading from '@/components/shared/SectionHeading';
 

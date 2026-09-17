@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { Bell, X, ArrowRight, Phone, Mail, MapPin } from 'lucide-react';
 import { URGENT_NOTICES } from '@/data/eventsData';
-import { SCHOOL_INFO } from '@/data/schoolData';
+import './NoticeBar.css';
 
 export default function NoticeBar() {
   const [isVisible, setIsVisible] = useState(true);

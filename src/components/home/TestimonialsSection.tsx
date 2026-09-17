@@ -1,6 +1,7 @@
 import React from 'react';
-import { Quote, Star, Award, GraduationCap } from 'lucide-react';
+import { Quote, Star } from 'lucide-react';
 import SectionHeading from '@/components/shared/SectionHeading';
+import './TestimonialsSection.css';
 
 const ALUMNAE_VOICES = [
   {

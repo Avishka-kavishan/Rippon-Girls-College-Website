@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { Image as ImageIcon, Sparkles, X, ChevronLeft, ChevronRight, Calendar } from 'lucide-react';
 import { GALLERY_ITEMS, GalleryItem } from '@/data/eventsData';
 import SectionHeading from '@/components/shared/SectionHeading';
+import './gallery.css';
 
 const CATEGORIES = ['All', 'Academics', 'Sports', 'Aesthetic', 'Tradition', 'Campus'];
 

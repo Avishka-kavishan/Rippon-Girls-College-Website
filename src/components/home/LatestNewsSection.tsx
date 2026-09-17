@@ -1,6 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { Calendar, ArrowRight, Sparkles } from 'lucide-react';
+import './LatestNewsSection.css';
 import { NEWS_ARTICLES } from '@/data/eventsData';
 
 export default function LatestNewsSection() {

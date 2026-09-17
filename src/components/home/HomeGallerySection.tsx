@@ -1,6 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { ArrowRight, Eye } from 'lucide-react';
+import './HomeGallerySection.css';
 
 const GALLERY_IMAGES = [
   {

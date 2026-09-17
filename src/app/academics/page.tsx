@@ -14,14 +14,15 @@ import {
   FileText,
   Download,
   Sparkles,
-  Award,
-  ChevronRight
+  ChevronRight,
+  LucideIcon
 } from 'lucide-react';
 import { ACADEMIC_STREAMS, SCHOOL_INFO } from '@/data/schoolData';
 import SectionHeading from '@/components/shared/SectionHeading';
+import './academics.css';
 
 export default function AcademicsPage() {
-  const streamIcons: Record<string, any> = {
+  const streamIcons: Record<string, LucideIcon> = {
     'biological-science': Microscope,
     'physical-science': Calculator,
     'commerce': Briefcase,

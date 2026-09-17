@@ -1,11 +1,12 @@
 import React from 'react';
 import Link from 'next/link';
-import { ArrowRight, CheckCircle, Sparkles, BookOpen, Microscope, Calculator, Briefcase, Palette, Cpu } from 'lucide-react';
+import { ArrowRight, CheckCircle, BookOpen, Microscope, Calculator, Briefcase, Palette, Cpu, LucideIcon } from 'lucide-react';
 import { ACADEMIC_STREAMS } from '@/data/schoolData';
 import SectionHeading from '@/components/shared/SectionHeading';
+import './AcademicStreamsPreview.css';
 
 export default function AcademicStreamsPreview() {
-  const streamIcons: Record<string, any> = {
+  const streamIcons: Record<string, LucideIcon> = {
     'biological-science': Microscope,
     'physical-science': Calculator,
     'commerce': Briefcase,
