@@ -28,7 +28,7 @@ export default function HomePage() {
           </h1>
 
           <p className="hero-subtitle">
-            Oldest Girl&apos;s School in Southern Province of Sri Lanka
+            The Oldest Girls&apos; School in the Southern Province of Sri Lanka
           </p>
 
           <Link href="#about" className="hero-cta-btn">
@@ -93,7 +93,7 @@ export default function HomePage() {
           <div className="pathway-card">
             <div className="pathway-card-media">
               <Image
-                src={getAssetPath("/images/pathway-primary.svg")}
+                src={getAssetPath("/images/primary.jpg")}
                 alt="Primary Education"
                 fill
                 className="discover-img"
@@ -114,7 +114,7 @@ export default function HomePage() {
           <div className="pathway-card">
             <div className="pathway-card-media">
               <Image
-                src={getAssetPath("/images/pathway-secondary.svg")}
+                src={getAssetPath("/images/second.jpg")}
                 alt="Secondary Education"
                 fill
                 className="discover-img"
@@ -135,7 +135,7 @@ export default function HomePage() {
           <div className="pathway-card">
             <div className="pathway-card-media">
               <Image
-                src={getAssetPath("/images/pathway-advanced.svg")}
+                src={getAssetPath("/images/advance.jpeg")}
                 alt="Advanced Level Education"
                 fill
                 className="discover-img"
@@ -144,7 +144,7 @@ export default function HomePage() {
             </div>
             <div className="pathway-card-body">
               <p className="pathway-card-text">
-                Advanced Level education provides students with an opportunity to specialize in areas that match their interests, abilities and future goals.
+                Advanced Level education provides students with an opportunity to specialise in areas that match their interests, abilities and future goals.
               </p>
               <p className="pathway-card-text">
                 Students undertake focused study in their selected stream while developing deeper subject knowledge, analytical thinking, research skills and independent learning abilities.
@@ -167,7 +167,7 @@ export default function HomePage() {
           {/* Gallery Item 1 */}
           <div className="gallery-item">
             <Image
-              src={getAssetPath("/images/gallery-1.jpg")}
+              src={getAssetPath("/images/Gallery-1.jpeg")}
               alt="Rippon Girls' College Students"
               fill
               className="gallery-img"
@@ -178,7 +178,7 @@ export default function HomePage() {
           {/* Gallery Item 2 */}
           <div className="gallery-item">
             <Image
-              src={getAssetPath("/images/gallery-2.svg")}
+              src={getAssetPath("/images/gallery 2.jpg")}
               alt="College Library and Study"
               fill
               className="gallery-img"
@@ -189,7 +189,7 @@ export default function HomePage() {
           {/* Gallery Item 3 */}
           <div className="gallery-item">
             <Image
-              src={getAssetPath("/images/gallery-3.svg")}
+              src={getAssetPath("/images/gallery3.jpg")}
               alt="Science & Technology Laboratory"
               fill
               className="gallery-img"
