@@ -2,6 +2,7 @@ import React from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { MapPin, Phone, Mail } from "lucide-react";
+import { getAssetPath } from "@/utils/assets";
 
 export default function Footer() {
   return (
@@ -12,7 +13,7 @@ export default function Footer() {
           <div className="footer-brand">
             <div className="footer-logo-circle">
               <Image
-                src="/images/sample-logo.png"
+                src={getAssetPath("/images/sample-logo.png")}
                 alt="Rippon Girl's College Crest"
                 width={56}
                 height={56}

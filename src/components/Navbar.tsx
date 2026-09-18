@@ -4,12 +4,13 @@ import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Menu, X } from "lucide-react";
+import { getAssetPath } from "@/utils/assets";
 import "./Navbar.css";
 
 const navLinks = [
   { name: "Home", href: "/" },
   { name: "About", href: "#about" },
-  { name: "News", href: "#news" },
+  { name: "Academics", href: "#academics" },
   { name: "Gallery", href: "#gallery" },
   { name: "Contact", href: "#contact" },
 ];
@@ -24,7 +25,7 @@ export default function Navbar() {
         <Link href="/" className="navbar-brand">
           <div className="navbar-logo-circle">
             <Image
-              src="/images/sample-logo.png"
+              src={getAssetPath("/images/sample-logo.png")}
               alt="Rippon Girl's College Logo"
               width={64}
               height={64}

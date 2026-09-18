@@ -2,6 +2,7 @@ import React from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
+import { getAssetPath } from "@/utils/assets";
 
 export default function HomePage() {
   return (
@@ -11,7 +12,7 @@ export default function HomePage() {
           ========================================================================= */}
       <section className="hero-section" id="hero">
         <Image
-          src="/images/hero-image.webp"
+          src={getAssetPath("/images/hero-image.webp")}
           alt="Rippon Girls' College Campus"
           fill
           priority
@@ -67,7 +68,7 @@ export default function HomePage() {
           <div className="discover-image-col">
             <div className="discover-image-frame">
               <Image
-                src="/images/discover-band.jpg"
+                src={getAssetPath("/images/discover-band.jpg")}
                 alt="Rippon Girls' College Band & Excellence"
                 fill
                 className="discover-img"
@@ -92,7 +93,7 @@ export default function HomePage() {
           <div className="pathway-card">
             <div className="pathway-card-media">
               <Image
-                src="/images/pathway-primary.svg"
+                src={getAssetPath("/images/pathway-primary.svg")}
                 alt="Primary Education"
                 fill
                 className="discover-img"
@@ -113,7 +114,7 @@ export default function HomePage() {
           <div className="pathway-card">
             <div className="pathway-card-media">
               <Image
-                src="/images/pathway-secondary.svg"
+                src={getAssetPath("/images/pathway-secondary.svg")}
                 alt="Secondary Education"
                 fill
                 className="discover-img"
@@ -134,7 +135,7 @@ export default function HomePage() {
           <div className="pathway-card">
             <div className="pathway-card-media">
               <Image
-                src="/images/pathway-advanced.svg"
+                src={getAssetPath("/images/pathway-advanced.svg")}
                 alt="Advanced Level Education"
                 fill
                 className="discover-img"
@@ -166,7 +167,7 @@ export default function HomePage() {
           {/* Gallery Item 1 */}
           <div className="gallery-item">
             <Image
-              src="/images/gallery-1.jpg"
+              src={getAssetPath("/images/gallery-1.jpg")}
               alt="Rippon Girls' College Students"
               fill
               className="gallery-img"
@@ -177,7 +178,7 @@ export default function HomePage() {
           {/* Gallery Item 2 */}
           <div className="gallery-item">
             <Image
-              src="/images/gallery-2.svg"
+              src={getAssetPath("/images/gallery-2.svg")}
               alt="College Library and Study"
               fill
               className="gallery-img"
@@ -188,7 +189,7 @@ export default function HomePage() {
           {/* Gallery Item 3 */}
           <div className="gallery-item">
             <Image
-              src="/images/gallery-3.svg"
+              src={getAssetPath("/images/gallery-3.svg")}
               alt="Science & Technology Laboratory"
               fill
               className="gallery-img"
@@ -199,7 +200,7 @@ export default function HomePage() {
           {/* Gallery Item 4 */}
           <div className="gallery-item">
             <Image
-              src="/images/gallery-4.svg"
+              src={getAssetPath("/images/gallery-4.svg")}
               alt="Sports & Athletics Meet"
               fill
               className="gallery-img"
@@ -210,7 +211,7 @@ export default function HomePage() {
           {/* Gallery Item 5 */}
           <div className="gallery-item">
             <Image
-              src="/images/gallery-5.svg"
+              src={getAssetPath("/images/gallery-5.svg")}
               alt="Cultural & Drama Festival"
               fill
               className="gallery-img"
@@ -221,7 +222,7 @@ export default function HomePage() {
           {/* Gallery Item 6 */}
           <div className="gallery-item">
             <Image
-              src="/images/gallery-6.svg"
+              src={getAssetPath("/images/gallery-6.svg")}
               alt="Annual Prize Giving Ceremony"
               fill
               className="gallery-img"
