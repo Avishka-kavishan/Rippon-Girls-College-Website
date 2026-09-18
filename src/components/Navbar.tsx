@@ -21,12 +21,12 @@ export default function Navbar() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-10 h-20 flex items-center justify-between">
         {/* Brand identity: Logo & Title */}
         <Link href="/" className="flex items-center gap-3 group">
-          <div className="relative w-12 h-12 sm:w-14 sm:h-14 shrink-0 rounded-full overflow-hidden bg-white shadow-sm flex items-center justify-center p-0.5 border border-neutral-300">
+          <div className="relative w-14 h-14 sm:w-16 sm:h-16 shrink-0 rounded-full overflow-hidden bg-white shadow-sm flex items-center justify-center p-1.5 sm:p-2 border border-neutral-300/80">
             <Image
               src="/images/sample-logo.png"
               alt="Rippon Girl's College Logo"
-              width={56}
-              height={56}
+              width={64}
+              height={64}
               className="w-full h-full object-contain"
               priority
             />
