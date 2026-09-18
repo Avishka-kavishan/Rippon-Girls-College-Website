@@ -12,7 +12,7 @@ export default function HomePage() {
           ========================================================================= */}
       <section className="hero-section" id="hero">
         <Image
-          src={getAssetPath("/images/hero-image.webp")}
+          src={getAssetPath("/images/Hero_img.jpg")}
           alt="Rippon Girls' College Campus"
           fill
           priority
@@ -46,7 +46,7 @@ export default function HomePage() {
           {/* Left Column: Text Content */}
           <div className="discover-text-col">
             <span className="discover-eyebrow">Discover Our School</span>
-            
+
             <h2 className="discover-heading">
               Empowering Girls Through Education, Character and Excellence
             </h2>
@@ -68,7 +68,7 @@ export default function HomePage() {
           <div className="discover-image-col">
             <div className="discover-image-frame">
               <Image
-                src={getAssetPath("/images/discover-band.jpg")}
+                src={getAssetPath("/images/subhero.jpg")}
                 alt="Rippon Girls' College Band & Excellence"
                 fill
                 className="discover-img"
