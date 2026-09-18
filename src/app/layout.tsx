@@ -22,9 +22,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={notoSans.variable}>
-      <body className="font-sans antialiased min-h-screen bg-neutral-100 text-neutral-900 flex flex-col">
+      <body>
         <Navbar />
-        <main className="flex-1">{children}</main>
+        <main>{children}</main>
       </body>
     </html>
   );
