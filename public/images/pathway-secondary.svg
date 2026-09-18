@@ -1,0 +1,33 @@
+<svg width="400" height="250" viewBox="0 0 400 250" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="secGrad" x1="0" y1="0" x2="400" y2="250" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#EFF6FF"/>
+      <stop offset="1" stop-color="#E0E7FF"/>
+    </linearGradient>
+    <linearGradient id="secBadgeGrad" x1="0" y1="0" x2="100" y2="100" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#1E40AF"/>
+      <stop offset="1" stop-color="#1E3A8A"/>
+    </linearGradient>
+  </defs>
+  <rect width="400" height="250" rx="16" fill="url(#secGrad)"/>
+  
+  <!-- Decorative Elements -->
+  <circle cx="60" cy="190" r="35" fill="#C7D2FE" fill-opacity="0.4"/>
+  <circle cx="340" cy="50" r="30" fill="#C7D2FE" fill-opacity="0.4"/>
+  
+  <!-- Center Badge -->
+  <circle cx="200" cy="110" r="52" fill="url(#secBadgeGrad)" filter="drop-shadow(0 6px 16px rgba(30,64,175,0.25))"/>
+  
+  <!-- Science & Globe Icon -->
+  <circle cx="200" cy="110" r="24" stroke="white" stroke-width="2.5" stroke-dasharray="4 3"/>
+  <ellipse cx="200" cy="110" rx="12" ry="24" stroke="white" stroke-width="2.5"/>
+  <line x1="176" y1="110" x2="224" y2="110" stroke="white" stroke-width="2.5"/>
+  
+  <!-- Orbiting Atom dots -->
+  <circle cx="185" cy="90" r="4" fill="#F59E0B"/>
+  <circle cx="218" cy="125" r="4" fill="#F59E0B"/>
+  
+  <!-- Label Text -->
+  <text x="200" y="195" text-anchor="middle" font-family="'Noto Sans', system-ui, sans-serif" font-size="16" font-weight="700" fill="#1E3A8A" letter-spacing="0.5">SECONDARY EDUCATION</text>
+  <text x="200" y="218" text-anchor="middle" font-family="'Noto Sans', system-ui, sans-serif" font-size="12" font-weight="500" fill="#64748B">Grades 6 – 11 • G.C.E. Ordinary Level</text>
+</svg>

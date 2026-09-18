@@ -1,7 +1,7 @@
 /* Navbar Vanilla CSS */
 .navbar-header {
   width: 100%;
-  background-color: var(--nav-bg, #0b3fa8);
+  background-color: var(--nav-bg, #ffffff);
   border-bottom: 1px solid var(--nav-border, rgba(255, 255, 255, 0.15));
   position: sticky;
   top: 0;

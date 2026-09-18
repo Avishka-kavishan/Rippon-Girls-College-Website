@@ -90,7 +90,15 @@ export default function HomePage() {
         <div className="pathway-grid">
           {/* Card 1: Primary Education */}
           <div className="pathway-card">
-            <div className="pathway-card-media" />
+            <div className="pathway-card-media">
+              <Image
+                src="/images/pathway-primary.svg"
+                alt="Primary Education"
+                fill
+                className="discover-img"
+                sizes="(max-width: 860px) 100vw, 360px"
+              />
+            </div>
             <div className="pathway-card-body">
               <p className="pathway-card-text">
                 The Primary Education stage introduces students to the joy of learning and helps them develop the essential knowledge, skills and attitudes needed for their future education.
@@ -103,7 +111,15 @@ export default function HomePage() {
 
           {/* Card 2: Secondary Education */}
           <div className="pathway-card">
-            <div className="pathway-card-media" />
+            <div className="pathway-card-media">
+              <Image
+                src="/images/pathway-secondary.svg"
+                alt="Secondary Education"
+                fill
+                className="discover-img"
+                sizes="(max-width: 860px) 100vw, 360px"
+              />
+            </div>
             <div className="pathway-card-body">
               <p className="pathway-card-text">
                 The Secondary Education stage provides students with a broader and deeper learning experience. Students develop their academic knowledge while discovering their interests, abilities and areas of strength.
@@ -116,7 +132,15 @@ export default function HomePage() {
 
           {/* Card 3: Advanced Level Education */}
           <div className="pathway-card">
-            <div className="pathway-card-media" />
+            <div className="pathway-card-media">
+              <Image
+                src="/images/pathway-advanced.svg"
+                alt="Advanced Level Education"
+                fill
+                className="discover-img"
+                sizes="(max-width: 860px) 100vw, 360px"
+              />
+            </div>
             <div className="pathway-card-body">
               <p className="pathway-card-text">
                 Advanced Level education provides students with an opportunity to specialize in areas that match their interests, abilities and future goals.
@@ -151,19 +175,59 @@ export default function HomePage() {
           </div>
 
           {/* Gallery Item 2 */}
-          <div className="gallery-item" />
+          <div className="gallery-item">
+            <Image
+              src="/images/gallery-2.svg"
+              alt="College Library and Study"
+              fill
+              className="gallery-img"
+              sizes="(max-width: 640px) 100vw, (max-width: 860px) 50vw, 33vw"
+            />
+          </div>
 
           {/* Gallery Item 3 */}
-          <div className="gallery-item" />
+          <div className="gallery-item">
+            <Image
+              src="/images/gallery-3.svg"
+              alt="Science & Technology Laboratory"
+              fill
+              className="gallery-img"
+              sizes="(max-width: 640px) 100vw, (max-width: 860px) 50vw, 33vw"
+            />
+          </div>
 
           {/* Gallery Item 4 */}
-          <div className="gallery-item" />
+          <div className="gallery-item">
+            <Image
+              src="/images/gallery-4.svg"
+              alt="Sports & Athletics Meet"
+              fill
+              className="gallery-img"
+              sizes="(max-width: 640px) 100vw, (max-width: 860px) 50vw, 33vw"
+            />
+          </div>
 
           {/* Gallery Item 5 */}
-          <div className="gallery-item" />
+          <div className="gallery-item">
+            <Image
+              src="/images/gallery-5.svg"
+              alt="Cultural & Drama Festival"
+              fill
+              className="gallery-img"
+              sizes="(max-width: 640px) 100vw, (max-width: 860px) 50vw, 33vw"
+            />
+          </div>
 
           {/* Gallery Item 6 */}
-          <div className="gallery-item" />
+          <div className="gallery-item">
+            <Image
+              src="/images/gallery-6.svg"
+              alt="Annual Prize Giving Ceremony"
+              fill
+              className="gallery-img"
+              sizes="(max-width: 640px) 100vw, (max-width: 860px) 50vw, 33vw"
+            />
+          </div>
         </div>
 
         <div className="gallery-action">

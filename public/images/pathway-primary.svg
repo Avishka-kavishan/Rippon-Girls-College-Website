@@ -1,0 +1,34 @@
+<svg width="400" height="250" viewBox="0 0 400 250" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="primGrad" x1="0" y1="0" x2="400" y2="250" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#EFF6FF"/>
+      <stop offset="1" stop-color="#DBEAFE"/>
+    </linearGradient>
+    <linearGradient id="badgeGrad" x1="0" y1="0" x2="100" y2="100" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#2563EB"/>
+      <stop offset="1" stop-color="#1D4ED8"/>
+    </linearGradient>
+  </defs>
+  <rect width="400" height="250" rx="16" fill="url(#primGrad)"/>
+  
+  <!-- Decorative Circles -->
+  <circle cx="80" cy="50" r="30" fill="#BFDBFE" fill-opacity="0.4"/>
+  <circle cx="340" cy="200" r="40" fill="#BFDBFE" fill-opacity="0.4"/>
+  <circle cx="330" cy="60" r="20" fill="#FDE68A" fill-opacity="0.5"/>
+  
+  <!-- Center Badge -->
+  <circle cx="200" cy="110" r="52" fill="url(#badgeGrad)" filter="drop-shadow(0 6px 16px rgba(37,99,235,0.25))"/>
+  
+  <!-- Open Book Icon -->
+  <path d="M200 95C193.5 88 181.5 86 168 86C163 86 158 87 154 89V133C158 131 163 130 168 130C181.5 130 193.5 134 200 141C206.5 134 218.5 130 232 130C237 130 242 131 246 133V89C242 87 237 86 232 86C218.5 86 206.5 88 200 95Z" fill="white" fill-opacity="0.95"/>
+  <path d="M200 95V141" stroke="#2563EB" stroke-width="2.5" stroke-linecap="round"/>
+  
+  <!-- Sparkles / Stars -->
+  <path d="M200 60L202 66L208 68L202 70L200 76L198 70L192 68L198 66L200 60Z" fill="#F59E0B"/>
+  <path d="M140 100L141.5 104.5L146 106L141.5 107.5L140 112L138.5 107.5L134 106L138.5 104.5L140 100Z" fill="#F59E0B"/>
+  <path d="M260 100L261.5 104.5L266 106L261.5 107.5L260 112L258.5 107.5L254 106L258.5 104.5L260 100Z" fill="#F59E0B"/>
+  
+  <!-- Label Text -->
+  <text x="200" y="195" text-anchor="middle" font-family="'Noto Sans', system-ui, sans-serif" font-size="16" font-weight="700" fill="#1E3A8A" letter-spacing="0.5">PRIMARY EDUCATION</text>
+  <text x="200" y="218" text-anchor="middle" font-family="'Noto Sans', system-ui, sans-serif" font-size="12" font-weight="500" fill="#64748B">Grades 1 – 5 • Foundational Learning</text>
+</svg>
