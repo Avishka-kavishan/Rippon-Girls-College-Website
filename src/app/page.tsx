@@ -101,11 +101,12 @@ export default function HomePage() {
               />
             </div>
             <div className="pathway-card-body">
+              <h3 className="pathway-card-title">Primary Education</h3>
               <p className="pathway-card-text">
                 The Primary Education stage introduces students to the joy of learning and helps them develop the essential knowledge, skills and attitudes needed for their future education.
               </p>
               <p className="pathway-card-text">
-                During these important early years, students are encouraged to explore, ask questions, communicate confidently, and develop positive learning habits.
+                During these important early years, students are encouraged to explore, ask questions, communicate confidently and develop positive learning habits.
               </p>
             </div>
           </div>
@@ -122,27 +123,29 @@ export default function HomePage() {
               />
             </div>
             <div className="pathway-card-body">
+              <h3 className="pathway-card-title">Secondary Education</h3>
               <p className="pathway-card-text">
                 The Secondary Education stage provides students with a broader and deeper learning experience. Students develop their academic knowledge while discovering their interests, abilities and areas of strength.
               </p>
               <p className="pathway-card-text">
-                As students progress through the secondary grades, they are encouraged to think critically, solve problems, work collaboratively and take greater responsibility for their learning.
+                As students progress through the secondary grades, they are encouraged to think critically, solve problems, work independently and take greater responsibility for their learning.
               </p>
             </div>
           </div>
 
-          {/* Card 3: Advanced Level Education */}
+          {/* Card 3: Advance level Education */}
           <div className="pathway-card">
             <div className="pathway-card-media">
               <Image
                 src={getAssetPath("/images/advance.jpeg")}
-                alt="Advanced Level Education"
+                alt="Advance level Education"
                 fill
                 className="discover-img"
                 sizes="(max-width: 860px) 100vw, 360px"
               />
             </div>
             <div className="pathway-card-body">
+              <h3 className="pathway-card-title">Advance level Education</h3>
               <p className="pathway-card-text">
                 Advanced Level education provides students with an opportunity to specialise in areas that match their interests, abilities and future goals.
               </p>
