@@ -57,13 +57,13 @@ export default function Footer() {
               <Link href="/">Home</Link>
             </li>
             <li className="footer-link-item">
-              <Link href="#about">About</Link>
+              <Link href="/about">About</Link>
             </li>
             <li className="footer-link-item">
-              <Link href="#academics">Academics</Link>
+              <Link href="/#academics">Academics</Link>
             </li>
             <li className="footer-link-item">
-              <Link href="#gallery">Gallery</Link>
+              <Link href="/#gallery">Gallery</Link>
             </li>
             <li className="footer-link-item">
               <Link href="#contact">Contact</Link>

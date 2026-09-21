@@ -31,7 +31,7 @@ export default function HomePage() {
             The Oldest Girls&apos; School in the Southern Province of Sri Lanka
           </p>
 
-          <Link href="#about" className="hero-cta-btn">
+          <Link href="/about" className="hero-cta-btn">
             <span>Discover more</span>
             <ArrowRight size={18} className="hero-cta-arrow" />
           </Link>

@@ -9,9 +9,9 @@ import "./Navbar.css";
 
 const navLinks = [
   { name: "Home", href: "/" },
-  { name: "About", href: "#about" },
-  { name: "Academics", href: "#academics" },
-  { name: "Gallery", href: "#gallery" },
+  { name: "About", href: "/about" },
+  { name: "Academics", href: "/#academics" },
+  { name: "Gallery", href: "/#gallery" },
   { name: "Contact", href: "#contact" },
 ];
 
