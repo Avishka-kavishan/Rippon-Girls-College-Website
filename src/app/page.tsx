@@ -235,7 +235,7 @@ export default function HomePage() {
         </div>
 
         <div className="gallery-action">
-          <Link href="#gallery" className="gallery-view-btn">
+          <Link href="/gallery" className="gallery-view-btn">
             View All
           </Link>
         </div>
