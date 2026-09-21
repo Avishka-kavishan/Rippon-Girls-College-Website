@@ -3,8 +3,11 @@
 [![Next.js](https://img.shields.io/badge/Next.js-16.3.5-black?style=flat&logo=next.js)](https://nextjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue?style=flat&logo=typescript)](https://www.typescriptlang.org/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-v4-38bdf8?style=flat&logo=tailwind-css)](https://tailwindcss.com/)
+[![GitHub Pages](https://img.shields.io/badge/GitHub_Pages-Live_Demo-2ea44f?style=flat&logo=github)](https://avishka-kavishan.github.io/Rippon-Girls-College-Website/)
 
 Official web portal for **Rippon Girls' College, Galle (Sri Lanka)** — A premier 1AB National School founded in 1871 on the historic heights of Richmond Hill, Galle.
+
+🔗 **Live Website (GitHub Pages)**: [https://avishka-kavishan.github.io/Rippon-Girls-College-Website/](https://avishka-kavishan.github.io/Rippon-Girls-College-Website/)
 
 ---
 
