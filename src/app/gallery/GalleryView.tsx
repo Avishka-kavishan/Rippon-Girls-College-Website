@@ -265,17 +265,28 @@ export default function GalleryView() {
   return (
     <div className="gallery-page-container">
       {/* =========================================================================
-          1. HEADER / TITLE SECTION
+          1. HERO BANNER / MAIN IMAGE SECTION
           ========================================================================= */}
-      <section className="gallery-header-section" id="gallery-header">
-        <h1 className="gallery-page-title">Gallery</h1>
-        <p className="gallery-page-subtitle">
-          Explore the vibrant moments, historical traditions, student triumphs,
-          and everyday experiences that define Rippon Girls&apos; College, Galle.
-        </p>
-      </section>
+      <section className="gallery-hero-section" id="gallery-hero">
+        <Image
+          src={getAssetPath("/images/primary.jpg")}
+          alt="Rippon Girls' College Gallery - Primary Students"
+          fill
+          priority
+          className="gallery-hero-bg-img"
+          sizes="100vw"
+        />
 
-      <div className="gallery-header-divider" aria-hidden="true" />
+        <div className="gallery-hero-overlay" />
+
+        <div className="gallery-hero-content">
+          <h1 className="gallery-hero-title">Gallery</h1>
+          <p className="gallery-hero-subtitle">
+            <span>Explore the memorable moments, special events, achievements and everyday experiences that bring the Rippon Girls' College community to life.</span>
+
+          </p>
+        </div>
+      </section>
 
       {/* =========================================================================
           2. GALLERY CATEGORIES SECTION
