@@ -203,7 +203,7 @@ export default function HomePage() {
           {/* Gallery Item 4 */}
           <div className="gallery-item">
             <Image
-              src={getAssetPath("/images/gallery-4.svg")}
+              src={getAssetPath("/images/band2.jpg")}
               alt="Sports & Athletics Meet"
               fill
               className="gallery-img"
@@ -214,7 +214,7 @@ export default function HomePage() {
           {/* Gallery Item 5 */}
           <div className="gallery-item">
             <Image
-              src={getAssetPath("/images/gallery-5.svg")}
+              src={getAssetPath("/images/band.jpg")}
               alt="Cultural & Drama Festival"
               fill
               className="gallery-img"
@@ -225,7 +225,7 @@ export default function HomePage() {
           {/* Gallery Item 6 */}
           <div className="gallery-item">
             <Image
-              src={getAssetPath("/images/gallery-6.svg")}
+              src={getAssetPath("/images/music.jpg")}
               alt="Annual Prize Giving Ceremony"
               fill
               className="gallery-img"
