@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import Image from "next/image";
-import { ChevronLeft, ChevronRight, ChevronDown, Maximize2, Tag, Layers } from "lucide-react";
+import { ChevronLeft, ChevronRight, Maximize2, Tag, Layers } from "lucide-react";
 import { getAssetPath } from "@/utils/assets";
 import "./gallery.css";
 
@@ -268,8 +268,7 @@ export default function GalleryView() {
           1. HEADER / TITLE SECTION
           ========================================================================= */}
       <section className="gallery-header-section" id="gallery-header">
-        <span className="gallery-header-badge">Rippon Photographic Archives</span>
-        <h1 className="gallery-page-title">Campus Life & Gallery</h1>
+        <h1 className="gallery-page-title">Gallery</h1>
         <p className="gallery-page-subtitle">
           Explore the vibrant moments, historical traditions, student triumphs,
           and everyday experiences that define Rippon Girls&apos; College, Galle.
@@ -298,9 +297,8 @@ export default function GalleryView() {
                     activeCategory === category.id ? "all" : category.id
                   )
                 }
-                className={`category-card ${hasImage ? "has-image" : ""} ${
-                  isCategoryActive ? "active" : ""
-                }`}
+                className={`category-card ${hasImage ? "has-image" : ""} ${isCategoryActive ? "active" : ""
+                  }`}
                 aria-label={`Filter by ${category.label}`}
               >
                 {hasImage && category.image && (
@@ -378,8 +376,8 @@ export default function GalleryView() {
                 ? photo.span === "featured"
                   ? "bento-span-featured"
                   : photo.span === "wide"
-                  ? "bento-span-wide"
-                  : "bento-span-standard"
+                    ? "bento-span-wide"
+                    : "bento-span-standard"
                 : "bento-span-filtered";
 
             return (
@@ -438,19 +436,8 @@ export default function GalleryView() {
             aria-label="View all gallery images"
           >
             <span className="see-all-text">
-              {activeCategory !== "all"
-                ? "See All Photos"
-                : isExpanded
-                ? "Show Less"
-                : "See All"}
+              {isExpanded ? "Show Less" : "See All"}
             </span>
-            <span className="see-all-count">({bentoPhotos.length} Photos)</span>
-            <ChevronDown
-              size={18}
-              className={`see-all-icon ${
-                isExpanded && activeCategory === "all" ? "rotated" : ""
-              }`}
-            />
           </button>
         </div>
       </section>
