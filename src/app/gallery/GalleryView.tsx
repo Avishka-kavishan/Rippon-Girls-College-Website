@@ -34,26 +34,31 @@ const categoriesData: Category[] = [
     id: "achievements",
     label: "Achievements",
     icon: "🏆",
+    image: "/images/gallery 2.jpg",
   },
   {
     id: "sports",
     label: "Sports",
     icon: "⚽",
+    image: "/images/band2.jpg",
   },
   {
     id: "arts",
     label: "Arts & Culture",
     icon: "🎭",
+    image: "/images/gallery3.jpg",
   },
   {
     id: "events",
     label: "School Events",
     icon: "🎉",
+    image: "/images/band.jpg",
   },
   {
     id: "facilities",
     label: "Campus & Facilities",
     icon: "🏫",
+    image: "/images/about.png",
   },
 ];
 
