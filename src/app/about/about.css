@@ -335,7 +335,7 @@
 
 .about-crest-oval {
   position: relative;
-  width: 220px;
+  width: 235px;
   height: 300px;
   filter: drop-shadow(0 16px 32px rgba(8, 37, 103, 0.3));
   transition: transform 0.3s ease, filter 0.3s ease;
@@ -506,7 +506,7 @@
   }
 
   .about-crest-oval {
-    width: 180px;
+    width: 195px;
     height: 250px;
   }
 }

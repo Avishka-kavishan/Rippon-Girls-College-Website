@@ -146,6 +146,9 @@ export default function AboutPage() {
               <div className="about-admin-media">
                 <Image
                   src={getAssetPath("/images/pin.png")}
+
+
+
                   alt="Principal Mrs. M. S. R. Irangani"
                   fill
                   className="about-admin-img"
