@@ -60,7 +60,7 @@ export default function Footer() {
               <Link href="/about">About</Link>
             </li>
             <li className="footer-link-item">
-              <Link href="/#academics">Academics</Link>
+              <Link href="/news">News</Link>
             </li>
             <li className="footer-link-item">
               <Link href="/#gallery">Gallery</Link>

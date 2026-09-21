@@ -1,0 +1,442 @@
+/* ==========================================================================
+   NEWS & EVENTS PAGE STYLES - RIPPON GIRLS' COLLEGE
+   ========================================================================== */
+
+.news-page-wrapper {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: #ffffff;
+}
+
+/* --------------------------------------------------------------------------
+   1. HERO BANNER
+   -------------------------------------------------------------------------- */
+.news-hero-section {
+  position: relative;
+  width: 100%;
+  height: 480px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background-color: #0b1e3f;
+}
+
+.news-hero-bg-img {
+  object-fit: cover;
+  object-position: center 38%;
+  z-index: 1;
+}
+
+.news-hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0.45) 0%,
+    rgba(10, 20, 45, 0.65) 60%,
+    rgba(7, 15, 35, 0.88) 100%
+  );
+  z-index: 2;
+  pointer-events: none;
+}
+
+.news-hero-content {
+  position: relative;
+  z-index: 3;
+  width: 100%;
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.news-hero-title {
+  font-size: 3.5rem;
+  font-weight: 800;
+  color: #ffffff;
+  line-height: 1.15;
+  letter-spacing: -0.025em;
+  text-shadow: 0 2px 14px rgba(0, 0, 0, 0.65);
+  margin-bottom: 1rem;
+}
+
+.news-hero-subtitle {
+  font-size: 1.25rem;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.95);
+  line-height: 1.55;
+  max-width: 740px;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
+  margin: 0 auto;
+}
+
+/* --------------------------------------------------------------------------
+   2. LATEST NEWS SECTION
+   -------------------------------------------------------------------------- */
+.news-latest-section {
+  width: 100%;
+  padding: 5rem 1.5rem 5.5rem;
+  background-color: #ffffff;
+}
+
+.news-section-container {
+  max-width: 1180px;
+  margin: 0 auto;
+}
+
+.news-main-heading {
+  font-size: 2.35rem;
+  font-weight: 800;
+  color: #0f172a;
+  text-align: center;
+  letter-spacing: -0.02em;
+  margin-bottom: 3.25rem;
+}
+
+/* 3-Column News Card Grid */
+.news-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+}
+
+/* News & Achievement Card */
+.news-item-card {
+  background-color: #ffffff;
+  border-radius: 22px;
+  padding: 1.15rem 1.15rem 1.6rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.news-item-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 18px 38px rgba(0, 0, 0, 0.13);
+}
+
+/* Media Box */
+.news-item-media {
+  position: relative;
+  width: 100%;
+  height: 220px;
+  border-radius: 16px;
+  overflow: hidden;
+  background-color: #f1f5f9;
+}
+
+.news-item-img {
+  object-fit: cover;
+  object-position: center;
+  transition: transform 0.35s ease;
+}
+
+.news-item-card:hover .news-item-img {
+  transform: scale(1.03);
+}
+
+/* Card Body */
+.news-item-body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 1.35rem 0.5rem 0.25rem;
+  flex: 1;
+}
+
+.news-item-text {
+  font-size: 0.95rem;
+  line-height: 1.55;
+  color: #374151;
+  margin-bottom: 1.5rem;
+  flex: 1;
+}
+
+/* Learn More Link / Button */
+.news-item-link {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #d97706;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  transition: color 0.18s ease, transform 0.18s ease;
+}
+
+.news-item-link:hover {
+  color: #b45309;
+  transform: translateX(3px);
+}
+
+/* --------------------------------------------------------------------------
+   3. UPCOMING EVENTS SECTION (DARK NAVY)
+   -------------------------------------------------------------------------- */
+.news-events-section {
+  width: 100%;
+  padding: 5.5rem 1.5rem;
+  background-color: #01163c;
+  color: #ffffff;
+}
+
+.news-events-container {
+  max-width: 1180px;
+  margin: 0 auto;
+}
+
+.news-events-header {
+  text-align: center;
+  margin-bottom: 3.25rem;
+}
+
+.news-events-eyebrow {
+  display: inline-block;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #f5a600;
+  letter-spacing: 0.02em;
+  margin-bottom: 0.45rem;
+}
+
+.news-events-title {
+  font-size: 2.35rem;
+  font-weight: 800;
+  color: #ffffff;
+  letter-spacing: -0.02em;
+}
+
+/* 2-Column Events Grid */
+.news-events-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+}
+
+/* Event Card Block */
+.event-card-box {
+  background-color: #d9d9d9;
+  border-radius: 16px;
+  min-height: 96px;
+  padding: 1.25rem 1.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.25rem;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18);
+  transition: transform 0.22s ease, background-color 0.22s ease, box-shadow 0.22s ease;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.event-card-box:hover {
+  background-color: #e5e7eb;
+  transform: translateY(-3px);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.28);
+}
+
+.event-card-left {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+.event-date-badge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: #01163c;
+  color: #ffffff;
+  border-radius: 10px;
+  min-width: 54px;
+  height: 54px;
+  padding: 0.25rem;
+  flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(1, 22, 60, 0.35);
+}
+
+.event-date-month {
+  font-size: 0.675rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #f5a600;
+  line-height: 1;
+}
+
+.event-date-day {
+  font-size: 1.35rem;
+  font-weight: 800;
+  line-height: 1.1;
+  color: #ffffff;
+}
+
+.event-details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.event-title {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #0f172a;
+  line-height: 1.3;
+}
+
+.event-meta {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #4b5563;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.event-card-arrow {
+  color: #01163c;
+  opacity: 0.6;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+  flex-shrink: 0;
+}
+
+.event-card-box:hover .event-card-arrow {
+  opacity: 1;
+  transform: translateX(4px);
+}
+
+/* --------------------------------------------------------------------------
+   4. STUDENT ACHIEVEMENTS SECTION
+   -------------------------------------------------------------------------- */
+.news-achievements-section {
+  width: 100%;
+  padding: 5.5rem 1.5rem 6.5rem;
+  background-color: #ffffff;
+}
+
+.news-achievements-header {
+  text-align: center;
+  margin-bottom: 3.5rem;
+}
+
+.news-achievements-eyebrow {
+  display: inline-block;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #d97706;
+  letter-spacing: 0.02em;
+  margin-bottom: 0.45rem;
+}
+
+.news-achievements-title {
+  font-size: 2.35rem;
+  font-weight: 800;
+  color: #0f172a;
+  letter-spacing: -0.02em;
+}
+
+/* --------------------------------------------------------------------------
+   RESPONSIVE DESIGN BREAKPOINTS
+   -------------------------------------------------------------------------- */
+@media (max-width: 1024px) {
+  .news-cards-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.75rem;
+  }
+
+  .news-events-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.25rem;
+  }
+
+  .news-hero-title {
+    font-size: 2.85rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .news-hero-section {
+    height: 400px;
+  }
+
+  .news-hero-title {
+    font-size: 2.35rem;
+  }
+
+  .news-hero-subtitle {
+    font-size: 1.05rem;
+  }
+
+  .news-latest-section,
+  .news-events-section,
+  .news-achievements-section {
+    padding: 3.75rem 1.25rem;
+  }
+
+  .news-main-heading,
+  .news-events-title,
+  .news-achievements-title {
+    font-size: 1.95rem;
+    margin-bottom: 2.25rem;
+  }
+
+  .news-cards-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  .news-events-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .event-card-box {
+    padding: 1rem 1.25rem;
+    min-height: 84px;
+  }
+
+  .event-title {
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .news-hero-section {
+    height: 360px;
+  }
+
+  .news-hero-title {
+    font-size: 2rem;
+  }
+
+  .news-hero-subtitle {
+    font-size: 0.95rem;
+  }
+
+  .news-item-media {
+    height: 190px;
+  }
+
+  .event-card-left {
+    gap: 0.85rem;
+  }
+
+  .event-date-badge {
+    min-width: 46px;
+    height: 48px;
+  }
+
+  .event-date-day {
+    font-size: 1.15rem;
+  }
+}
