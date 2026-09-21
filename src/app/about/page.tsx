@@ -26,7 +26,7 @@ export default function AboutPage() {
           ========================================================================= */}
       <section className="about-hero-section" id="about-hero">
         <Image
-          src={getAssetPath("/images/IMAGE 4.png")}
+          src={getAssetPath("/images/image 4.png")}
           alt="Rippon Girls' College Campus Facade"
           fill
           priority
@@ -39,7 +39,8 @@ export default function AboutPage() {
         <div className="about-hero-content">
           <h1 className="about-hero-title">About Us</h1>
           <p className="about-hero-subtitle">
-            Our History · Vision &amp; Mission · Principal&apos;s Message · School Leadership · Our Values
+            <span>Our History · Vision &amp; Mission · Principal&apos;s Message ·</span>
+            <span className="about-hero-subline">School Leadership · Our Values</span>
           </p>
         </div>
       </section>
