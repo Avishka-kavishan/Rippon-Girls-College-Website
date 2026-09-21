@@ -176,10 +176,14 @@ export default function AboutPage() {
             {/* Left Quadrant Items */}
             <div className="about-population-col left">
               <div className="about-pop-stat-item">
+                <span className="about-pop-stat-count">3,200+</span>
                 <span className="about-pop-stat-text">Since 1817</span>
+                <span className="about-pop-stat-sub">Total Students</span>
               </div>
               <div className="about-pop-stat-item">
+                <span className="about-pop-stat-count">1,200+</span>
                 <span className="about-pop-stat-text">Primary Students</span>
+                <span className="about-pop-stat-sub">Grades 1 – 5</span>
               </div>
             </div>
 
@@ -199,10 +203,14 @@ export default function AboutPage() {
             {/* Right Quadrant Items */}
             <div className="about-population-col right">
               <div className="about-pop-stat-item">
+                <span className="about-pop-stat-count">1,300+</span>
                 <span className="about-pop-stat-text">Secondary Students</span>
+                <span className="about-pop-stat-sub">Grades 6 – 11</span>
               </div>
               <div className="about-pop-stat-item">
+                <span className="about-pop-stat-count">700+</span>
                 <span className="about-pop-stat-text">Advance Level Students</span>
+                <span className="about-pop-stat-sub">Grades 12 – 13</span>
               </div>
             </div>
           </div>

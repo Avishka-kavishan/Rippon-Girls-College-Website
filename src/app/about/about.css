@@ -303,7 +303,7 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  height: 260px;
+  min-height: 290px;
 }
 
 .about-population-col.left {
@@ -317,15 +317,52 @@
 }
 
 .about-pop-stat-item {
-  padding: 0.5rem 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 0.25rem 0;
+  transition: transform 0.25s ease;
+}
+
+.about-population-col.left .about-pop-stat-item {
+  align-items: flex-end;
+}
+
+.about-population-col.right .about-pop-stat-item {
+  align-items: flex-start;
+}
+
+.about-pop-stat-item:hover {
+  transform: translateY(-2px);
+}
+
+.about-pop-stat-count {
+  font-size: clamp(2.2rem, 3.2vw, 2.9rem);
+  font-weight: 800;
+  color: #082567;
+  letter-spacing: -0.025em;
+  line-height: 1.05;
 }
 
 .about-pop-stat-text {
-  font-size: clamp(1.35rem, 2.2vw, 1.75rem);
+  font-size: clamp(1.2rem, 1.8vw, 1.45rem);
   font-weight: 700;
   color: #111827;
   letter-spacing: -0.015em;
   line-height: 1.25;
+}
+
+.about-pop-stat-sub {
+  display: inline-block;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #475569;
+  background-color: #f1f5f9;
+  padding: 0.2rem 0.7rem;
+  border-radius: 9999px;
+  letter-spacing: 0.01em;
+  margin-top: 0.15rem;
+  width: fit-content;
 }
 
 /* Center Oval Crest */
@@ -466,12 +503,19 @@
 
   .about-population-col {
     min-height: auto;
+    gap: 2rem;
   }
 
   .about-population-col.left,
   .about-population-col.right {
     text-align: center;
     padding: 0;
+    align-items: center;
+  }
+
+  .about-population-col.left .about-pop-stat-item,
+  .about-population-col.right .about-pop-stat-item {
+    align-items: center;
   }
 
   .about-vm-row {
