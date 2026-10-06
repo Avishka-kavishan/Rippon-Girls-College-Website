@@ -1,0 +1,25 @@
+1:"$Sreact.fragment"
+2:I[47257,["/Rippon-Girls-College-Website/_next/static/chunks/0je9ob768g84u.js","/Rippon-Girls-College-Website/_next/static/chunks/0zf8aaf_ecc9x.js"],"ClientPageRoot"]
+3:I[72906,["/Rippon-Girls-College-Website/_next/static/chunks/0je9ob768g84u.js","/Rippon-Girls-College-Website/_next/static/chunks/0zf8aaf_ecc9x.js","/Rippon-Girls-College-Website/_next/static/chunks/0fvk4u1xjpe9n.js","/Rippon-Girls-College-Website/_next/static/chunks/2n9pcnbwde3os.js"],"default"]
+6:I[97367,["/Rippon-Girls-College-Website/_next/static/chunks/0je9ob768g84u.js","/Rippon-Girls-College-Website/_next/static/chunks/0zf8aaf_ecc9x.js"],"OutletBoundary"]
+7:"$Sreact.suspense"
+b:I[97367,["/Rippon-Girls-College-Website/_next/static/chunks/0je9ob768g84u.js","/Rippon-Girls-College-Website/_next/static/chunks/0zf8aaf_ecc9x.js"],"ViewportBoundary"]
+c:I[97367,["/Rippon-Girls-College-Website/_next/static/chunks/0je9ob768g84u.js","/Rippon-Girls-College-Website/_next/static/chunks/0zf8aaf_ecc9x.js"],"MetadataBoundary"]
+d:I[27201,["/Rippon-Girls-College-Website/_next/static/chunks/0je9ob768g84u.js","/Rippon-Girls-College-Website/_next/static/chunks/0zf8aaf_ecc9x.js"],"IconMark"]
+f:I[39756,["/Rippon-Girls-College-Website/_next/static/chunks/0je9ob768g84u.js","/Rippon-Girls-College-Website/_next/static/chunks/0zf8aaf_ecc9x.js"],"default"]
+10:I[37457,["/Rippon-Girls-College-Website/_next/static/chunks/0je9ob768g84u.js","/Rippon-Girls-College-Website/_next/static/chunks/0zf8aaf_ecc9x.js"],"default"]
+:HL["/Rippon-Girls-College-Website/_next/static/chunks/2668z34jh2iqp.css","style"]
+a:X
+12:X
+12:C
+0:{"buildId":"r61uxlhY71dzYidm1htlP","data":[{"rsc":["$","$1","c",{"children":[["$","$L2",null,{"Component":"$3","serverProvidedParams":{"searchParams":{},"params":{},"promises":["$@4","$@5"]}}],[["$","link","0",{"rel":"stylesheet","href":"/Rippon-Girls-College-Website/_next/static/chunks/2668z34jh2iqp.css","precedence":"next"}],["$","script","script-0",{"src":"/Rippon-Girls-College-Website/_next/static/chunks/0fvk4u1xjpe9n.js","async":true}],["$","script","script-1",{"src":"/Rippon-Girls-College-Website/_next/static/chunks/2n9pcnbwde3os.js","async":true}]],["$","$L6",null,{"children":["$","$7",null,{"name":"Next.MetadataOutlet","children":"$@8"}]}]]}],"isPartial":"$@9","staleTime":"$a","varyParams":null},{"rsc":["$","$1","h",{"children":[null,["$","$Lb",null,{"children":[["$","meta","0",{"charSet":"utf-8"}],["$","meta","1",{"name":"viewport","content":"width=device-width, initial-scale=1"}]]}],["$","div",null,{"hidden":true,"children":["$","$Lc",null,{"children":["$","$7",null,{"name":"Next.Metadata","children":[["$","title","0",{"children":"Rippon Girl's College | Galle, Sri Lanka"}],["$","meta","1",{"name":"description","content":"Official website of Rippon Girl's College - Oldest Girl's School in Southern Province of Sri Lanka."}],["$","link","2",{"rel":"icon","href":"/Rippon-Girls-College-Website/favicon.ico?favicon.2vob68tjqpejf.ico","sizes":"256x256","type":"image/x-icon"}],["$","$Ld","3",{}]]}]}]}],["$","meta",null,{"name":"next-size-adjust","content":""}]]}],"isPartial":"$@e","staleTime":"$a","varyParams":null},{"rsc":["$","$1","c",{"children":[null,["$","$Lf",null,{"parallelRouterKey":"children","template":["$","$L10",null,{}]}]]}],"isPartial":"$@11","staleTime":"$a","varyParams":"$12"}],"isUpgradeableISRFallback":false,"a":"$@13","rootVaryParams":null,"needsRuntimeRequest":"$@14"}
+4:{}
+5:"$0:data:0:rsc:props:children:0:props:serverProvidedParams:params"
+8:null
+14:true
+a:300
+a:C
+13:0
+e:"$undefined"
+11:"$undefined"
+9:"$undefined"
