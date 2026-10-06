@@ -67,7 +67,7 @@ export default function AboutPage() {
             {/* Right Column: Narrative History */}
             <div className="about-school-text">
               <p className="about-school-paragraph">
-                Rippon Girls&apos; College, Galle, has a rich heritage dating back to 1817. From its early beginnings as the Galle School, the institution developed into a leading national school serving generations of young women.
+                Rippon Girls&apos; College, Galle, has a rich heritage dating back to 1871. From its early beginnings as the Galle School, the institution developed into a leading national school serving generations of young women.
               </p>
               <p className="about-school-paragraph">
                 The school became a government institution in 1929 and was upgraded to National School status in 1994.
@@ -177,12 +177,12 @@ export default function AboutPage() {
             {/* Left Quadrant Items */}
             <div className="about-population-col left">
               <div className="about-pop-stat-item">
-                <span className="about-pop-stat-count">3,200+</span>
+                <span className="about-pop-stat-count">2,690+</span>
                 <span className="about-pop-stat-text">Since 1817</span>
                 <span className="about-pop-stat-sub">Total Students</span>
               </div>
               <div className="about-pop-stat-item">
-                <span className="about-pop-stat-count">1,200+</span>
+                <span className="about-pop-stat-count">584+</span>
                 <span className="about-pop-stat-text">Primary Students</span>
                 <span className="about-pop-stat-sub">Grades 1 – 5</span>
               </div>
@@ -196,7 +196,7 @@ export default function AboutPage() {
                   alt="Rippon Girls' College Golden Crest"
                   fill
                   className="about-crest-img"
-                  sizes="240px"
+                  sizes="280px"
                 />
               </div>
             </div>
@@ -204,12 +204,12 @@ export default function AboutPage() {
             {/* Right Quadrant Items */}
             <div className="about-population-col right">
               <div className="about-pop-stat-item">
-                <span className="about-pop-stat-count">1,300+</span>
+                <span className="about-pop-stat-count">1,346+</span>
                 <span className="about-pop-stat-text">Secondary Students</span>
                 <span className="about-pop-stat-sub">Grades 6 – 11</span>
               </div>
               <div className="about-pop-stat-item">
-                <span className="about-pop-stat-count">700+</span>
+                <span className="about-pop-stat-count">760+</span>
                 <span className="about-pop-stat-text">Advance Level Students</span>
                 <span className="about-pop-stat-sub">Grades 12 – 13</span>
               </div>
