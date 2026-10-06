@@ -31,18 +31,18 @@ export default function Footer() {
           <div className="footer-contact-list">
             <div className="footer-contact-item">
               <MapPin size={18} className="footer-contact-icon" />
-              <span>Rippon Girls&apos; College, Richmond Hill, Galle, Sri Lanka</span>
+              <span>Rippon Girls&apos; College, Richmond Hill Street, Galle, Sri Lanka</span>
             </div>
             <div className="footer-contact-item">
               <Phone size={18} className="footer-contact-icon" />
-              <span>Tel: +94 91 223 4753</span>
+              <span>Tel: +94 91 223 4769</span>
             </div>
             <div className="footer-contact-item">
               <Mail size={18} className="footer-contact-icon" />
               <span>
                 Email:{" "}
                 <a href="mailto:ripponcollegalk@gmail.com">
-                  ripponcollegalk@gmail.com
+                  ripponbalika@gmail.com
                 </a>
               </span>
             </div>
@@ -126,7 +126,7 @@ export default function Footer() {
       {/* Bottom Copyright Bar */}
       <div className="footer-bottom">
         <p className="footer-copyright">
-          © 2026 Rippon Girls School, All rights reserved | Developed by Kavishan
+          © 2026 Rippon Girls School, All rights reserved | Developed by AK Rathnaweera
         </p>
       </div>
     </footer>
