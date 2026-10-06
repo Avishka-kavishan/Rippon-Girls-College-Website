@@ -20,7 +20,7 @@ export interface GalleryPhoto {
   category: string;
   image: string;
   alt: string;
-  span?: "featured" | "wide" | "standard";
+  span?: "featured" | "wide" | "standard" | "tall";
 }
 
 const categoriesData: Category[] = [
@@ -174,19 +174,49 @@ const bentoPhotos: GalleryPhoto[] = [
   },
 ];
 
+import { getAllContent, onContentChange } from "@/services/contentService";
+
 export default function GalleryView() {
+  const [photos, setPhotos] = useState<GalleryPhoto[]>(bentoPhotos);
   // "all" or specific category ID
   const [activeCategory, setActiveCategory] = useState<string>("all");
-  const [currentLightboxIndex, setCurrentLightboxIndex] = useState<number>(1); // Default to Celesta Band
+  const [currentLightboxIndex, setCurrentLightboxIndex] = useState<number>(0);
   const [isExpanded, setIsExpanded] = useState<boolean>(false);
+  // Adaptive image orientation detection & display mode
+  const [aspectMap, setAspectMap] = useState<Record<string, "portrait" | "landscape" | "square">>({});
+  const [lightboxFitMode, setLightboxFitMode] = useState<"contain" | "cover">("contain");
+  const [activePhotoRatioText, setActivePhotoRatioText] = useState<string>("");
+
+  // Sync with Supabase / local content service
+  useEffect(() => {
+    let isMounted = true;
+    getAllContent().then((data) => {
+      if (isMounted && data.gallery && data.gallery.length > 0) {
+        setPhotos(data.gallery);
+      }
+    });
+
+    const unsubscribe = onContentChange(() => {
+      getAllContent().then((data) => {
+        if (isMounted && data.gallery && data.gallery.length > 0) {
+          setPhotos(data.gallery);
+        }
+      });
+    });
+
+    return () => {
+      isMounted = false;
+      unsubscribe();
+    };
+  }, []);
 
   // Filtered photos based on active category
   const filteredPhotos = useMemo(() => {
     if (activeCategory === "all") {
-      return bentoPhotos;
+      return photos;
     }
-    return bentoPhotos.filter((p) => p.category === activeCategory);
-  }, [activeCategory]);
+    return photos.filter((p) => p.category === activeCategory);
+  }, [activeCategory, photos]);
 
   // Photos displayed in grid (initially 6 items unless expanded or filtered)
   const displayedPhotos = useMemo(() => {
@@ -199,19 +229,19 @@ export default function GalleryView() {
     return filteredPhotos;
   }, [activeCategory, filteredPhotos, isExpanded]);
 
-  const activePhoto = bentoPhotos[currentLightboxIndex] || bentoPhotos[0];
+  const activePhoto = photos[currentLightboxIndex] || photos[0] || bentoPhotos[0];
 
   const handlePrev = useCallback(() => {
     setCurrentLightboxIndex((prev) =>
-      prev === 0 ? bentoPhotos.length - 1 : prev - 1
+      prev === 0 ? photos.length - 1 : prev - 1
     );
-  }, []);
+  }, [photos.length]);
 
   const handleNext = useCallback(() => {
     setCurrentLightboxIndex((prev) =>
-      prev === bentoPhotos.length - 1 ? 0 : prev + 1
+      prev === photos.length - 1 ? 0 : prev + 1
     );
-  }, []);
+  }, [photos.length]);
 
   // Keyboard navigation for lightbox
   useEffect(() => {
@@ -229,7 +259,7 @@ export default function GalleryView() {
 
   // Click handler for any bento card
   const handlePhotoClick = (photo: GalleryPhoto) => {
-    const foundIndex = bentoPhotos.findIndex((p) => p.id === photo.id);
+    const foundIndex = photos.findIndex((p) => p.id === photo.id);
     if (foundIndex !== -1) {
       setCurrentLightboxIndex(foundIndex);
     }
@@ -244,7 +274,7 @@ export default function GalleryView() {
     setActiveCategory(categoryId);
     // Find first matching photo in this category for lightbox preview
     if (categoryId !== "all") {
-      const idx = bentoPhotos.findIndex((p) => p.category === categoryId);
+      const idx = photos.findIndex((p) => p.category === categoryId);
       if (idx !== -1) {
         setCurrentLightboxIndex(idx);
       }
@@ -263,8 +293,8 @@ export default function GalleryView() {
 
   // Helper count for pills
   const getCategoryCount = (catId: string) => {
-    if (catId === "all") return bentoPhotos.length;
-    return bentoPhotos.filter((p) => p.category === catId).length;
+    if (catId === "all") return photos.length;
+    return photos.filter((p) => p.category === catId).length;
   };
 
   return (
@@ -393,7 +423,9 @@ export default function GalleryView() {
                   ? "bento-span-featured"
                   : photo.span === "wide"
                     ? "bento-span-wide"
-                    : "bento-span-standard"
+                    : photo.span === "tall"
+                      ? "bento-span-tall"
+                      : "bento-span-standard"
                 : "bento-span-filtered";
 
             return (
@@ -410,13 +442,30 @@ export default function GalleryView() {
                 }}
                 aria-label={`View ${photo.title} in Lightbox`}
               >
-                <div className="bento-media-wrap">
+                <div className={`bento-media-wrap ${aspectMap[photo.id] ? `media-${aspectMap[photo.id]}` : ""}`}>
+                  {/* Soft ambient background for extreme aspect ratios */}
+                  <div className="bento-ambient-wrap" aria-hidden="true">
+                    <Image
+                      src={getAssetPath(photo.image)}
+                      alt=""
+                      fill
+                      className="bento-ambient-img"
+                    />
+                  </div>
+
                   <Image
                     src={getAssetPath(photo.image)}
                     alt={photo.alt}
                     fill
-                    className="bento-card-img"
+                    className={`bento-card-img ${aspectMap[photo.id] ? `is-${aspectMap[photo.id]}` : ""}`}
                     sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                    onLoadingComplete={(res) => {
+                      const ratio = res.naturalWidth / res.naturalHeight;
+                      setAspectMap((prev) => ({
+                        ...prev,
+                        [photo.id]: ratio < 0.88 ? "portrait" : ratio > 1.25 ? "landscape" : "square",
+                      }));
+                    }}
                   />
                   <div className="bento-gradient-overlay" />
                 </div>
@@ -470,17 +519,65 @@ export default function GalleryView() {
         </div>
 
         <div className="lightbox-main-box">
-          <div className="lightbox-bg-media">
+          {/* Ambient blurred backdrop so any aspect ratio fills the box with beautiful matching colors */}
+          <div className="lightbox-ambient-layer" aria-hidden="true">
             <Image
-              key={activePhoto.image}
+              key={`ambient-${activePhoto.image}`}
+              src={getAssetPath(activePhoto.image)}
+              alt=""
+              fill
+              className="lightbox-ambient-img"
+            />
+            <div className="lightbox-ambient-blur-overlay" />
+          </div>
+
+          {/* Top Controls Toolbar: Aspect Ratio badge & Fit/Fill mode toggle */}
+          <div className="lightbox-top-toolbar">
+            {activePhotoRatioText && (
+              <span className="lightbox-aspect-badge">{activePhotoRatioText}</span>
+            )}
+            <button
+              type="button"
+              className={`lightbox-mode-toggle ${lightboxFitMode === "contain" ? "mode-active" : ""}`}
+              onClick={() => setLightboxFitMode((prev) => (prev === "contain" ? "cover" : "contain"))}
+              title={lightboxFitMode === "contain" ? "Switch to Fill Screen mode (crops image)" : "Switch to Fit Image mode (100% visible)"}
+              aria-label="Toggle Fit or Fill display mode"
+            >
+              {lightboxFitMode === "contain" ? (
+                <>
+                  <Maximize2 size={13} />
+                  <span>Full View (100% visible)</span>
+                </>
+              ) : (
+                <>
+                  <Layers size={13} />
+                  <span>Fill Box (Zoomed)</span>
+                </>
+              )}
+            </button>
+          </div>
+
+          {/* Foreground Adaptive Image Stage */}
+          <div className={`lightbox-active-stage mode-${lightboxFitMode}`}>
+            <Image
+              key={`stage-${activePhoto.image}`}
               src={getAssetPath(activePhoto.image)}
               alt={activePhoto.alt}
               fill
               priority
-              className="lightbox-main-img"
+              className="lightbox-stage-img"
               sizes="(max-width: 1060px) 100vw, 1060px"
+              onLoadingComplete={(res) => {
+                const ratio = res.naturalWidth / res.naturalHeight;
+                setActivePhotoRatioText(
+                  ratio < 0.88
+                    ? "Portrait Format"
+                    : ratio > 1.35
+                      ? "Landscape Format"
+                      : "Square Format"
+                );
+              }}
             />
-            <div className="lightbox-vignette" />
           </div>
 
           {/* Previous Arrow Button */}
@@ -513,7 +610,7 @@ export default function GalleryView() {
               </p>
             </div>
             <span className="lightbox-counter-badge">
-              {currentLightboxIndex + 1} / {bentoPhotos.length}
+              {photos.length > 0 ? `${currentLightboxIndex + 1} / ${photos.length}` : "0 / 0"}
             </span>
           </div>
         </div>

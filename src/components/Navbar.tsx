@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { Menu, X } from "lucide-react";
 import { getAssetPath } from "@/utils/assets";
 import "./Navbar.css";
@@ -16,7 +17,13 @@ const navLinks = [
 ];
 
 export default function Navbar() {
+  const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
+
+  // Hide the public website navbar on admin interface routes
+  if (pathname?.startsWith("/admin")) {
+    return null;
+  }
 
   return (
     <header className="navbar-header">

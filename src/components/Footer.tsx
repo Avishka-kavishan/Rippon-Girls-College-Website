@@ -127,6 +127,20 @@ export default function Footer() {
       <div className="footer-bottom">
         <p className="footer-copyright">
           © 2026 Rippon Girls School, All rights reserved | Developed by AK Rathnaweera
+          <span style={{ margin: "0 8px", opacity: 0.4 }}>•</span>
+          <Link
+            href="/admin"
+            style={{
+              color: "inherit",
+              opacity: 0.7,
+              textDecoration: "underline",
+              fontSize: "0.85rem",
+              transition: "opacity 0.2s",
+            }}
+            title="School Administration Portal"
+          >
+            🔒 Staff Admin
+          </Link>
         </p>
       </div>
     </footer>
