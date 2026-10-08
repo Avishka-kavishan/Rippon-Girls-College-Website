@@ -225,12 +225,12 @@ export default function ContactView() {
               <div className="contact-card-icon-wrap">
                 <MapPin size={24} />
               </div>
-              <h2 className="contact-card-title">Campus Location</h2>
+              <h2 className="contact-card-title">School Location</h2>
               <p className="contact-card-desc">
-                Rippon Girls&apos; College, Richmond Hill Street, Galle 80000, Southern Province, Sri Lanka.
+                Rippon Girls&apos; College, Richmond Hill Street, Galle, Southern Province, Sri Lanka.
               </p>
               <a href="#map-section" className="contact-card-action">
-                <span>View Campus Map</span>
+                <span>View School Map</span>
                 <ChevronDown size={16} />
               </a>
             </div>
@@ -388,7 +388,7 @@ export default function ContactView() {
                     {/* Phone Number */}
                     <div className="contact-field-group">
                       <label htmlFor="contact-phone" className="contact-field-label">
-                        Contact Phone <span style={{ color: "#9ca3af", fontWeight: 400 }}>(Optional)</span>
+                        Contact No <span style={{ color: "#9ca3af", fontWeight: 400 }}>(Optional)</span>
                       </label>
                       <input
                         id="contact-phone"
@@ -544,7 +544,7 @@ export default function ContactView() {
               <div className="contact-visiting-card" id="visiting-guide">
                 <h3 className="contact-visiting-title">
                   <ShieldCheck size={20} color="var(--primary-blue)" />
-                  Campus Visiting Protocol
+                  School Visiting Protocol
                 </h3>
 
                 <div className="contact-visiting-list">
