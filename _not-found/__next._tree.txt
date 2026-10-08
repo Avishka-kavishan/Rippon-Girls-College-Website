@@ -1,2 +1,2 @@
-:HL["/Rippon-Girls-College-Website/_next/static/chunks/3qo8t5eiefukj.css","style"]
-0:{"tree":{"name":"","param":null,"prefetchHints":4112,"slots":{"children":{"name":"/_not-found","param":null,"prefetchHints":4160,"slots":{"children":{"name":"__PAGE__","param":null,"prefetchHints":4256,"slots":null}}}}},"staleTime":300,"buildId":"r61uxlhY71dzYidm1htlP"}
+:HL["/Rippon-Girls-College-Website/_next/static/chunks/0iytnn7bd_tc3.css","style"]
+0:{"tree":{"name":"","param":null,"prefetchHints":4112,"slots":{"children":{"name":"/_not-found","param":null,"prefetchHints":4160,"slots":{"children":{"name":"__PAGE__","param":null,"prefetchHints":4256,"slots":null}}}}},"staleTime":300,"buildId":"kYzD0DKTkU1nZfiSUwsTl"}
