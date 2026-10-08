@@ -1854,3 +1854,277 @@
   color: var(--adm-text-secondary);
   line-height: 1.45;
 }
+
+/* -------------------------------------------------------------------------
+   13. CONTACT PAGE MANAGEMENT STYLES
+   ------------------------------------------------------------------------- */
+.adm-contact-subtabs {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+  background: #f1f5f9;
+  padding: 0.35rem;
+  border-radius: var(--adm-radius-md);
+  border: 1px solid var(--adm-border);
+}
+
+.adm-contact-subtab-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.55rem 1rem;
+  border-radius: 8px;
+  background: transparent;
+  border: none;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--adm-text-secondary);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.adm-contact-subtab-btn:hover {
+  color: var(--adm-primary);
+  background: rgba(255, 255, 255, 0.6);
+}
+
+.adm-contact-subtab-btn.active {
+  background: #ffffff;
+  color: var(--adm-primary);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.adm-contact-badge-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.15rem 0.5rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  border-radius: 12px;
+  background: #e2e8f0;
+  color: #475569;
+}
+
+.adm-contact-subtab-btn.active .adm-contact-badge-count {
+  background: var(--adm-primary-soft);
+  color: var(--adm-primary);
+}
+
+.adm-contact-badge-count.unread {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.adm-contact-card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 1.25rem;
+}
+
+.adm-dept-card {
+  background: #ffffff;
+  border: 1px solid var(--adm-border);
+  border-radius: var(--adm-radius-md);
+  padding: 1.25rem;
+  box-shadow: var(--adm-shadow-sm);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.adm-dept-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--adm-shadow-md);
+  border-color: #cbd5e1;
+}
+
+.adm-dept-card-top {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.85rem;
+  margin-bottom: 0.75rem;
+}
+
+.adm-dept-card-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  background: var(--adm-primary-soft);
+  color: var(--adm-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.adm-dept-card-title {
+  font-size: 0.98rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin-bottom: 0.25rem;
+}
+
+.adm-dept-card-desc {
+  font-size: 0.82rem;
+  color: var(--adm-text-secondary);
+  line-height: 1.45;
+  margin-bottom: 0.85rem;
+  flex: 1;
+}
+
+.adm-dept-card-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding-top: 0.65rem;
+  border-top: 1px dashed var(--adm-border);
+  margin-bottom: 0.85rem;
+  font-size: 0.8rem;
+  color: #475569;
+}
+
+.adm-dept-card-meta-row {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.adm-dept-card-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.45rem;
+}
+
+.adm-faq-item-card {
+  background: #ffffff;
+  border: 1px solid var(--adm-border);
+  border-radius: var(--adm-radius-md);
+  padding: 1.25rem;
+  box-shadow: var(--adm-shadow-sm);
+  margin-bottom: 1rem;
+  transition: all 0.15s ease;
+}
+
+.adm-faq-item-card:hover {
+  border-color: #cbd5e1;
+}
+
+.adm-faq-item-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.adm-faq-item-q {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #0f172a;
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.adm-faq-item-a {
+  font-size: 0.85rem;
+  color: var(--adm-text-secondary);
+  line-height: 1.5;
+  padding-left: 1.5rem;
+  border-left: 2px solid var(--adm-primary-soft);
+  margin-top: 0.35rem;
+}
+
+.adm-inquiry-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.adm-inquiry-card {
+  background: #ffffff;
+  border: 1px solid var(--adm-border);
+  border-radius: var(--adm-radius-md);
+  padding: 1.25rem;
+  box-shadow: var(--adm-shadow-sm);
+  transition: all 0.15s ease;
+}
+
+.adm-inquiry-card.unread {
+  border-left: 4px solid #ef4444;
+  background: #fafaf9;
+}
+
+.adm-inquiry-card.resolved {
+  border-left: 4px solid #10b981;
+}
+
+.adm-inquiry-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.65rem;
+  flex-wrap: wrap;
+}
+
+.adm-inquiry-ref {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.2rem 0.55rem;
+  border-radius: 4px;
+  background: #eff6ff;
+  color: #1d4ed8;
+  font-size: 0.75rem;
+  font-weight: 700;
+  font-family: monospace;
+}
+
+.adm-inquiry-status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.25rem 0.65rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.adm-inquiry-status-pill.unread {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.adm-inquiry-status-pill.read {
+  background: #fef3c7;
+  color: #b45309;
+}
+
+.adm-inquiry-status-pill.resolved {
+  background: #d1fae5;
+  color: #047857;
+}
+
+.adm-inquiry-details-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 0.5rem 1rem;
+  background: #f8fafc;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  font-size: 0.82rem;
+  color: #475569;
+  margin-bottom: 0.85rem;
+}
+
+.adm-inquiry-msg-snippet {
+  font-size: 0.88rem;
+  color: #1e293b;
+  line-height: 1.5;
+  margin-bottom: 1rem;
+}

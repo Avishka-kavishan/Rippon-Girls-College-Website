@@ -254,15 +254,11 @@
 
 .contact-badge-label {
   display: inline-block;
-  font-size: 0.825rem;
+  font-size: 1.05rem;
   font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: var(--primary-blue, #0b3fa8);
-  background-color: rgba(11, 63, 168, 0.08);
-  padding: 0.3rem 0.85rem;
-  border-radius: 9999px;
-  margin-bottom: 0.75rem;
+  color: #f5a600;
+  letter-spacing: 0.02em;
+  margin-bottom: 0.45rem;
 }
 
 .contact-main-title {

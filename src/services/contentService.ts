@@ -6,6 +6,8 @@ import {
   defaultAdministration,
   defaultStudentPopulation,
   defaultAchievements,
+  defaultContactDetails,
+  defaultContactInquiries,
   defaultInitialSiteContent,
 } from "@/data/defaultData";
 import {
@@ -15,6 +17,8 @@ import {
   AdminMember,
   StudentPopulationStats,
   AchievementItem,
+  ContactPageDetails,
+  ContactInquiry,
   SiteContentState,
 } from "@/types/content";
 
@@ -62,6 +66,12 @@ function getLocalCache(): SiteContentState {
         administration: parsed.administration || defaultAdministration,
         studentPopulation: parsed.studentPopulation || defaultStudentPopulation,
         achievements: parsed.achievements || defaultAchievements,
+        contact: parsed.contact
+          ? { ...defaultContactDetails, ...parsed.contact }
+          : defaultContactDetails,
+        contactInquiries: Array.isArray(parsed.contactInquiries)
+          ? parsed.contactInquiries
+          : defaultContactInquiries,
       };
     }
   } catch (e) {
@@ -109,12 +119,18 @@ export async function getAllContent(): Promise<SiteContentState> {
       });
 
       const merged: SiteContentState = {
-        gallery: map["gallery"] || local.gallery,
-        news: map["news"] || local.news,
-        events: map["events"] || local.events,
-        administration: map["administration"] || local.administration,
-        studentPopulation: map["studentPopulation"] || local.studentPopulation,
-        achievements: map["achievements"] || local.achievements,
+        gallery: map["gallery"] || local.gallery || defaultGalleryPhotos,
+        news: map["news"] || local.news || defaultNewsData,
+        events: map["events"] || local.events || defaultUpcomingEvents,
+        administration: map["administration"] || local.administration || defaultAdministration,
+        studentPopulation: map["studentPopulation"] || local.studentPopulation || defaultStudentPopulation,
+        achievements: map["achievements"] || local.achievements || defaultAchievements,
+        contact: map["contact"]
+          ? { ...defaultContactDetails, ...map["contact"] }
+          : (local.contact ? { ...defaultContactDetails, ...local.contact } : defaultContactDetails),
+        contactInquiries: Array.isArray(map["contactInquiries"])
+          ? map["contactInquiries"]
+          : (Array.isArray(local.contactInquiries) ? local.contactInquiries : defaultContactInquiries),
       };
 
       setLocalCache(merged);
@@ -185,6 +201,8 @@ export async function syncAllToSupabase(): Promise<{ success: boolean; error?: s
     { id: "administration", data: current.administration, updated_at: new Date().toISOString() },
     { id: "studentPopulation", data: current.studentPopulation, updated_at: new Date().toISOString() },
     { id: "achievements", data: current.achievements, updated_at: new Date().toISOString() },
+    { id: "contact", data: current.contact, updated_at: new Date().toISOString() },
+    { id: "contactInquiries", data: current.contactInquiries || [], updated_at: new Date().toISOString() },
   ];
 
   try {
@@ -279,6 +297,12 @@ export async function importContentFromJSON(jsonString: string): Promise<boolean
       administration: parsed.administration || defaultAdministration,
       studentPopulation: parsed.studentPopulation || defaultStudentPopulation,
       achievements: parsed.achievements || defaultAchievements,
+      contact: parsed.contact
+        ? { ...defaultContactDetails, ...parsed.contact }
+        : defaultContactDetails,
+      contactInquiries: Array.isArray(parsed.contactInquiries)
+        ? parsed.contactInquiries
+        : defaultContactInquiries,
     };
     setLocalCache(merged);
     const supabase = getSupabaseClient();
@@ -290,4 +314,34 @@ export async function importContentFromJSON(jsonString: string): Promise<boolean
     console.error("Failed to parse JSON:", err);
     return false;
   }
+}
+
+/**
+ * Submit a new Contact Inquiry from the Contact Page Form
+ */
+export async function submitContactInquiry(
+  inquiry: Omit<ContactInquiry, "id" | "submittedAt" | "status" | "referenceId">
+): Promise<{ success: boolean; referenceId: string; usedSupabase: boolean }> {
+  const referenceId = `RGC-${new Date().getFullYear()}-${Math.floor(
+    1000 + Math.random() * 9000
+  )}`;
+
+  const newEntry: ContactInquiry = {
+    id: `inq-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+    ...inquiry,
+    referenceId,
+    submittedAt: new Date().toISOString(),
+    status: "unread",
+  };
+
+  const current = getLocalCache();
+  const updatedList = [newEntry, ...(current.contactInquiries || [])];
+
+  const res = await saveSection("contactInquiries", updatedList);
+
+  return {
+    success: res.success,
+    referenceId,
+    usedSupabase: res.usedSupabase,
+  };
 }

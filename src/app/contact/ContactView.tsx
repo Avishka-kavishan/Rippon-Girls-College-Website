@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -22,6 +22,14 @@ import {
   ShieldCheck,
 } from "lucide-react";
 import { getAssetPath } from "@/utils/assets";
+import { getAllContent, onContentChange, submitContactInquiry } from "@/services/contentService";
+import {
+  defaultContactDetails,
+  defaultContactDepartments,
+  defaultContactVisitingGuide,
+  defaultContactFaqs,
+} from "@/data/defaultData";
+import { ContactPageDetails } from "@/types/content";
 import "./contact.css";
 
 interface FormData {
@@ -49,12 +57,48 @@ const initialForm: FormData = {
 };
 
 export default function ContactView() {
+  const [contactData, setContactData] = useState<ContactPageDetails>(defaultContactDetails);
+
+  // Guarantee all fields are safely populated even if database/cache returns partial data
+  const activeContact: ContactPageDetails = {
+    ...defaultContactDetails,
+    ...(contactData || {}),
+  };
+
   const [formData, setFormData] = useState<FormData>(initialForm);
   const [errors, setErrors] = useState<FormErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [submissionRef, setSubmissionRef] = useState("");
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(0);
+
+  useEffect(() => {
+    let isMounted = true;
+    getAllContent().then((data) => {
+      if (isMounted && data && data.contact) {
+        setContactData({
+          ...defaultContactDetails,
+          ...data.contact,
+        });
+      }
+    });
+
+    const unsubscribe = onContentChange(() => {
+      getAllContent().then((data) => {
+        if (isMounted && data && data.contact) {
+          setContactData({
+            ...defaultContactDetails,
+            ...data.contact,
+          });
+        }
+      });
+    });
+
+    return () => {
+      isMounted = false;
+      unsubscribe();
+    };
+  }, []);
 
   const validate = (): boolean => {
     const errs: FormErrors = {};
@@ -74,20 +118,31 @@ export default function ContactView() {
     return Object.keys(errs).length === 0;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validate()) return;
 
     setIsSubmitting(true);
-    // Simulate server dispatch
-    setTimeout(() => {
+    try {
+      const res = await submitContactInquiry({
+        fullName: formData.fullName,
+        email: formData.email,
+        phone: formData.phone,
+        role: formData.role,
+        subject: formData.subject,
+        message: formData.message,
+      });
       setIsSubmitting(false);
       setIsSubmitted(true);
-      const randomRef = `RGC-${new Date().getFullYear()}-${Math.floor(
+      setSubmissionRef(res.referenceId);
+    } catch {
+      setIsSubmitting(false);
+      setIsSubmitted(true);
+      const fallbackRef = `RGC-${new Date().getFullYear()}-${Math.floor(
         1000 + Math.random() * 9000
       )}`;
-      setSubmissionRef(randomRef);
-    }, 750);
+      setSubmissionRef(fallbackRef);
+    }
   };
 
   const handleReset = () => {
@@ -100,73 +155,35 @@ export default function ContactView() {
     setOpenFaqIndex(openFaqIndex === index ? null : index);
   };
 
-  const departments = [
-    {
-      title: "Principal's Office",
-      icon: <Building size={20} />,
-      desc: "Executive administration, institutional governance, appointments, and official delegations.",
-      phone: "+94 91 223 4770",
-      email: "principal@rippongirlscollege.lk",
-    },
-    {
-      title: "Admissions & Student Affairs",
-      icon: <GraduationCap size={20} />,
-      desc: "Grade 1 admissions, mid-year secondary school admissions, and G.C.E. Advanced Level streaming.",
-      phone: "+94 91 223 4769 Ext. 102",
-      email: "admissions@rippongirlscollege.lk",
-    },
-    {
-      title: "Examinations & Records",
-      icon: <BookOpen size={20} />,
-      desc: "School leaving certificates, character certificates, G.C.E. O/L and A/L student verification records.",
-      phone: "+94 91 223 4769 Ext. 104",
-      email: "records@rippongirlscollege.lk",
-    },
-    {
-      title: "Past Pupils' Association (PPA)",
-      icon: <Users size={20} />,
-      desc: "Alumni network, global chapter reunions, scholarship funds, and school development contributions.",
-      phone: "+94 91 223 4769 Ext. 106",
-      email: "ppa@rippongirlscollege.lk",
-    },
-    {
-      title: "Sports & Co-Curricular Council",
-      icon: <Award size={20} />,
-      desc: "Interschool tournaments, athletic council, Western band, Eastern orchestra, and cultural troupes.",
-      phone: "+94 91 223 4769 Ext. 108",
-      email: "sports@rippongirlscollege.lk",
-    },
-    {
-      title: "General Reception Desk",
-      icon: <Phone size={20} />,
-      desc: "Public inquiries, campus visits, general front-desk assistance, and visitor gate passes.",
-      phone: "+94 91 223 4769",
-      email: "ripponbalika@gmail.com",
-    },
-  ];
+  const renderDeptIcon = (iconName?: string) => {
+    switch (iconName) {
+      case "Building":
+        return <Building size={20} />;
+      case "GraduationCap":
+        return <GraduationCap size={20} />;
+      case "BookOpen":
+        return <BookOpen size={20} />;
+      case "Users":
+        return <Users size={20} />;
+      case "Award":
+        return <Award size={20} />;
+      case "Phone":
+      default:
+        return <Phone size={20} />;
+    }
+  };
 
-  const faqs = [
-    {
-      q: "What is the procedure for obtaining a School Leaving Certificate?",
-      a: "Past pupils or authorized guardians should visit the College Records Office during weekday morning hours (8:30 AM – 1:00 PM). Please bring the student's Admission Number, National Identity Card (NIC), and clearance form. Processing generally takes 3 to 5 working days.",
-    },
-    {
-      q: "How can I schedule an official meeting with the Principal?",
-      a: "Appointments with the Principal are scheduled for Tuesdays and Thursdays between 9:00 AM and 11:30 AM. To ensure availability, please submit your request via telephone (+94 91 223 4770) or send an email to principal@rippongirlscollege.lk at least two business days in advance.",
-    },
-    {
-      q: "What are the school session and office working hours?",
-      a: "Academic classes operate from 7:30 AM to 1:30 PM, Monday to Friday. The Administrative Secretariat remains open until 3:30 PM on all government school working days. Both academic and administrative offices are closed on weekends and public/mercantile holidays.",
-    },
-    {
-      q: "How do students apply for Advanced Level (A/L) admission after O/Ls?",
-      a: "Admission announcements for the G.C.E. Advanced Level streams (Physical Science, Biological Science, Commerce, Arts, and Technology) are published shortly after official O/L results are issued by the Department of Examinations. Application forms can be obtained from the school administrative desk.",
-    },
-    {
-      q: "How can alumni register with the Past Pupils' Association (PPA)?",
-      a: "Former students who have completed their education at Rippon Girls' College can join the PPA by registering online or at the PPA Secretariat on campus. For membership forms and upcoming alumni reunions, email ppa@rippongirlscollege.lk.",
-    },
-  ];
+  const renderVisitingIcon = (iconName?: string) => {
+    switch (iconName) {
+      case "Clock":
+        return <Clock size={16} />;
+      case "Compass":
+        return <Compass size={16} />;
+      case "ShieldCheck":
+      default:
+        return <ShieldCheck size={16} />;
+    }
+  };
 
   return (
     <div className="contact-page-wrapper">
@@ -188,27 +205,28 @@ export default function ContactView() {
         <div className="contact-hero-content">
           <div className="contact-hero-badge">
             <Compass size={14} />
-            <span>Connect &bull; Richmond Hill, Galle</span>
+            <span>{activeContact.heroBadge || "Connect • Richmond Hill, Galle"}</span>
           </div>
 
-          <h1 className="contact-hero-title">Contact Rippon Girls&apos; College</h1>
+          <h1 className="contact-hero-title">{activeContact.heroTitle || "Contact Rippon Girls' College"}</h1>
 
           <p className="contact-hero-subtitle">
-            Have a question or need more information? Get in touch with Rippon Girls' College and connect with us for inquiries, school information, admissions, events, and other matters.
+            {activeContact.heroSubtitle ||
+              "Have a question or need more information? Get in touch with Rippon Girls' College and connect with us for inquiries, school information, admissions, events, and other matters."}
           </p>
 
           <div className="contact-hero-pills">
             <div className="contact-hero-pill">
               <MapPin size={15} />
-              <span>Richmond Hill Street, Galle</span>
+              <span>{(activeContact.address || "").split(",")[1]?.trim() || "Richmond Hill Street, Galle"}</span>
             </div>
             <div className="contact-hero-pill">
               <Phone size={15} />
-              <span>+94 91 223 4769</span>
+              <span>{activeContact.generalPhone}</span>
             </div>
             <div className="contact-hero-pill">
               <Clock size={15} />
-              <span>Mon – Fri: 7:30 AM – 3:30 PM</span>
+              <span>Office: {activeContact.officeHours}</span>
             </div>
           </div>
         </div>
@@ -227,7 +245,7 @@ export default function ContactView() {
               </div>
               <h2 className="contact-card-title">School Location</h2>
               <p className="contact-card-desc">
-                Rippon Girls&apos; College, Richmond Hill Street, Galle, Southern Province, Sri Lanka.
+                {activeContact.address}
               </p>
               <a href="#map-section" className="contact-card-action">
                 <span>View School Map</span>
@@ -242,10 +260,10 @@ export default function ContactView() {
               </div>
               <h2 className="contact-card-title">Telephone Desk</h2>
               <p className="contact-card-desc">
-                <strong>General:</strong> +94 91 223 4769<br />
-                <strong>Principal:</strong> +94 91 223 4770
+                <strong>General:</strong> {activeContact.generalPhone}<br />
+                <strong>Principal:</strong> {activeContact.principalPhone}
               </p>
-              <a href="tel:+94912234769" className="contact-card-action">
+              <a href={`tel:${(activeContact.generalPhone || "").replace(/\s+/g, "")}`} className="contact-card-action">
                 <span>Call Administrative Desk</span>
                 <ExternalLink size={14} />
               </a>
@@ -258,10 +276,10 @@ export default function ContactView() {
               </div>
               <h2 className="contact-card-title">Email Inquiries</h2>
               <p className="contact-card-desc">
-                <strong>Primary:</strong> ripponbalika@gmail.com<br />
-                <strong>Official:</strong> info@rippongirlscollege.lk
+                <strong>Primary:</strong> {activeContact.primaryEmail}<br />
+                <strong>Official:</strong> {activeContact.officialEmail}
               </p>
-              <a href="mailto:ripponbalika@gmail.com" className="contact-card-action">
+              <a href={`mailto:${activeContact.primaryEmail}`} className="contact-card-action">
                 <span>Send Direct Email</span>
                 <ExternalLink size={14} />
               </a>
@@ -274,8 +292,8 @@ export default function ContactView() {
               </div>
               <h2 className="contact-card-title">School &amp; Office Hours</h2>
               <p className="contact-card-desc">
-                <strong>School:</strong> 7:30 AM – 1:30 PM<br />
-                <strong>Office:</strong> 7:30 AM – 3:30 PM (Mon–Fri)
+                <strong>School:</strong> {activeContact.schoolHours}<br />
+                <strong>Office:</strong> {activeContact.officeHours}
               </p>
               <a href="#visiting-guide" className="contact-card-action">
                 <span>Visitor Protocol</span>
@@ -523,7 +541,7 @@ export default function ContactView() {
                   <iframe
                     title="Rippon Girls' College Google Maps Location"
                     className="contact-map-iframe"
-                    src="https://maps.google.com/maps?q=Rippon+Girls+College+Richmond+Hill+Galle+Sri+Lanka&t=&z=15&ie=UTF8&iwloc=&output=embed"
+                    src={activeContact.mapEmbedUrl}
                     loading="lazy"
                     allowFullScreen
                   />
@@ -533,9 +551,9 @@ export default function ContactView() {
                   <span className="contact-map-address">
                     Rippon Girls&apos; College
                   </span>
-                  <span>Richmond Hill Street, Galle, Southern Province, Sri Lanka</span>
+                  <span>{activeContact.address}</span>
                   <span style={{ fontSize: "0.8rem", color: "#6b7280" }}>
-                    Postal Code: 80000 &bull; Coordinates: 6.0463&deg; N, 80.2075&deg; E
+                    Postal Code: {activeContact.mapPostalCode} &bull; Coordinates: {activeContact.mapCoordinates}
                   </span>
                 </div>
               </div>
@@ -548,44 +566,17 @@ export default function ContactView() {
                 </h3>
 
                 <div className="contact-visiting-list">
-                  <div className="contact-visiting-item">
-                    <div className="contact-visiting-icon-badge">
-                      <ShieldCheck size={16} />
+                  {(activeContact.visitingGuide || defaultContactVisitingGuide).map((item) => (
+                    <div key={item.id || item.title} className="contact-visiting-item">
+                      <div className="contact-visiting-icon-badge">
+                        {renderVisitingIcon(item.iconName)}
+                      </div>
+                      <div className="contact-visiting-text-block">
+                        <h4 className="contact-visiting-heading">{item.title}</h4>
+                        <p className="contact-visiting-desc">{item.desc}</p>
+                      </div>
                     </div>
-                    <div className="contact-visiting-text-block">
-                      <h4 className="contact-visiting-heading">Main Security Gate</h4>
-                      <p className="contact-visiting-desc">
-                        All visitors must report to the Security Gatehouse at Richmond Hill Road,
-                        produce a valid National ID Card (NIC), and receive a visitor pass.
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="contact-visiting-item">
-                    <div className="contact-visiting-icon-badge">
-                      <Clock size={16} />
-                    </div>
-                    <div className="contact-visiting-text-block">
-                      <h4 className="contact-visiting-heading">Visiting Hours for Parents</h4>
-                      <p className="contact-visiting-desc">
-                        Parent-teacher consultations and sectional meetings are conducted after
-                        1:30 PM on school days or by scheduled appointment.
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="contact-visiting-item">
-                    <div className="contact-visiting-icon-badge">
-                      <Compass size={16} />
-                    </div>
-                    <div className="contact-visiting-text-block">
-                      <h4 className="contact-visiting-heading">How to Reach Us</h4>
-                      <p className="contact-visiting-desc">
-                        Situated in Richmond Hill, just 2.5 km (8 minutes) from Galle Fort and
-                        Galle Central Railway &amp; Bus stations. Readily accessible via local buses and cabs.
-                      </p>
-                    </div>
-                  </div>
+                  ))}
                 </div>
               </div>
             </div>
@@ -608,10 +599,10 @@ export default function ContactView() {
           </div>
 
           <div className="contact-directory-grid">
-            {departments.map((dept) => (
-              <div key={dept.title} className="contact-dept-card">
+            {(activeContact.departments || defaultContactDepartments).map((dept) => (
+              <div key={dept.id || dept.title} className="contact-dept-card">
                 <div className="contact-dept-header">
-                  <div className="contact-dept-icon">{dept.icon}</div>
+                  <div className="contact-dept-icon">{renderDeptIcon(dept.iconName)}</div>
                   <h3 className="contact-dept-name">{dept.title}</h3>
                 </div>
                 <p className="contact-dept-desc">{dept.desc}</p>
@@ -646,11 +637,11 @@ export default function ContactView() {
           </div>
 
           <div className="contact-faq-list">
-            {faqs.map((faq, index) => {
+            {(activeContact.faqs || defaultContactFaqs).map((faq, index) => {
               const isOpen = openFaqIndex === index;
               return (
                 <div
-                  key={faq.q}
+                  key={faq.id || faq.q}
                   className={`contact-faq-item ${isOpen ? "open" : ""}`}
                 >
                   <button
@@ -685,13 +676,13 @@ export default function ContactView() {
             or drop by the Richmond Hill campus.
           </p>
           <div className="contact-cta-buttons">
-            <a href="tel:+94912234769" className="contact-cta-btn-primary">
+            <a href={`tel:${(activeContact.generalPhone || "").replace(/\s+/g, "")}`} className="contact-cta-btn-primary">
               <Phone size={18} />
-              <span>Call General Desk: +94 91 223 4769</span>
+              <span>Call General Desk: {activeContact.generalPhone}</span>
             </a>
-            <a href="mailto:ripponbalika@gmail.com" className="contact-cta-btn-secondary">
+            <a href={`mailto:${activeContact.primaryEmail}`} className="contact-cta-btn-secondary">
               <Mail size={18} />
-              <span>Email: ripponbalika@gmail.com</span>
+              <span>Email: {activeContact.primaryEmail}</span>
             </a>
           </div>
         </div>

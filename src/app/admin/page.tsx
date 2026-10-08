@@ -38,6 +38,14 @@ import {
   Sparkles,
   Palette,
   Globe,
+  PhoneCall,
+  Phone,
+  Mail,
+  MessageSquare,
+  HelpCircle,
+  Building,
+  BookOpen,
+  Award,
 } from "lucide-react";
 import {
   GalleryItem,
@@ -45,6 +53,11 @@ import {
   EventItem,
   AdminMember,
   StudentPopulationStats,
+  ContactDepartment,
+  ContactVisitingItem,
+  ContactFaq,
+  ContactPageDetails,
+  ContactInquiry,
   SiteContentState,
 } from "@/types/content";
 import {
@@ -61,7 +74,7 @@ import {
   removeStoredSupabaseConfig,
   SUPABASE_SQL_SETUP,
 } from "@/lib/supabase";
-import { defaultGalleryCategories } from "@/data/defaultData";
+import { defaultGalleryCategories, defaultContactDetails } from "@/data/defaultData";
 import { getAssetPath } from "@/utils/assets";
 import "./admin.css";
 
@@ -79,7 +92,15 @@ type ActiveTab =
   | "events"
   | "administration"
   | "population"
+  | "contact"
   | "settings";
+
+export type ContactSubTab =
+  | "general"
+  | "departments"
+  | "visiting"
+  | "faqs"
+  | "inquiries";
 
 export default function AdminPage() {
   // Theme State (Default: Rippon Royal Blue & Gold - Official School Colors)
@@ -124,6 +145,18 @@ export default function AdminPage() {
   const [adminModalOpen, setAdminModalOpen] = useState<boolean>(false);
   const [editingAdminItem, setEditingAdminItem] = useState<AdminMember | null>(null);
 
+  // Contact Page State & Modals
+  const [contactSubTab, setContactSubTab] = useState<ContactSubTab>("general");
+  const [contactForm, setContactForm] = useState<ContactPageDetails | null>(null);
+  const [deptModalOpen, setDeptModalOpen] = useState<boolean>(false);
+  const [editingDept, setEditingDept] = useState<ContactDepartment | null>(null);
+  const [visitingModalOpen, setVisitingModalOpen] = useState<boolean>(false);
+  const [editingVisiting, setEditingVisiting] = useState<ContactVisitingItem | null>(null);
+  const [faqModalOpen, setFaqModalOpen] = useState<boolean>(false);
+  const [editingFaq, setEditingFaq] = useState<ContactFaq | null>(null);
+  const [selectedInquiry, setSelectedInquiry] = useState<ContactInquiry | null>(null);
+  const [inquiryFilter, setInquiryFilter] = useState<"all" | "unread" | "resolved">("all");
+
   // Delete Confirmation Modal
   const [deleteConfirm, setDeleteConfirm] = useState<{
     open: boolean;
@@ -151,6 +184,10 @@ export default function AdminPage() {
         setNewsModalOpen(false);
         setEventModalOpen(false);
         setAdminModalOpen(false);
+        setDeptModalOpen(false);
+        setVisitingModalOpen(false);
+        setFaqModalOpen(false);
+        setSelectedInquiry(null);
         setDeleteConfirm(null);
       }
     };
@@ -193,6 +230,10 @@ export default function AdminPage() {
       const data = await getAllContent();
       setContent(data);
       setPopulationForm(data.studentPopulation);
+      setContactForm({
+        ...defaultContactDetails,
+        ...(data?.contact || {}),
+      });
 
       const existingConfig = getStoredSupabaseConfig();
       if (existingConfig) {
@@ -449,6 +490,208 @@ export default function AdminPage() {
   };
 
   // -------------------------------------------------------------------------
+  // CONTACT PAGE HANDLERS
+  // -------------------------------------------------------------------------
+  const handleSaveContactGeneral = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!content || !contactForm) return;
+
+    const res = await saveSection("contact", contactForm);
+    setContent({ ...content, contact: contactForm });
+    showToast(
+      res.usedSupabase ? "Contact details synced to Supabase!" : "Contact details saved locally!"
+    );
+  };
+
+  const handleSaveContactDept = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!content || !contactForm || !editingDept) return;
+    if (!editingDept.title.trim() || !editingDept.phone.trim() || !editingDept.email.trim()) {
+      showToast("Title, Phone, and Email are required.", "error");
+      return;
+    }
+
+    const currentDepts = contactForm.departments || [];
+    let updatedDepts: ContactDepartment[];
+    const exists = currentDepts.some((d) => d.id === editingDept.id);
+    if (exists) {
+      updatedDepts = currentDepts.map((d) => (d.id === editingDept.id ? editingDept : d));
+    } else {
+      updatedDepts = [...currentDepts, editingDept];
+    }
+
+    const updatedContact: ContactPageDetails = {
+      ...contactForm,
+      departments: updatedDepts,
+    };
+
+    const res = await saveSection("contact", updatedContact);
+    setContent({ ...content, contact: updatedContact });
+    setContactForm(updatedContact);
+    setDeptModalOpen(false);
+    setEditingDept(null);
+    showToast(res.usedSupabase ? "Department saved to cloud!" : "Department saved locally!");
+  };
+
+  const handleDeleteContactDept = (id: string) => {
+    setDeleteConfirm({
+      open: true,
+      title: "Remove this department from the directory?",
+      onConfirm: async () => {
+        if (!content || !contactForm) return;
+        const updatedDepts = (contactForm.departments || []).filter((d) => d.id !== id);
+        const updatedContact: ContactPageDetails = {
+          ...contactForm,
+          departments: updatedDepts,
+        };
+        const res = await saveSection("contact", updatedContact);
+        setContent({ ...content, contact: updatedContact });
+        setContactForm(updatedContact);
+        setDeleteConfirm(null);
+        showToast(res.usedSupabase ? "Department removed from cloud." : "Department removed locally.");
+      },
+    });
+  };
+
+  const handleSaveContactVisiting = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!content || !contactForm || !editingVisiting) return;
+    if (!editingVisiting.title.trim() || !editingVisiting.desc.trim()) {
+      showToast("Title and Description are required.", "error");
+      return;
+    }
+
+    const currentList = contactForm.visitingGuide || [];
+    let updatedList: ContactVisitingItem[];
+    const exists = currentList.some((v) => v.id === editingVisiting.id);
+    if (exists) {
+      updatedList = currentList.map((v) => (v.id === editingVisiting.id ? editingVisiting : v));
+    } else {
+      updatedList = [...currentList, editingVisiting];
+    }
+
+    const updatedContact: ContactPageDetails = {
+      ...contactForm,
+      visitingGuide: updatedList,
+    };
+
+    const res = await saveSection("contact", updatedContact);
+    setContent({ ...content, contact: updatedContact });
+    setContactForm(updatedContact);
+    setVisitingModalOpen(false);
+    setEditingVisiting(null);
+    showToast(res.usedSupabase ? "Visiting protocol saved!" : "Visiting protocol saved locally!");
+  };
+
+  const handleDeleteContactVisiting = (id: string) => {
+    setDeleteConfirm({
+      open: true,
+      title: "Remove this visiting protocol guideline?",
+      onConfirm: async () => {
+        if (!content || !contactForm) return;
+        const updatedList = (contactForm.visitingGuide || []).filter((v) => v.id !== id);
+        const updatedContact: ContactPageDetails = {
+          ...contactForm,
+          visitingGuide: updatedList,
+        };
+        const res = await saveSection("contact", updatedContact);
+        setContent({ ...content, contact: updatedContact });
+        setContactForm(updatedContact);
+        setDeleteConfirm(null);
+        showToast("Visiting guideline removed.");
+      },
+    });
+  };
+
+  const handleSaveContactFaq = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!content || !contactForm || !editingFaq) return;
+    if (!editingFaq.q.trim() || !editingFaq.a.trim()) {
+      showToast("Question and Answer are required.", "error");
+      return;
+    }
+
+    const currentFaqs = contactForm.faqs || [];
+    let updatedFaqs: ContactFaq[];
+    const exists = currentFaqs.some((f) => f.id === editingFaq.id);
+    if (exists) {
+      updatedFaqs = currentFaqs.map((f) => (f.id === editingFaq.id ? editingFaq : f));
+    } else {
+      updatedFaqs = [...currentFaqs, editingFaq];
+    }
+
+    const updatedContact: ContactPageDetails = {
+      ...contactForm,
+      faqs: updatedFaqs,
+    };
+
+    const res = await saveSection("contact", updatedContact);
+    setContent({ ...content, contact: updatedContact });
+    setContactForm(updatedContact);
+    setFaqModalOpen(false);
+    setEditingFaq(null);
+    showToast(res.usedSupabase ? "FAQ saved to cloud!" : "FAQ saved locally!");
+  };
+
+  const handleDeleteContactFaq = (id: string) => {
+    setDeleteConfirm({
+      open: true,
+      title: "Delete this FAQ from the contact page?",
+      onConfirm: async () => {
+        if (!content || !contactForm) return;
+        const updatedFaqs = (contactForm.faqs || []).filter((f) => f.id !== id);
+        const updatedContact: ContactPageDetails = {
+          ...contactForm,
+          faqs: updatedFaqs,
+        };
+        const res = await saveSection("contact", updatedContact);
+        setContent({ ...content, contact: updatedContact });
+        setContactForm(updatedContact);
+        setDeleteConfirm(null);
+        showToast("FAQ removed.");
+      },
+    });
+  };
+
+  const handleToggleInquiryStatus = async (id: string) => {
+    if (!content) return;
+    const currentInquiries = content.contactInquiries || [];
+    const updated = currentInquiries.map((inq) => {
+      if (inq.id === id) {
+        const nextStatus = inq.status === "unread" ? "resolved" : inq.status === "resolved" ? "unread" : "resolved";
+        return { ...inq, status: nextStatus as "unread" | "read" | "resolved" };
+      }
+      return inq;
+    });
+
+    const res = await saveSection("contactInquiries", updated);
+    setContent({ ...content, contactInquiries: updated });
+    if (selectedInquiry && selectedInquiry.id === id) {
+      const match = updated.find((i) => i.id === id);
+      if (match) setSelectedInquiry(match);
+    }
+    showToast(res.usedSupabase ? "Inquiry status updated in cloud!" : "Inquiry status updated locally!");
+  };
+
+  const handleDeleteInquiry = (id: string) => {
+    setDeleteConfirm({
+      open: true,
+      title: "Delete this inquiry permanently?",
+      onConfirm: async () => {
+        if (!content) return;
+        const updated = (content.contactInquiries || []).filter((inq) => inq.id !== id);
+        const res = await saveSection("contactInquiries", updated);
+        setContent({ ...content, contactInquiries: updated });
+        if (selectedInquiry?.id === id) {
+          setSelectedInquiry(null);
+        }
+        setDeleteConfirm(null);
+        showToast("Inquiry message deleted.");
+      },
+    });
+  };
+
+  // -------------------------------------------------------------------------
   // SUPABASE CONFIGURATION
   // -------------------------------------------------------------------------
   const handleSaveSupabaseConfig = async (e: React.FormEvent) => {
@@ -473,6 +716,10 @@ export default function AdminPage() {
       showToast("Connected to Supabase live cloud database!", "success");
       const fresh = await getAllContent();
       setContent(fresh);
+      setContactForm({
+        ...defaultContactDetails,
+        ...(fresh.contact || {}),
+      });
     } else {
       showToast(check.message, "error");
     }
@@ -514,6 +761,10 @@ export default function AdminPage() {
         const fresh = await getAllContent();
         setContent(fresh);
         setPopulationForm(fresh.studentPopulation);
+        setContactForm({
+          ...defaultContactDetails,
+          ...(fresh.contact || {}),
+        });
         showToast("Website content restored from backup!", "success");
       } else {
         showToast("Invalid JSON file.", "error");
@@ -531,6 +782,10 @@ export default function AdminPage() {
         const fresh = await getAllContent();
         setContent(fresh);
         setPopulationForm(fresh.studentPopulation);
+        setContactForm({
+          ...defaultContactDetails,
+          ...(fresh.contact || {}),
+        });
         setDeleteConfirm(null);
         showToast("All content has been reset to defaults.");
       },
@@ -598,6 +853,60 @@ export default function AdminPage() {
         item.role.toLowerCase().includes(q)
     );
   }, [content?.administration, searchQuery]);
+
+  const filteredDepartments = useMemo(() => {
+    if (!contactForm?.departments) return [];
+    if (!searchQuery.trim()) return contactForm.departments;
+    const q = searchQuery.toLowerCase();
+    return contactForm.departments.filter(
+      (dept) =>
+        dept.title.toLowerCase().includes(q) ||
+        dept.desc.toLowerCase().includes(q) ||
+        dept.email.toLowerCase().includes(q) ||
+        dept.phone.toLowerCase().includes(q)
+    );
+  }, [contactForm?.departments, searchQuery]);
+
+  const filteredVisiting = useMemo(() => {
+    if (!contactForm?.visitingGuide) return [];
+    if (!searchQuery.trim()) return contactForm.visitingGuide;
+    const q = searchQuery.toLowerCase();
+    return contactForm.visitingGuide.filter(
+      (item) =>
+        item.title.toLowerCase().includes(q) ||
+        item.desc.toLowerCase().includes(q)
+    );
+  }, [contactForm?.visitingGuide, searchQuery]);
+
+  const filteredFaqs = useMemo(() => {
+    if (!contactForm?.faqs) return [];
+    if (!searchQuery.trim()) return contactForm.faqs;
+    const q = searchQuery.toLowerCase();
+    return contactForm.faqs.filter(
+      (faq) =>
+        faq.q.toLowerCase().includes(q) ||
+        faq.a.toLowerCase().includes(q)
+    );
+  }, [contactForm?.faqs, searchQuery]);
+
+  const filteredInquiries = useMemo(() => {
+    let list = content?.contactInquiries || [];
+    if (inquiryFilter !== "all") {
+      list = list.filter((inq) => inq.status === inquiryFilter);
+    }
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase();
+      list = list.filter(
+        (inq) =>
+          inq.fullName.toLowerCase().includes(q) ||
+          inq.email.toLowerCase().includes(q) ||
+          inq.subject.toLowerCase().includes(q) ||
+          inq.message.toLowerCase().includes(q) ||
+          inq.referenceId.toLowerCase().includes(q)
+      );
+    }
+    return list;
+  }, [content?.contactInquiries, inquiryFilter, searchQuery]);
 
   // Current formatted Sri Lanka date
   const todayFormatted = new Intl.DateTimeFormat("en-US", {
@@ -880,6 +1189,32 @@ export default function AdminPage() {
                   <span>Student Population</span>
                 </div>
               </button>
+
+              <button
+                className={`adm-nav-item ${activeTab === "contact" ? "active" : ""}`}
+                onClick={() => {
+                  setActiveTab("contact");
+                  setMobileSidebarOpen(false);
+                  setSearchQuery("");
+                }}
+              >
+                <div className="adm-nav-item-content">
+                  <PhoneCall size={18} />
+                  <span>Contact Page</span>
+                </div>
+                {content?.contactInquiries && content.contactInquiries.filter((i) => i.status === "unread").length > 0 ? (
+                  <span
+                    className="adm-nav-badge"
+                    style={{ backgroundColor: "#ef4444", color: "#ffffff", fontWeight: 700 }}
+                  >
+                    {content.contactInquiries.filter((i) => i.status === "unread").length} new
+                  </span>
+                ) : (
+                  <span className="adm-nav-badge">
+                    {contactForm?.departments?.length || 0}
+                  </span>
+                )}
+              </button>
             </div>
           </div>
 
@@ -983,6 +1318,7 @@ export default function AdminPage() {
                 {activeTab === "events" && "Upcoming Events"}
                 {activeTab === "administration" && "Our Administration"}
                 {activeTab === "population" && "Student Population"}
+                {activeTab === "contact" && "Contact Page Management"}
                 {activeTab === "settings" && "Database & Cloud Settings"}
               </span>
             </div>
@@ -1190,6 +1526,29 @@ export default function AdminPage() {
                       </div>
                       <div className="adm-kpi-icon purple">
                         <Users size={22} />
+                      </div>
+                    </div>
+
+                    <div
+                      className="adm-kpi-card"
+                      onClick={() => setActiveTab("contact")}
+                    >
+                      <div className="adm-kpi-info">
+                        <span className="adm-kpi-label">Contact &amp; Inquiries</span>
+                        <span className="adm-kpi-value">
+                          {contactForm?.departments?.length || 0}
+                        </span>
+                        <span className="adm-kpi-jump">
+                          <span>
+                            {content?.contactInquiries && content.contactInquiries.filter((i) => i.status === "unread").length > 0
+                              ? `${content.contactInquiries.filter((i) => i.status === "unread").length} new message${content.contactInquiries.filter((i) => i.status === "unread").length > 1 ? "s" : ""}`
+                              : "Manage Contact"}
+                          </span>
+                          <ChevronRight size={12} />
+                        </span>
+                      </div>
+                      <div className="adm-kpi-icon blue">
+                        <PhoneCall size={22} />
                       </div>
                     </div>
                   </div>
@@ -2052,7 +2411,715 @@ export default function AdminPage() {
               )}
 
               {/* -------------------------------------------------------------
-                  TAB 7: DATABASE & CLOUD SETTINGS
+                  TAB 7: CONTACT PAGE MANAGEMENT
+                  ------------------------------------------------------------- */}
+              {activeTab === "contact" && contactForm && (
+                <div>
+                  <div className="adm-header-banner">
+                    <div className="adm-section-heading">
+                      <h1>Contact Page Management</h1>
+                      <p>
+                        Configure public telephone lines, emails, office hours, map coordinates,
+                        department directory, visiting protocols, FAQs, and manage submitted messages.
+                      </p>
+                    </div>
+
+                    <div style={{ display: "flex", gap: "0.75rem", flexWrap: "wrap" }}>
+                      <Link
+                        href="/contact"
+                        target="_blank"
+                        className="adm-btn-secondary"
+                        style={{ textDecoration: "none" }}
+                      >
+                        <ExternalLink size={15} />
+                        <span>Preview Contact Page</span>
+                      </Link>
+
+                      {contactSubTab === "departments" && (
+                        <button
+                          type="button"
+                          className="adm-btn-create"
+                          onClick={() => {
+                            setEditingDept({
+                              id: `dept-${Date.now()}`,
+                              title: "",
+                              desc: "",
+                              phone: "+94 91 223 ",
+                              email: "@rippongirlscollege.lk",
+                              iconName: "Building",
+                            });
+                            setDeptModalOpen(true);
+                          }}
+                        >
+                          <Plus size={16} />
+                          <span>Add Department</span>
+                        </button>
+                      )}
+
+                      {contactSubTab === "visiting" && (
+                        <button
+                          type="button"
+                          className="adm-btn-create"
+                          onClick={() => {
+                            setEditingVisiting({
+                              id: `visit-${Date.now()}`,
+                              title: "",
+                              desc: "",
+                              iconName: "ShieldCheck",
+                            });
+                            setVisitingModalOpen(true);
+                          }}
+                        >
+                          <Plus size={16} />
+                          <span>Add Visiting Guideline</span>
+                        </button>
+                      )}
+
+                      {contactSubTab === "faqs" && (
+                        <button
+                          type="button"
+                          className="adm-btn-create"
+                          onClick={() => {
+                            setEditingFaq({
+                              id: `faq-${Date.now()}`,
+                              q: "",
+                              a: "",
+                            });
+                            setFaqModalOpen(true);
+                          }}
+                        >
+                          <Plus size={16} />
+                          <span>Add FAQ</span>
+                        </button>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Sub-navigation Tabs */}
+                  <div className="adm-contact-subtabs">
+                    <button
+                      type="button"
+                      className={`adm-contact-subtab-btn ${contactSubTab === "general" ? "active" : ""}`}
+                      onClick={() => setContactSubTab("general")}
+                    >
+                      <MapPin size={16} />
+                      <span>General &amp; Office Hours</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      className={`adm-contact-subtab-btn ${contactSubTab === "departments" ? "active" : ""}`}
+                      onClick={() => setContactSubTab("departments")}
+                    >
+                      <Building size={16} />
+                      <span>Departmental Directory</span>
+                      <span className="adm-contact-badge-count">
+                        {contactForm.departments?.length || 0}
+                      </span>
+                    </button>
+
+                    <button
+                      type="button"
+                      className={`adm-contact-subtab-btn ${contactSubTab === "visiting" ? "active" : ""}`}
+                      onClick={() => setContactSubTab("visiting")}
+                    >
+                      <ShieldCheck size={16} />
+                      <span>Visiting Protocols</span>
+                      <span className="adm-contact-badge-count">
+                        {contactForm.visitingGuide?.length || 0}
+                      </span>
+                    </button>
+
+                    <button
+                      type="button"
+                      className={`adm-contact-subtab-btn ${contactSubTab === "faqs" ? "active" : ""}`}
+                      onClick={() => setContactSubTab("faqs")}
+                    >
+                      <HelpCircle size={16} />
+                      <span>FAQs Accordion</span>
+                      <span className="adm-contact-badge-count">
+                        {contactForm.faqs?.length || 0}
+                      </span>
+                    </button>
+
+                    <button
+                      type="button"
+                      className={`adm-contact-subtab-btn ${contactSubTab === "inquiries" ? "active" : ""}`}
+                      onClick={() => setContactSubTab("inquiries")}
+                    >
+                      <MessageSquare size={16} />
+                      <span>Form Inquiries</span>
+                      {content?.contactInquiries && content.contactInquiries.filter((i) => i.status === "unread").length > 0 ? (
+                        <span className="adm-contact-badge-count unread">
+                          {content.contactInquiries.filter((i) => i.status === "unread").length} new
+                        </span>
+                      ) : (
+                        <span className="adm-contact-badge-count">
+                          {content?.contactInquiries?.length || 0}
+                        </span>
+                      )}
+                    </button>
+                  </div>
+
+                  {/* SUBTAB 1: GENERAL CONTACT DETAILS FORM */}
+                  {contactSubTab === "general" && (
+                    <form onSubmit={handleSaveContactGeneral}>
+                      <div className="adm-quad-container">
+                        {/* Box 1: Telephone Desk & Emails */}
+                        <div className="adm-quad-box">
+                          <div className="adm-quad-header">
+                            <PhoneCall size={18} style={{ color: "#2563eb" }} />
+                            <span>Contact Lines &amp; Official Emails</span>
+                          </div>
+
+                          <div className="adm-form-field" style={{ marginBottom: "0.85rem" }}>
+                            <label className="adm-label">General Telephone Desk *</label>
+                            <input
+                              type="text"
+                              className="adm-input"
+                              placeholder="+94 91 223 4769"
+                              value={contactForm.generalPhone}
+                              onChange={(e) =>
+                                setContactForm({ ...contactForm, generalPhone: e.target.value })
+                              }
+                              required
+                            />
+                          </div>
+
+                          <div className="adm-form-field" style={{ marginBottom: "0.85rem" }}>
+                            <label className="adm-label">Principal Office Line *</label>
+                            <input
+                              type="text"
+                              className="adm-input"
+                              placeholder="+94 91 223 4770"
+                              value={contactForm.principalPhone}
+                              onChange={(e) =>
+                                setContactForm({ ...contactForm, principalPhone: e.target.value })
+                              }
+                              required
+                            />
+                          </div>
+
+                          <div className="adm-form-field" style={{ marginBottom: "0.85rem" }}>
+                            <label className="adm-label">Primary Public Email *</label>
+                            <input
+                              type="email"
+                              className="adm-input"
+                              placeholder="ripponbalika@gmail.com"
+                              value={contactForm.primaryEmail}
+                              onChange={(e) =>
+                                setContactForm({ ...contactForm, primaryEmail: e.target.value })
+                              }
+                              required
+                            />
+                          </div>
+
+                          <div className="adm-form-field">
+                            <label className="adm-label">Official Domain Email *</label>
+                            <input
+                              type="email"
+                              className="adm-input"
+                              placeholder="info@rippongirlscollege.lk"
+                              value={contactForm.officialEmail}
+                              onChange={(e) =>
+                                setContactForm({ ...contactForm, officialEmail: e.target.value })
+                              }
+                              required
+                            />
+                          </div>
+                        </div>
+
+                        {/* Box 2: Operating Hours & Address */}
+                        <div className="adm-quad-box">
+                          <div className="adm-quad-header">
+                            <Clock size={18} style={{ color: "#059669" }} />
+                            <span>Operating Hours &amp; Location Address</span>
+                          </div>
+
+                          <div className="adm-form-field" style={{ marginBottom: "0.85rem" }}>
+                            <label className="adm-label">Academic School Hours *</label>
+                            <input
+                              type="text"
+                              className="adm-input"
+                              placeholder="7:30 AM – 1:30 PM"
+                              value={contactForm.schoolHours}
+                              onChange={(e) =>
+                                setContactForm({ ...contactForm, schoolHours: e.target.value })
+                              }
+                              required
+                            />
+                          </div>
+
+                          <div className="adm-form-field" style={{ marginBottom: "0.85rem" }}>
+                            <label className="adm-label">Administrative Secretariat Hours *</label>
+                            <input
+                              type="text"
+                              className="adm-input"
+                              placeholder="7:30 AM – 3:30 PM (Mon–Fri)"
+                              value={contactForm.officeHours}
+                              onChange={(e) =>
+                                setContactForm({ ...contactForm, officeHours: e.target.value })
+                              }
+                              required
+                            />
+                          </div>
+
+                          <div className="adm-form-field">
+                            <label className="adm-label">School Physical Address *</label>
+                            <textarea
+                              rows={3}
+                              className="adm-input"
+                              placeholder="Rippon Girls' College, Richmond Hill Street, Galle, Southern Province, Sri Lanka"
+                              value={contactForm.address}
+                              onChange={(e) =>
+                                setContactForm({ ...contactForm, address: e.target.value })
+                              }
+                              required
+                            />
+                          </div>
+                        </div>
+
+                        {/* Box 3: Google Maps Integration */}
+                        <div className="adm-quad-box">
+                          <div className="adm-quad-header">
+                            <MapPin size={18} style={{ color: "#d97706" }} />
+                            <span>Map &amp; Geo Coordinates</span>
+                          </div>
+
+                          <div className="adm-form-field" style={{ marginBottom: "0.85rem" }}>
+                            <label className="adm-label">Google Maps Embed Iframe URL *</label>
+                            <input
+                              type="text"
+                              className="adm-input"
+                              placeholder="https://maps.google.com/maps?q=..."
+                              value={contactForm.mapEmbedUrl}
+                              onChange={(e) =>
+                                setContactForm({ ...contactForm, mapEmbedUrl: e.target.value })
+                              }
+                              required
+                            />
+                          </div>
+
+                          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.75rem", marginBottom: "0.85rem" }}>
+                            <div className="adm-form-field">
+                              <label className="adm-label">Postal Code</label>
+                              <input
+                                type="text"
+                                className="adm-input"
+                                placeholder="80000"
+                                value={contactForm.mapPostalCode}
+                                onChange={(e) =>
+                                  setContactForm({ ...contactForm, mapPostalCode: e.target.value })
+                                }
+                              />
+                            </div>
+                            <div className="adm-form-field">
+                              <label className="adm-label">GPS Coordinates</label>
+                              <input
+                                type="text"
+                                className="adm-input"
+                                placeholder="6.0463° N, 80.2075° E"
+                                value={contactForm.mapCoordinates}
+                                onChange={(e) =>
+                                  setContactForm({ ...contactForm, mapCoordinates: e.target.value })
+                                }
+                              />
+                            </div>
+                          </div>
+
+                          <div className="adm-form-field">
+                            <label className="adm-label">Map Embed Preview</label>
+                            <div
+                              style={{
+                                height: 110,
+                                borderRadius: 8,
+                                overflow: "hidden",
+                                border: "1px solid var(--adm-border)",
+                              }}
+                            >
+                              <iframe
+                                title="Map Preview"
+                                src={contactForm.mapEmbedUrl}
+                                width="100%"
+                                height="100%"
+                                style={{ border: 0 }}
+                                loading="lazy"
+                              />
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Box 4: Hero Header Text */}
+                        <div className="adm-quad-box">
+                          <div className="adm-quad-header">
+                            <Sparkles size={18} style={{ color: "#7c3aed" }} />
+                            <span>Contact Banner Title &amp; Subtitle</span>
+                          </div>
+
+                          <div className="adm-form-field" style={{ marginBottom: "0.85rem" }}>
+                            <label className="adm-label">Hero Badge Text</label>
+                            <input
+                              type="text"
+                              className="adm-input"
+                              placeholder="Connect • Richmond Hill, Galle"
+                              value={contactForm.heroBadge}
+                              onChange={(e) =>
+                                setContactForm({ ...contactForm, heroBadge: e.target.value })
+                              }
+                            />
+                          </div>
+
+                          <div className="adm-form-field" style={{ marginBottom: "0.85rem" }}>
+                            <label className="adm-label">Hero Main Title *</label>
+                            <input
+                              type="text"
+                              className="adm-input"
+                              placeholder="Contact Rippon Girls' College"
+                              value={contactForm.heroTitle}
+                              onChange={(e) =>
+                                setContactForm({ ...contactForm, heroTitle: e.target.value })
+                              }
+                              required
+                            />
+                          </div>
+
+                          <div className="adm-form-field">
+                            <label className="adm-label">Hero Description Subtitle</label>
+                            <textarea
+                              rows={3}
+                              className="adm-input"
+                              placeholder="Have a question or need more information?..."
+                              value={contactForm.heroSubtitle}
+                              onChange={(e) =>
+                                setContactForm({ ...contactForm, heroSubtitle: e.target.value })
+                              }
+                            />
+                          </div>
+                        </div>
+                      </div>
+
+                      <div style={{ display: "flex", justifyContent: "flex-end" }}>
+                        <button
+                          type="submit"
+                          className="adm-btn-create"
+                          style={{ padding: "0.85rem 2.25rem", fontSize: "0.95rem" }}
+                        >
+                          <Check size={18} />
+                          <span>Save Contact Information</span>
+                        </button>
+                      </div>
+                    </form>
+                  )}
+
+                  {/* SUBTAB 2: DEPARTMENTAL DIRECTORY */}
+                  {contactSubTab === "departments" && (
+                    <div>
+                      {filteredDepartments.length === 0 ? (
+                        <div className="adm-empty-state">
+                          <Building size={48} />
+                          <h3>No Departments Found</h3>
+                          <p>
+                            {searchQuery
+                              ? `No departments match "${searchQuery}".`
+                              : "No departmental offices registered yet. Add one using the button above."}
+                          </p>
+                        </div>
+                      ) : (
+                        <div className="adm-contact-card-grid">
+                          {filteredDepartments.map((dept) => (
+                            <div key={dept.id} className="adm-dept-card">
+                              <div>
+                                <div className="adm-dept-card-top">
+                                  <div className="adm-dept-card-icon">
+                                    <Building size={20} />
+                                  </div>
+                                  <div>
+                                    <h4 className="adm-dept-card-title">{dept.title}</h4>
+                                  </div>
+                                </div>
+                                <p className="adm-dept-card-desc">{dept.desc}</p>
+                                <div className="adm-dept-card-meta">
+                                  <div className="adm-dept-card-meta-row">
+                                    <Phone size={13} style={{ color: "#2563eb" }} />
+                                    <span>{dept.phone}</span>
+                                  </div>
+                                  <div className="adm-dept-card-meta-row">
+                                    <Mail size={13} style={{ color: "#d97706" }} />
+                                    <span>{dept.email}</span>
+                                  </div>
+                                </div>
+                              </div>
+
+                              <div className="adm-dept-card-actions">
+                                <button
+                                  type="button"
+                                  className="adm-btn-action"
+                                  title="Edit department"
+                                  onClick={() => {
+                                    setEditingDept(dept);
+                                    setDeptModalOpen(true);
+                                  }}
+                                >
+                                  <Edit size={14} />
+                                  <span>Edit</span>
+                                </button>
+                                <button
+                                  type="button"
+                                  className="adm-btn-action delete"
+                                  title="Delete department"
+                                  onClick={() => handleDeleteContactDept(dept.id)}
+                                >
+                                  <Trash2 size={14} />
+                                  <span>Delete</span>
+                                </button>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* SUBTAB 3: VISITING PROTOCOLS & GUIDELINES */}
+                  {contactSubTab === "visiting" && (
+                    <div>
+                      {filteredVisiting.length === 0 ? (
+                        <div className="adm-empty-state">
+                          <ShieldCheck size={48} />
+                          <h3>No Visiting Guidelines Found</h3>
+                          <p>No guidelines listed. Add one using the button above.</p>
+                        </div>
+                      ) : (
+                        <div className="adm-contact-card-grid">
+                          {filteredVisiting.map((item) => (
+                            <div key={item.id} className="adm-dept-card">
+                              <div>
+                                <div className="adm-dept-card-top">
+                                  <div className="adm-dept-card-icon">
+                                    <ShieldCheck size={20} />
+                                  </div>
+                                  <div>
+                                    <h4 className="adm-dept-card-title">{item.title}</h4>
+                                  </div>
+                                </div>
+                                <p className="adm-dept-card-desc">{item.desc}</p>
+                              </div>
+
+                              <div className="adm-dept-card-actions">
+                                <button
+                                  type="button"
+                                  className="adm-btn-action"
+                                  title="Edit protocol"
+                                  onClick={() => {
+                                    setEditingVisiting(item);
+                                    setVisitingModalOpen(true);
+                                  }}
+                                >
+                                  <Edit size={14} />
+                                  <span>Edit</span>
+                                </button>
+                                <button
+                                  type="button"
+                                  className="adm-btn-action delete"
+                                  title="Delete protocol"
+                                  onClick={() => handleDeleteContactVisiting(item.id)}
+                                >
+                                  <Trash2 size={14} />
+                                  <span>Delete</span>
+                                </button>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* SUBTAB 4: FAQS ACCORDION */}
+                  {contactSubTab === "faqs" && (
+                    <div>
+                      {filteredFaqs.length === 0 ? (
+                        <div className="adm-empty-state">
+                          <HelpCircle size={48} />
+                          <h3>No FAQs Found</h3>
+                          <p>No FAQs registered. Click &quot;Add FAQ&quot; to create one.</p>
+                        </div>
+                      ) : (
+                        <div>
+                          {filteredFaqs.map((faq) => (
+                            <div key={faq.id} className="adm-faq-item-card">
+                              <div className="adm-faq-item-header">
+                                <div className="adm-faq-item-q">
+                                  <HelpCircle size={18} style={{ color: "#2563eb", flexShrink: 0 }} />
+                                  <span>{faq.q}</span>
+                                </div>
+                                <div className="adm-dept-card-actions">
+                                  <button
+                                    type="button"
+                                    className="adm-btn-action"
+                                    onClick={() => {
+                                      setEditingFaq(faq);
+                                      setFaqModalOpen(true);
+                                    }}
+                                  >
+                                    <Edit size={14} />
+                                    <span>Edit</span>
+                                  </button>
+                                  <button
+                                    type="button"
+                                    className="adm-btn-action delete"
+                                    onClick={() => handleDeleteContactFaq(faq.id)}
+                                  >
+                                    <Trash2 size={14} />
+                                    <span>Delete</span>
+                                  </button>
+                                </div>
+                              </div>
+                              <div className="adm-faq-item-a">{faq.a}</div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* SUBTAB 5: FORM INQUIRIES INBOX */}
+                  {contactSubTab === "inquiries" && (
+                    <div>
+                      <div className="adm-filter-toolbar">
+                        <div className="adm-category-chips">
+                          <button
+                            type="button"
+                            className={`adm-category-chip ${inquiryFilter === "all" ? "active" : ""}`}
+                            onClick={() => setInquiryFilter("all")}
+                          >
+                            <span>All Messages ({content?.contactInquiries?.length || 0})</span>
+                          </button>
+                          <button
+                            type="button"
+                            className={`adm-category-chip ${inquiryFilter === "unread" ? "active" : ""}`}
+                            onClick={() => setInquiryFilter("unread")}
+                          >
+                            <span>
+                              Unread ({(content?.contactInquiries || []).filter((i) => i.status === "unread").length})
+                            </span>
+                          </button>
+                          <button
+                            type="button"
+                            className={`adm-category-chip ${inquiryFilter === "resolved" ? "active" : ""}`}
+                            onClick={() => setInquiryFilter("resolved")}
+                          >
+                            <span>
+                              Resolved ({(content?.contactInquiries || []).filter((i) => i.status === "resolved").length})
+                            </span>
+                          </button>
+                        </div>
+                      </div>
+
+                      {filteredInquiries.length === 0 ? (
+                        <div className="adm-empty-state">
+                          <MessageSquare size={48} />
+                          <h3>No Inquiries Found</h3>
+                          <p>
+                            {searchQuery
+                              ? `No inquiry messages match "${searchQuery}".`
+                              : "No inquiry messages in this filter."}
+                          </p>
+                        </div>
+                      ) : (
+                        <div className="adm-inquiry-list">
+                          {filteredInquiries.map((inq) => (
+                            <div key={inq.id} className={`adm-inquiry-card ${inq.status}`}>
+                              <div className="adm-inquiry-header">
+                                <div style={{ display: "flex", alignItems: "center", gap: "0.65rem", flexWrap: "wrap" }}>
+                                  <span className="adm-inquiry-ref">{inq.referenceId}</span>
+                                  <h4 style={{ margin: 0, fontSize: "1rem", fontWeight: 700, color: "#0f172a" }}>
+                                    {inq.fullName}
+                                  </h4>
+                                  <span style={{ fontSize: "0.82rem", color: "#64748b" }}>
+                                    ({inq.role})
+                                  </span>
+                                </div>
+
+                                <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                                  <span className={`adm-inquiry-status-pill ${inq.status}`}>
+                                    {inq.status === "unread" && "🔴 Unread"}
+                                    {inq.status === "read" && "🟡 Reviewed"}
+                                    {inq.status === "resolved" && "🟢 Resolved"}
+                                  </span>
+                                  <span style={{ fontSize: "0.78rem", color: "#94a3b8" }}>
+                                    {new Date(inq.submittedAt).toLocaleDateString()}
+                                  </span>
+                                </div>
+                              </div>
+
+                              <div className="adm-inquiry-details-grid">
+                                <div>
+                                  <strong>Subject:</strong> {inq.subject}
+                                </div>
+                                <div>
+                                  <strong>Email:</strong>{" "}
+                                  <a href={`mailto:${inq.email}`} style={{ color: "#2563eb" }}>
+                                    {inq.email}
+                                  </a>
+                                </div>
+                                {inq.phone && (
+                                  <div>
+                                    <strong>Phone:</strong> {inq.phone}
+                                  </div>
+                                )}
+                              </div>
+
+                              <div className="adm-inquiry-msg-snippet">
+                                {inq.message}
+                              </div>
+
+                              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "0.5rem" }}>
+                                <button
+                                  type="button"
+                                  className="adm-btn-secondary"
+                                  style={{ fontSize: "0.82rem", padding: "0.45rem 0.85rem" }}
+                                  onClick={() => setSelectedInquiry(inq)}
+                                >
+                                  <Eye size={14} />
+                                  <span>View Details &amp; Reply</span>
+                                </button>
+
+                                <div style={{ display: "flex", gap: "0.5rem" }}>
+                                  <button
+                                    type="button"
+                                    className="adm-btn-action"
+                                    style={{ fontSize: "0.82rem" }}
+                                    onClick={() => handleToggleInquiryStatus(inq.id)}
+                                  >
+                                    <CheckCircle2 size={14} />
+                                    <span>
+                                      {inq.status === "resolved" ? "Mark as Unread" : "Mark as Resolved"}
+                                    </span>
+                                  </button>
+
+                                  <button
+                                    type="button"
+                                    className="adm-btn-action delete"
+                                    style={{ fontSize: "0.82rem" }}
+                                    onClick={() => handleDeleteInquiry(inq.id)}
+                                  >
+                                    <Trash2 size={14} />
+                                    <span>Delete</span>
+                                  </button>
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* -------------------------------------------------------------
+                  TAB 8: DATABASE & CLOUD SETTINGS
                   ------------------------------------------------------------- */}
               {activeTab === "settings" && (
                 <div className="adm-settings-stack">
@@ -3017,6 +4084,390 @@ export default function AdminPage() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* =====================================================================
+          MODAL: CONTACT DEPARTMENT EDIT / CREATE
+          ===================================================================== */}
+      {deptModalOpen && editingDept && (
+        <div className="adm-modal-backdrop" onClick={() => setDeptModalOpen(false)}>
+          <div className="adm-modal-card" onClick={(e) => e.stopPropagation()}>
+            <div className="adm-modal-topbar">
+              <h3 className="adm-modal-title">
+                {contactForm?.departments?.some((d) => d.id === editingDept.id)
+                  ? "Edit Department Details"
+                  : "Add New Department"}
+              </h3>
+              <button
+                className="adm-modal-close-btn"
+                onClick={() => setDeptModalOpen(false)}
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveContactDept} style={{ display: "flex", flexDirection: "column", gap: "1.1rem" }}>
+              <div className="adm-form-field">
+                <label className="adm-label">Department / Office Title *</label>
+                <input
+                  type="text"
+                  className="adm-input"
+                  placeholder="e.g. Admissions & Student Affairs"
+                  value={editingDept.title}
+                  onChange={(e) =>
+                    setEditingDept({ ...editingDept, title: e.target.value })
+                  }
+                  required
+                />
+              </div>
+
+              <div className="adm-form-field">
+                <label className="adm-label">Scope / Responsibilities Description *</label>
+                <textarea
+                  rows={3}
+                  className="adm-input"
+                  placeholder="Brief description of matters handled by this department..."
+                  value={editingDept.desc}
+                  onChange={(e) =>
+                    setEditingDept({ ...editingDept, desc: e.target.value })
+                  }
+                  required
+                />
+              </div>
+
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
+                <div className="adm-form-field">
+                  <label className="adm-label">Telephone Line *</label>
+                  <input
+                    type="text"
+                    className="adm-input"
+                    placeholder="+94 91 223 4769 Ext. 102"
+                    value={editingDept.phone}
+                    onChange={(e) =>
+                      setEditingDept({ ...editingDept, phone: e.target.value })
+                    }
+                    required
+                  />
+                </div>
+
+                <div className="adm-form-field">
+                  <label className="adm-label">Official Email *</label>
+                  <input
+                    type="email"
+                    className="adm-input"
+                    placeholder="admissions@rippongirlscollege.lk"
+                    value={editingDept.email}
+                    onChange={(e) =>
+                      setEditingDept({ ...editingDept, email: e.target.value })
+                    }
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="adm-form-field">
+                <label className="adm-label">Display Icon Style</label>
+                <select
+                  className="adm-input"
+                  value={editingDept.iconName || "Building"}
+                  onChange={(e) =>
+                    setEditingDept({ ...editingDept, iconName: e.target.value })
+                  }
+                >
+                  <option value="Building">🏢 Building / Administrative</option>
+                  <option value="GraduationCap">🎓 GraduationCap / Admissions & Academics</option>
+                  <option value="BookOpen">📖 BookOpen / Records & Examinations</option>
+                  <option value="Users">👥 Users / Alumni & Community</option>
+                  <option value="Award">🏆 Award / Sports & Co-Curriculars</option>
+                  <option value="Phone">📞 Phone / General Reception</option>
+                </select>
+              </div>
+
+              <div className="adm-modal-footer">
+                <button
+                  type="button"
+                  className="adm-btn-secondary"
+                  onClick={() => setDeptModalOpen(false)}
+                >
+                  Cancel
+                </button>
+                <button type="submit" className="adm-btn-create">
+                  <Check size={16} />
+                  <span>Save Department</span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* =====================================================================
+          MODAL: VISITING PROTOCOL GUIDELINE EDIT / CREATE
+          ===================================================================== */}
+      {visitingModalOpen && editingVisiting && (
+        <div className="adm-modal-backdrop" onClick={() => setVisitingModalOpen(false)}>
+          <div className="adm-modal-card" onClick={(e) => e.stopPropagation()}>
+            <div className="adm-modal-topbar">
+              <h3 className="adm-modal-title">
+                {contactForm?.visitingGuide?.some((v) => v.id === editingVisiting.id)
+                  ? "Edit Visiting Guideline"
+                  : "Add Visiting Guideline"}
+              </h3>
+              <button
+                className="adm-modal-close-btn"
+                onClick={() => setVisitingModalOpen(false)}
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveContactVisiting} style={{ display: "flex", flexDirection: "column", gap: "1.1rem" }}>
+              <div className="adm-form-field">
+                <label className="adm-label">Guideline Title *</label>
+                <input
+                  type="text"
+                  className="adm-input"
+                  placeholder="e.g. Main Security Gate"
+                  value={editingVisiting.title}
+                  onChange={(e) =>
+                    setEditingVisiting({ ...editingVisiting, title: e.target.value })
+                  }
+                  required
+                />
+              </div>
+
+              <div className="adm-form-field">
+                <label className="adm-label">Instructions / Description *</label>
+                <textarea
+                  rows={4}
+                  className="adm-input"
+                  placeholder="Details regarding entry requirements, identification, appointment procedures..."
+                  value={editingVisiting.desc}
+                  onChange={(e) =>
+                    setEditingVisiting({ ...editingVisiting, desc: e.target.value })
+                  }
+                  required
+                />
+              </div>
+
+              <div className="adm-form-field">
+                <label className="adm-label">Icon</label>
+                <select
+                  className="adm-input"
+                  value={editingVisiting.iconName || "ShieldCheck"}
+                  onChange={(e) =>
+                    setEditingVisiting({ ...editingVisiting, iconName: e.target.value })
+                  }
+                >
+                  <option value="ShieldCheck">🛡️ ShieldCheck (Security & Gate)</option>
+                  <option value="Clock">⏰ Clock (Hours & Timing)</option>
+                  <option value="Compass">🧭 Compass (Location & Directions)</option>
+                </select>
+              </div>
+
+              <div className="adm-modal-footer">
+                <button
+                  type="button"
+                  className="adm-btn-secondary"
+                  onClick={() => setVisitingModalOpen(false)}
+                >
+                  Cancel
+                </button>
+                <button type="submit" className="adm-btn-create">
+                  <Check size={16} />
+                  <span>Save Guideline</span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* =====================================================================
+          MODAL: FAQ EDIT / CREATE
+          ===================================================================== */}
+      {faqModalOpen && editingFaq && (
+        <div className="adm-modal-backdrop" onClick={() => setFaqModalOpen(false)}>
+          <div className="adm-modal-card" onClick={(e) => e.stopPropagation()}>
+            <div className="adm-modal-topbar">
+              <h3 className="adm-modal-title">
+                {contactForm?.faqs?.some((f) => f.id === editingFaq.id)
+                  ? "Edit FAQ"
+                  : "Add Frequently Asked Question"}
+              </h3>
+              <button
+                className="adm-modal-close-btn"
+                onClick={() => setFaqModalOpen(false)}
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveContactFaq} style={{ display: "flex", flexDirection: "column", gap: "1.1rem" }}>
+              <div className="adm-form-field">
+                <label className="adm-label">Question *</label>
+                <input
+                  type="text"
+                  className="adm-input"
+                  placeholder="e.g. How can I schedule an official meeting with the Principal?"
+                  value={editingFaq.q}
+                  onChange={(e) =>
+                    setEditingFaq({ ...editingFaq, q: e.target.value })
+                  }
+                  required
+                />
+              </div>
+
+              <div className="adm-form-field">
+                <label className="adm-label">Answer *</label>
+                <textarea
+                  rows={5}
+                  className="adm-input"
+                  placeholder="Detailed answer provided to public inquiries..."
+                  value={editingFaq.a}
+                  onChange={(e) =>
+                    setEditingFaq({ ...editingFaq, a: e.target.value })
+                  }
+                  required
+                />
+              </div>
+
+              <div className="adm-modal-footer">
+                <button
+                  type="button"
+                  className="adm-btn-secondary"
+                  onClick={() => setFaqModalOpen(false)}
+                >
+                  Cancel
+                </button>
+                <button type="submit" className="adm-btn-create">
+                  <Check size={16} />
+                  <span>Save FAQ</span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* =====================================================================
+          MODAL: INQUIRY DETAILS & REPLY VIEW
+          ===================================================================== */}
+      {selectedInquiry && (
+        <div className="adm-modal-backdrop" onClick={() => setSelectedInquiry(null)}>
+          <div
+            className="adm-modal-card"
+            style={{ maxWidth: 620 }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="adm-modal-topbar">
+              <div style={{ display: "flex", alignItems: "center", gap: "0.6rem" }}>
+                <span className="adm-inquiry-ref">{selectedInquiry.referenceId}</span>
+                <h3 className="adm-modal-title">Inquiry Message</h3>
+              </div>
+              <button
+                className="adm-modal-close-btn"
+                onClick={() => setSelectedInquiry(null)}
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+              <div
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "1fr 1fr",
+                  gap: "0.75rem",
+                  background: "#f8fafc",
+                  padding: "0.85rem 1rem",
+                  borderRadius: 8,
+                  fontSize: "0.85rem",
+                }}
+              >
+                <div>
+                  <span style={{ color: "#64748b" }}>Sender: </span>
+                  <strong style={{ color: "#0f172a" }}>{selectedInquiry.fullName}</strong>
+                </div>
+                <div>
+                  <span style={{ color: "#64748b" }}>Role: </span>
+                  <strong style={{ color: "#0f172a" }}>{selectedInquiry.role}</strong>
+                </div>
+                <div>
+                  <span style={{ color: "#64748b" }}>Email: </span>
+                  <a href={`mailto:${selectedInquiry.email}`} style={{ color: "#2563eb", fontWeight: 600 }}>
+                    {selectedInquiry.email}
+                  </a>
+                </div>
+                <div>
+                  <span style={{ color: "#64748b" }}>Phone: </span>
+                  <strong style={{ color: "#0f172a" }}>{selectedInquiry.phone || "Not provided"}</strong>
+                </div>
+                <div>
+                  <span style={{ color: "#64748b" }}>Subject: </span>
+                  <strong style={{ color: "#0f172a" }}>{selectedInquiry.subject}</strong>
+                </div>
+                <div>
+                  <span style={{ color: "#64748b" }}>Received: </span>
+                  <span style={{ color: "#0f172a" }}>
+                    {new Date(selectedInquiry.submittedAt).toLocaleString()}
+                  </span>
+                </div>
+              </div>
+
+              <div>
+                <label className="adm-label" style={{ marginBottom: "0.4rem" }}>Message Content</label>
+                <div
+                  style={{
+                    background: "#ffffff",
+                    border: "1px solid var(--adm-border)",
+                    borderRadius: 8,
+                    padding: "1rem",
+                    fontSize: "0.92rem",
+                    lineHeight: 1.6,
+                    color: "#1e293b",
+                    whiteSpace: "pre-wrap",
+                  }}
+                >
+                  {selectedInquiry.message}
+                </div>
+              </div>
+
+              <div className="adm-modal-footer" style={{ justifyContent: "space-between", flexWrap: "wrap", gap: "0.5rem" }}>
+                <a
+                  href={`mailto:${selectedInquiry.email}?subject=Re: [${selectedInquiry.referenceId}] ${encodeURIComponent(selectedInquiry.subject)}`}
+                  className="adm-btn-create"
+                  style={{ textDecoration: "none" }}
+                >
+                  <Mail size={16} />
+                  <span>Reply via Email Client</span>
+                </a>
+
+                <div style={{ display: "flex", gap: "0.5rem" }}>
+                  <button
+                    type="button"
+                    className="adm-btn-secondary"
+                    onClick={() => handleToggleInquiryStatus(selectedInquiry.id)}
+                  >
+                    <CheckCircle2 size={15} />
+                    <span>
+                      {selectedInquiry.status === "resolved" ? "Mark as Unread" : "Mark as Resolved"}
+                    </span>
+                  </button>
+
+                  <button
+                    type="button"
+                    className="adm-btn-action delete"
+                    onClick={() => handleDeleteInquiry(selectedInquiry.id)}
+                  >
+                    <Trash2 size={15} />
+                    <span>Delete</span>
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       )}

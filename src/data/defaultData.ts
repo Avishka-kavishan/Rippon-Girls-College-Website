@@ -6,6 +6,11 @@ import {
   AdminMember,
   StudentPopulationStats,
   AchievementItem,
+  ContactDepartment,
+  ContactVisitingItem,
+  ContactFaq,
+  ContactPageDetails,
+  ContactInquiry,
   SiteContentState,
 } from "@/types/content";
 
@@ -345,6 +350,154 @@ export const defaultAchievements: AchievementItem[] = [
   },
 ];
 
+export const defaultContactDepartments: ContactDepartment[] = [
+  {
+    id: "dept-1",
+    title: "Principal's Office",
+    desc: "Executive administration, institutional governance, appointments, and official delegations.",
+    phone: "+94 91 223 4770",
+    email: "principal@rippongirlscollege.lk",
+    iconName: "Building",
+  },
+  {
+    id: "dept-2",
+    title: "Admissions & Student Affairs",
+    desc: "Grade 1 admissions, mid-year secondary school admissions, and G.C.E. Advanced Level streaming.",
+    phone: "+94 91 223 4769 Ext. 102",
+    email: "admissions@rippongirlscollege.lk",
+    iconName: "GraduationCap",
+  },
+  {
+    id: "dept-3",
+    title: "Examinations & Records",
+    desc: "School leaving certificates, character certificates, G.C.E. O/L and A/L student verification records.",
+    phone: "+94 91 223 4769 Ext. 104",
+    email: "records@rippongirlscollege.lk",
+    iconName: "BookOpen",
+  },
+  {
+    id: "dept-4",
+    title: "Past Pupils' Association (PPA)",
+    desc: "Alumni network, global chapter reunions, scholarship funds, and school development contributions.",
+    phone: "+94 91 223 4769 Ext. 106",
+    email: "ppa@rippongirlscollege.lk",
+    iconName: "Users",
+  },
+  {
+    id: "dept-5",
+    title: "Sports & Co-Curricular Council",
+    desc: "Interschool tournaments, athletic council, Western band, Eastern orchestra, and cultural troupes.",
+    phone: "+94 91 223 4769 Ext. 108",
+    email: "sports@rippongirlscollege.lk",
+    iconName: "Award",
+  },
+  {
+    id: "dept-6",
+    title: "General Reception Desk",
+    desc: "Public inquiries, campus visits, general front-desk assistance, and visitor gate passes.",
+    phone: "+94 91 223 4769",
+    email: "ripponbalika@gmail.com",
+    iconName: "Phone",
+  },
+];
+
+export const defaultContactVisitingGuide: ContactVisitingItem[] = [
+  {
+    id: "visit-1",
+    title: "Main Security Gate",
+    desc: "All visitors must report to the Security Gatehouse at Richmond Hill Road, produce a valid National ID Card (NIC), and receive a visitor pass.",
+    iconName: "ShieldCheck",
+  },
+  {
+    id: "visit-2",
+    title: "Visiting Hours for Parents",
+    desc: "Parent-teacher consultations and sectional meetings are conducted after 1:30 PM on school days or by scheduled appointment.",
+    iconName: "Clock",
+  },
+  {
+    id: "visit-3",
+    title: "How to Reach Us",
+    desc: "Situated in Richmond Hill, just 2.5 km (8 minutes) from Galle Fort and Galle Central Railway & Bus stations. Readily accessible via local buses and cabs.",
+    iconName: "Compass",
+  },
+];
+
+export const defaultContactFaqs: ContactFaq[] = [
+  {
+    id: "faq-1",
+    q: "What is the procedure for obtaining a School Leaving Certificate?",
+    a: "Past pupils or authorized guardians should visit the College Records Office during weekday morning hours (8:30 AM – 1:00 PM). Please bring the student's Admission Number, National Identity Card (NIC), and clearance form. Processing generally takes 3 to 5 working days.",
+  },
+  {
+    id: "faq-2",
+    q: "How can I schedule an official meeting with the Principal?",
+    a: "Appointments with the Principal are scheduled for Tuesdays and Thursdays between 9:00 AM and 11:30 AM. To ensure availability, please submit your request via telephone (+94 91 223 4770) or send an email to principal@rippongirlscollege.lk at least two business days in advance.",
+  },
+  {
+    id: "faq-3",
+    q: "What are the school session and office working hours?",
+    a: "Academic classes operate from 7:30 AM to 1:30 PM, Monday to Friday. The Administrative Secretariat remains open until 3:30 PM on all government school working days. Both academic and administrative offices are closed on weekends and public/mercantile holidays.",
+  },
+  {
+    id: "faq-4",
+    q: "How do students apply for Advanced Level (A/L) admission after O/Ls?",
+    a: "Admission announcements for the G.C.E. Advanced Level streams (Physical Science, Biological Science, Commerce, Arts, and Technology) are published shortly after official O/L results are issued by the Department of Examinations. Application forms can be obtained from the school administrative desk.",
+  },
+  {
+    id: "faq-5",
+    q: "How can alumni register with the Past Pupils' Association (PPA)?",
+    a: "Former students who have completed their education at Rippon Girls' College can join the PPA by registering online or at the PPA Secretariat on campus. For membership forms and upcoming alumni reunions, email ppa@rippongirlscollege.lk.",
+  },
+];
+
+export const defaultContactDetails: ContactPageDetails = {
+  heroBadge: "Connect • Richmond Hill, Galle",
+  heroTitle: "Contact Rippon Girls' College",
+  heroSubtitle:
+    "Have a question or need more information? Get in touch with Rippon Girls' College and connect with us for inquiries, school information, admissions, events, and other matters.",
+  address: "Rippon Girls' College, Richmond Hill Street, Galle, Southern Province, Sri Lanka.",
+  generalPhone: "+94 91 223 4769",
+  principalPhone: "+94 91 223 4770",
+  primaryEmail: "ripponbalika@gmail.com",
+  officialEmail: "info@rippongirlscollege.lk",
+  schoolHours: "7:30 AM – 1:30 PM",
+  officeHours: "7:30 AM – 3:30 PM (Mon–Fri)",
+  mapEmbedUrl:
+    "https://maps.google.com/maps?q=Rippon+Girls+College+Richmond+Hill+Galle+Sri+Lanka&t=&z=15&ie=UTF8&iwloc=&output=embed",
+  mapPostalCode: "80000",
+  mapCoordinates: "6.0463° N, 80.2075° E",
+  departments: defaultContactDepartments,
+  visitingGuide: defaultContactVisitingGuide,
+  faqs: defaultContactFaqs,
+};
+
+export const defaultContactInquiries: ContactInquiry[] = [
+  {
+    id: "inq-1",
+    fullName: "Kamani Jayawardena",
+    email: "kamani.j@example.com",
+    phone: "+94 77 412 8890",
+    role: "Parent / Guardian",
+    subject: "Admissions & Enrollment",
+    message: "Seeking information regarding Grade 1 enrollment procedures and required documents for the upcoming academic year.",
+    submittedAt: "2026-10-07T14:32:00Z",
+    referenceId: "RGC-2026-1092",
+    status: "unread",
+  },
+  {
+    id: "inq-2",
+    fullName: "Nisansala De Silva",
+    email: "nisansala.ds@example.com",
+    phone: "+94 71 889 1245",
+    role: "Alumna (Past Pupil)",
+    subject: "Past Pupils' Association (PPA)",
+    message: "Would like to inquire about life membership registration and upcoming 125th anniversary reunion celebrations.",
+    submittedAt: "2026-10-06T10:15:00Z",
+    referenceId: "RGC-2026-1085",
+    status: "read",
+  },
+];
+
 export const defaultInitialSiteContent: SiteContentState = {
   gallery: defaultGalleryPhotos,
   news: defaultNewsData,
@@ -352,4 +505,6 @@ export const defaultInitialSiteContent: SiteContentState = {
   administration: defaultAdministration,
   studentPopulation: defaultStudentPopulation,
   achievements: defaultAchievements,
+  contact: defaultContactDetails,
+  contactInquiries: defaultContactInquiries,
 };

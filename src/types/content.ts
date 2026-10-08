@@ -71,6 +71,60 @@ export interface AchievementItem {
   href?: string;
 }
 
+export interface ContactDepartment {
+  id: string;
+  title: string;
+  desc: string;
+  phone: string;
+  email: string;
+  iconName?: string;
+}
+
+export interface ContactVisitingItem {
+  id: string;
+  title: string;
+  desc: string;
+  iconName?: string;
+}
+
+export interface ContactFaq {
+  id: string;
+  q: string;
+  a: string;
+}
+
+export interface ContactPageDetails {
+  heroBadge: string;
+  heroTitle: string;
+  heroSubtitle: string;
+  address: string;
+  generalPhone: string;
+  principalPhone: string;
+  primaryEmail: string;
+  officialEmail: string;
+  schoolHours: string;
+  officeHours: string;
+  mapEmbedUrl: string;
+  mapPostalCode: string;
+  mapCoordinates: string;
+  departments: ContactDepartment[];
+  visitingGuide: ContactVisitingItem[];
+  faqs: ContactFaq[];
+}
+
+export interface ContactInquiry {
+  id: string;
+  fullName: string;
+  email: string;
+  phone?: string;
+  role: string;
+  subject: string;
+  message: string;
+  submittedAt: string;
+  referenceId: string;
+  status: "unread" | "read" | "resolved";
+}
+
 export interface SiteContentState {
   gallery: GalleryItem[];
   news: NewsItem[];
@@ -78,4 +132,6 @@ export interface SiteContentState {
   administration: AdminMember[];
   studentPopulation: StudentPopulationStats;
   achievements: AchievementItem[];
+  contact: ContactPageDetails;
+  contactInquiries?: ContactInquiry[];
 }
