@@ -18,9 +18,32 @@ import {
 } from "@/data/defaultData";
 import { getAllContent, onContentChange } from "@/services/contentService";
 import { AdminMember, StudentPopulationStats } from "@/types/content";
+import { useLanguage } from "@/context/LanguageContext";
+import { Language } from "@/locales/types";
 import "./about.css";
 
+function translateRole(role: string, lang: Language): string {
+  if (lang === "en") return role;
+  const lower = role.toLowerCase().trim();
+  if (lang === "si") {
+    if (lower === "principal") return "විදුහල්පතිතුමිය";
+    if (lower.includes("deputy principal")) return "නියෝජ්‍ය විදුහල්පති";
+    if (lower.includes("vice principal")) return "උප විදුහල්පති";
+    if (lower.includes("sectional head")) return "අංශ ප්‍රධානී";
+    return role;
+  }
+  if (lang === "ta") {
+    if (lower === "principal") return "அதிபர்";
+    if (lower.includes("deputy principal")) return "பிரதி அதிபர்";
+    if (lower.includes("vice principal")) return "உப அதிபர்";
+    if (lower.includes("sectional head")) return "பிரிவுத் தலைவர்";
+    return role;
+  }
+  return role;
+}
+
 export default function AboutView() {
+  const { t, language } = useLanguage();
   const [adminList, setAdminList] = useState<AdminMember[]>(defaultAdministration);
   const [population, setPopulation] = useState<StudentPopulationStats>(defaultStudentPopulation);
 
@@ -138,10 +161,9 @@ export default function AboutView() {
         <div className="about-hero-overlay" />
 
         <div className="about-hero-content">
-          <h1 className="about-hero-title">About Us</h1>
+          <h1 className="about-hero-title">{t.nav.about}</h1>
           <p className="about-hero-subtitle">
-            <span>Our History · Vision &amp; Mission · Principal&apos;s Message ·</span>
-            <span className="about-hero-subline">School Leadership · Our Values</span>
+            <span>{t.about.heroSubtitle}</span>
           </p>
         </div>
       </section>
@@ -151,7 +173,7 @@ export default function AboutView() {
           ========================================================================= */}
       <section className="about-school-section" id="about-school">
         <div className="about-school-container">
-          <h2 className="about-main-heading">About Our School</h2>
+          <h2 className="about-main-heading">{t.about.heritageTitle}</h2>
 
           <div className="about-school-grid">
             {/* Left Column: Campus Building Image */}
@@ -167,15 +189,9 @@ export default function AboutView() {
 
             {/* Right Column: Narrative History */}
             <div className="about-school-text">
-              <p className="about-school-paragraph">
-                Rippon Girls&apos; College, Galle, has a rich heritage dating back to 1871. From its early beginnings as the Galle School, the institution developed into a leading national school serving generations of young women.
-              </p>
-              <p className="about-school-paragraph">
-                The school became a government institution in 1929 and was upgraded to National School status in 1994.
-              </p>
-              <p className="about-school-paragraph">
-                Today, Rippon Girls&apos; College provides primary and secondary education and strives to prepare students to meet the challenges of the future with confidence and good attitudes.
-              </p>
+              <p className="about-school-paragraph">{t.about.heritageP1}</p>
+              <p className="about-school-paragraph">{t.about.heritageP2}</p>
+              <p className="about-school-paragraph">{t.about.heritageP3}</p>
             </div>
           </div>
 
@@ -183,17 +199,13 @@ export default function AboutView() {
           <div className="about-vm-wrapper">
             <div className="about-vm-card">
               <div className="about-vm-row">
-                <span className="about-vm-label">Our Vision</span>
-                <p className="about-vm-desc">
-                  To present a fully pledged Sri Lankan woman who is equipped with good attitudes and possesses a self-confident character that can face any challenges.
-                </p>
+                <span className="about-vm-label">{t.about.visionBadge}</span>
+                <p className="about-vm-desc">{t.about.visionText}</p>
               </div>
 
               <div className="about-vm-row">
-                <span className="about-vm-label">Our Mission</span>
-                <p className="about-vm-desc">
-                  To reward fully pledged Sri Lankan women enriched with knowledge, creativity and good attitudes with the aim of achieving common goals.
-                </p>
+                <span className="about-vm-label">{t.about.missionBadge}</span>
+                <p className="about-vm-desc">{t.about.missionText}</p>
               </div>
             </div>
           </div>
@@ -206,8 +218,10 @@ export default function AboutView() {
       <section className="about-admin-section" id="administration">
         <div className="about-admin-container">
           <div className="about-admin-header">
-            <span className="about-section-eyebrow gold">Academic Staff</span>
-            <h2 className="about-admin-title">Our Administration</h2>
+            <span className="about-section-eyebrow gold">
+              {t.about.leadershipEyebrow}
+            </span>
+            <h2 className="about-admin-title">{t.about.leadershipTitle}</h2>
           </div>
 
           <div className="about-admin-carousel-wrapper">
@@ -244,7 +258,9 @@ export default function AboutView() {
                     />
                   </div>
                   <div className="about-admin-body">
-                    <p className="about-admin-role">{admin.role}</p>
+                    <p className="about-admin-role">
+                      {translateRole(admin.role, language)}
+                    </p>
                     <h3 className="about-admin-name">{admin.name}</h3>
                   </div>
                 </div>
@@ -269,21 +285,23 @@ export default function AboutView() {
           ========================================================================= */}
       <section className="about-population-section" id="students">
         <div className="about-population-container">
-          <span className="about-section-eyebrow gold">Our Students</span>
-          <h2 className="about-population-title">Student Population</h2>
+          <span className="about-section-eyebrow gold">
+            {t.about.populationEyebrow}
+          </span>
+          <h2 className="about-population-title">{t.about.populationTitle}</h2>
 
           <div className="about-population-layout">
             {/* Left Quadrant Items */}
             <div className="about-population-col left">
               <div className="about-pop-stat-item">
                 <span className="about-pop-stat-count">{population.totalCount}</span>
-                <span className="about-pop-stat-text">{population.totalSubText}</span>
-                <span className="about-pop-stat-sub">{population.totalLabel}</span>
+                <span className="about-pop-stat-text">{t.about.stats.total.sub}</span>
+                <span className="about-pop-stat-sub">{t.about.stats.total.label}</span>
               </div>
               <div className="about-pop-stat-item">
                 <span className="about-pop-stat-count">{population.primaryCount}</span>
-                <span className="about-pop-stat-text">{population.primarySubText}</span>
-                <span className="about-pop-stat-sub">{population.primaryLabel}</span>
+                <span className="about-pop-stat-text">{t.about.stats.primary.sub}</span>
+                <span className="about-pop-stat-sub">{t.about.stats.primary.label}</span>
               </div>
             </div>
 
@@ -304,13 +322,13 @@ export default function AboutView() {
             <div className="about-population-col right">
               <div className="about-pop-stat-item">
                 <span className="about-pop-stat-count">{population.secondaryCount}</span>
-                <span className="about-pop-stat-text">{population.secondarySubText}</span>
-                <span className="about-pop-stat-sub">{population.secondaryLabel}</span>
+                <span className="about-pop-stat-text">{t.about.stats.secondary.sub}</span>
+                <span className="about-pop-stat-sub">{t.about.stats.secondary.label}</span>
               </div>
               <div className="about-pop-stat-item">
                 <span className="about-pop-stat-count">{population.alCount}</span>
-                <span className="about-pop-stat-text">{population.alSubText}</span>
-                <span className="about-pop-stat-sub">{population.alLabel}</span>
+                <span className="about-pop-stat-text">{t.about.stats.al.sub}</span>
+                <span className="about-pop-stat-sub">{t.about.stats.al.label}</span>
               </div>
             </div>
           </div>
@@ -322,8 +340,10 @@ export default function AboutView() {
           ========================================================================= */}
       <section className="about-facilities-section" id="facilities">
         <div className="about-facilities-container">
-          <span className="about-section-eyebrow gold">Supporting Every Student</span>
-          <h2 className="about-facilities-title">Our Facilities</h2>
+          <span className="about-section-eyebrow gold">
+            {t.about.facilitiesEyebrow}
+          </span>
+          <h2 className="about-facilities-title">{t.about.facilitiesTitle}</h2>
 
           <div className="about-facilities-grid">
             <div className="about-facility-card">
@@ -332,7 +352,9 @@ export default function AboutView() {
               </div>
               <div className="about-facility-divider" />
               <div className="about-facility-bottom">
-                <h3 className="about-facility-name">Learning Space</h3>
+                <h3 className="about-facility-name">
+                  {t.about.facilityItems.classrooms.title}
+                </h3>
               </div>
             </div>
 
@@ -342,7 +364,9 @@ export default function AboutView() {
               </div>
               <div className="about-facility-divider" />
               <div className="about-facility-bottom">
-                <h3 className="about-facility-name">Science Labs</h3>
+                <h3 className="about-facility-name">
+                  {t.about.facilityItems.labs.title}
+                </h3>
               </div>
             </div>
 
@@ -352,7 +376,9 @@ export default function AboutView() {
               </div>
               <div className="about-facility-divider" />
               <div className="about-facility-bottom">
-                <h3 className="about-facility-name">ICT Facilities</h3>
+                <h3 className="about-facility-name">
+                  {t.about.facilityItems.ict.title}
+                </h3>
               </div>
             </div>
 
@@ -362,7 +388,9 @@ export default function AboutView() {
               </div>
               <div className="about-facility-divider" />
               <div className="about-facility-bottom">
-                <h3 className="about-facility-name">Clubs &amp; Societies</h3>
+                <h3 className="about-facility-name">
+                  {t.about.facilityItems.clubs.title}
+                </h3>
               </div>
             </div>
 
@@ -372,7 +400,9 @@ export default function AboutView() {
               </div>
               <div className="about-facility-divider" />
               <div className="about-facility-bottom">
-                <h3 className="about-facility-name">Sports &amp; Recreation</h3>
+                <h3 className="about-facility-name">
+                  {t.about.facilityItems.sports.title}
+                </h3>
               </div>
             </div>
 
@@ -382,7 +412,9 @@ export default function AboutView() {
               </div>
               <div className="about-facility-divider" />
               <div className="about-facility-bottom">
-                <h3 className="about-facility-name">Arts &amp; Culture</h3>
+                <h3 className="about-facility-name">
+                  {t.about.facilityItems.arts.title}
+                </h3>
               </div>
             </div>
           </div>

@@ -12,9 +12,30 @@ import {
 } from "@/data/defaultData";
 import { getAllContent, onContentChange } from "@/services/contentService";
 import { NewsItem, EventItem, AchievementItem } from "@/types/content";
+import { useLanguage } from "@/context/LanguageContext";
+import { Language } from "@/locales/types";
 import "./news.css";
 
+function translateMonth(month: string, lang: Language): string {
+  if (lang === "en") return month;
+  const m = month.toUpperCase().trim();
+  const siMonths: Record<string, string> = {
+    JAN: "ජන", FEB: "පෙබ", MAR: "මාර්තු", APR: "අප්‍රේල්",
+    MAY: "මැයි", JUN: "ජූනි", JUL: "ජූලි", AUG: "අගෝ",
+    SEP: "සැප්", OCT: "ඔක්", NOV: "නොවැ", DEC: "දෙසැ",
+  };
+  const taMonths: Record<string, string> = {
+    JAN: "ஜன", FEB: "பிப்", MAR: "மார்ச்", APR: "ஏப்",
+    MAY: "மே", JUN: "ஜூன்", JUL: "ஜூலை", AUG: "ஆக",
+    SEP: "செப்", OCT: "அக்", NOV: "நவ", DEC: "டிச",
+  };
+  if (lang === "si" && siMonths[m]) return siMonths[m];
+  if (lang === "ta" && taMonths[m]) return taMonths[m];
+  return month;
+}
+
 export default function NewsView() {
+  const { t, language } = useLanguage();
   const [newsList, setNewsList] = useState<NewsItem[]>(defaultNewsData);
   const [eventsList, setEventsList] = useState<EventItem[]>(defaultUpcomingEvents);
   const [achievementsList, setAchievementsList] = useState<AchievementItem[]>(defaultAchievements);
@@ -83,11 +104,8 @@ export default function NewsView() {
         <div className="news-hero-overlay" />
 
         <div className="news-hero-content">
-          <h1 className="news-hero-title">News</h1>
-          <p className="news-hero-subtitle">
-            Stay connected with the latest news, events, achievements and memorable
-            moments from the Rippon Girls&apos; College community.
-          </p>
+          <h1 className="news-hero-title">{t.news.heroTitle}</h1>
+          <p className="news-hero-subtitle">{t.news.heroSubtitle}</p>
         </div>
       </section>
 
@@ -96,7 +114,7 @@ export default function NewsView() {
           ========================================================================= */}
       <section className="news-latest-section" id="latest-news">
         <div className="news-section-container">
-          <h2 className="news-main-heading">Latest News</h2>
+          <h2 className="news-main-heading">{t.news.latestNewsHeading}</h2>
 
           <div className="news-cards-grid">
             {newsList.map((item) => (
@@ -109,7 +127,7 @@ export default function NewsView() {
                       image: item.image,
                       alt: item.alt,
                       description: item.description,
-                      tag: "News",
+                      tag: t.nav.news,
                     })
                   }
                   role="button"
@@ -121,12 +139,12 @@ export default function NewsView() {
                         image: item.image,
                         alt: item.alt,
                         description: item.description,
-                        tag: "News",
+                        tag: t.nav.news,
                       });
                     }
                   }}
-                  title="Click to view full photo"
-                  aria-label={`View full photo for ${item.title}`}
+                  title={t.news.viewFullImage}
+                  aria-label={`${t.news.viewFullImage}: ${item.title}`}
                 >
                   {/* Soft ambient background for extreme aspect ratios */}
                   <div className="news-media-ambient" aria-hidden="true">
@@ -159,7 +177,7 @@ export default function NewsView() {
                   <div className="news-media-zoom-overlay">
                     <span className="news-media-zoom-btn">
                       <Maximize2 size={14} />
-                      <span>View Full Photo</span>
+                      <span>{t.news.viewFullImage}</span>
                     </span>
                     {aspectMap[item.id] === "portrait" && (
                       <span className="news-ratio-pill">Portrait</span>
@@ -180,7 +198,7 @@ export default function NewsView() {
                   </h3>
                   <p className="news-item-text">{item.description}</p>
                   <Link href={item.href || "#"} className="news-item-link">
-                    <span>{item.linkText || "Learn More"}</span>
+                    <span>{item.linkText || t.news.readMore}</span>
                   </Link>
                 </div>
               </article>
@@ -195,8 +213,10 @@ export default function NewsView() {
       <section className="news-events-section" id="upcoming-events">
         <div className="news-events-container">
           <div className="news-events-header">
-            <span className="news-events-eyebrow">Discover Our Upcoming Events</span>
-            <h2 className="news-events-title">Upcoming Events</h2>
+            <span className="news-events-eyebrow">
+              {t.news.upcomingEventsSubtitle}
+            </span>
+            <h2 className="news-events-title">{t.news.upcomingEventsHeading}</h2>
           </div>
 
           <div className="news-events-grid">
@@ -209,7 +229,9 @@ export default function NewsView() {
               >
                 <div className="event-card-left">
                   <div className="event-date-badge">
-                    <span className="event-date-month">{event.month}</span>
+                    <span className="event-date-month">
+                      {translateMonth(event.month, language)}
+                    </span>
                     <span className="event-date-day">{event.day}</span>
                   </div>
                   <div className="event-details">
@@ -236,9 +258,9 @@ export default function NewsView() {
         <div className="news-section-container">
           <div className="news-achievements-header">
             <span className="news-achievements-eyebrow">
-              Success Worth Celebrating
+              {t.news.achievementsSubtitle}
             </span>
-            <h2 className="news-achievements-title">Student Achievements</h2>
+            <h2 className="news-achievements-title">{t.news.achievementsHeading}</h2>
           </div>
 
           <div className="news-cards-grid">
@@ -252,7 +274,7 @@ export default function NewsView() {
                       image: achievement.image,
                       alt: achievement.alt,
                       description: achievement.description,
-                      tag: "Achievement",
+                      tag: t.news.achievementsHeading,
                     })
                   }
                   role="button"
@@ -264,12 +286,12 @@ export default function NewsView() {
                         image: achievement.image,
                         alt: achievement.alt,
                         description: achievement.description,
-                        tag: "Achievement",
+                        tag: t.news.achievementsHeading,
                       });
                     }
                   }}
-                  title="Click to view full photo"
-                  aria-label={`View full photo for ${achievement.title}`}
+                  title={t.news.viewFullImage}
+                  aria-label={`${t.news.viewFullImage}: ${achievement.title}`}
                 >
                   {/* Soft ambient background for extreme aspect ratios */}
                   <div className="news-media-ambient" aria-hidden="true">
@@ -302,7 +324,7 @@ export default function NewsView() {
                   <div className="news-media-zoom-overlay">
                     <span className="news-media-zoom-btn">
                       <Maximize2 size={14} />
-                      <span>View Full Photo</span>
+                      <span>{t.news.viewFullImage}</span>
                     </span>
                     {aspectMap[achievement.id] === "portrait" && (
                       <span className="news-ratio-pill">Portrait</span>
@@ -313,7 +335,7 @@ export default function NewsView() {
                 <div className="news-item-body">
                   <p className="news-item-text">{achievement.description}</p>
                   <Link href={achievement.href || "#"} className="news-item-link">
-                    <span>{achievement.linkText || "Learn More"}</span>
+                    <span>{achievement.linkText || t.news.readMore}</span>
                   </Link>
                 </div>
               </article>
@@ -353,7 +375,7 @@ export default function NewsView() {
               type="button"
               className="news-modal-close-btn"
               onClick={() => setSelectedImageModal(null)}
-              aria-label="Close photo preview"
+              aria-label={t.news.modalClose}
             >
               <X size={22} />
             </button>

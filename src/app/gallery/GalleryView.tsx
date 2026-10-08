@@ -4,6 +4,7 @@ import React, { useState, useEffect, useCallback, useMemo } from "react";
 import Image from "next/image";
 import { ChevronLeft, ChevronRight, Maximize2, Tag, Layers } from "lucide-react";
 import { getAssetPath } from "@/utils/assets";
+import { useLanguage } from "@/context/LanguageContext";
 import "./gallery.css";
 
 interface Category {
@@ -177,6 +178,7 @@ const bentoPhotos: GalleryPhoto[] = [
 import { getAllContent, onContentChange } from "@/services/contentService";
 
 export default function GalleryView() {
+  const { t, language } = useLanguage();
   const [photos, setPhotos] = useState<GalleryPhoto[]>(bentoPhotos);
   // "all" or specific category ID
   const [activeCategory, setActiveCategory] = useState<string>("all");
@@ -315,10 +317,9 @@ export default function GalleryView() {
         <div className="gallery-hero-overlay" />
 
         <div className="gallery-hero-content">
-          <h1 className="gallery-hero-title">Gallery</h1>
+          <h1 className="gallery-hero-title">{t.gallery.heroTitle}</h1>
           <p className="gallery-hero-subtitle">
-            <span>Explore the memorable moments, special events, achievements and everyday experiences that bring the Rippon Girls' College community to life.</span>
-
+            <span>{t.gallery.heroSubtitle}</span>
           </p>
         </div>
       </section>
@@ -327,7 +328,9 @@ export default function GalleryView() {
           2. GALLERY CATEGORIES SECTION
           ========================================================================= */}
       <section className="gallery-categories-section" id="gallery-categories">
-        <h2 className="gallery-section-heading">Browse by Category</h2>
+        <h2 className="gallery-section-heading">
+          {language === "si" ? "කාණ්ඩය අනුව තෝරන්න" : language === "ta" ? "பிரிவுகளின் படி உலாவுக" : "Browse by Category"}
+        </h2>
 
         <div className="categories-grid">
           {categoriesData.map((category) => {
@@ -362,7 +365,9 @@ export default function GalleryView() {
 
                 <div className="category-card-content">
                   <span className="category-icon">{category.icon}</span>
-                  <span className="category-title">{category.label}</span>
+                  <span className="category-title">
+                    {t.gallery.categories[category.id as keyof typeof t.gallery.categories] || category.label}
+                  </span>
                 </div>
               </button>
             );
@@ -376,7 +381,9 @@ export default function GalleryView() {
       <section className="bento-gallery-section" id="photo-gallery">
         <div className="bento-section-header">
           <div className="bento-title-group">
-            <h2 className="gallery-section-heading">Photo Gallery</h2>
+            <h2 className="gallery-section-heading">
+              {language === "si" ? "පාසල් ඡායාරූප" : language === "ta" ? "புகைப்பட தொகுப்பு" : "Photo Gallery"}
+            </h2>
             <p className="bento-section-desc">
               Curated highlights of student life, cultural events, sports meets, and academic excellence.
             </p>
@@ -392,7 +399,7 @@ export default function GalleryView() {
               className={`filter-pill-btn ${activeCategory === "all" ? "active" : ""}`}
             >
               <Layers size={14} className="pill-icon" />
-              <span>All Moments</span>
+              <span>{t.gallery.filterAll}</span>
               <span className="pill-count">{getCategoryCount("all")}</span>
             </button>
 
@@ -406,7 +413,9 @@ export default function GalleryView() {
                 className={`filter-pill-btn ${activeCategory === cat.id ? "active" : ""}`}
               >
                 <span className="pill-emoji">{cat.icon}</span>
-                <span>{cat.label}</span>
+                <span>
+                  {t.gallery.categories[cat.id as keyof typeof t.gallery.categories] || cat.label}
+                </span>
                 <span className="pill-count">{getCategoryCount(cat.id)}</span>
               </button>
             ))}
@@ -501,7 +510,9 @@ export default function GalleryView() {
             aria-label="View all gallery images"
           >
             <span className="see-all-text">
-              {isExpanded ? "Show Less" : "See All"}
+              {isExpanded
+                ? (language === "si" ? "අඩුවෙන් පෙන්වන්න" : language === "ta" ? "குறைவாகக் காட்டு" : "Show Less")
+                : (language === "si" ? "සියල්ල නරඹන්න" : language === "ta" ? "அனைத்தையும் காண்க" : "See All")}
             </span>
           </button>
         </div>
@@ -512,9 +523,15 @@ export default function GalleryView() {
           ========================================================================= */}
       <section className="image-lightbox-section" id="image-lightbox">
         <div className="lightbox-header-wrap">
-          <h2 className="gallery-section-heading">Featured Image Viewer</h2>
+          <h2 className="gallery-section-heading">
+            {language === "si" ? "විශේෂිත ඡායාරූප නැරඹුම" : language === "ta" ? "சிறப்புப் படக் காட்சி" : "Featured Image Viewer"}
+          </h2>
           <p className="lightbox-section-desc">
-            Click any photo from the bento grid above or use the navigation arrows below to inspect in high definition.
+            {language === "si"
+              ? "පැහැදිලි පෙනුම සඳහා ඉහතින් ඡායාරූපයක් තෝරන්න හෝ ඊතල භාවිත කරන්න."
+              : language === "ta"
+                ? "தெளிவான பார்வைக்கு மேலே உள்ள படத்தைத் தேர்ந்தெடுக்கவும் அல்லது அம்புக்குறிகளைப் பயன்படுத்தவும்."
+                : "Click any photo from the bento grid above or use the navigation arrows below to inspect in high definition."}
           </p>
         </div>
 

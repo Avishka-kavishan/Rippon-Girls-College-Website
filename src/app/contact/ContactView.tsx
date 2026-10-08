@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
-import Link from "next/link";
 import {
   MapPin,
   Phone,
@@ -18,7 +17,6 @@ import {
   Award,
   Users,
   Compass,
-  AlertCircle,
   ShieldCheck,
 } from "lucide-react";
 import { getAssetPath } from "@/utils/assets";
@@ -30,6 +28,7 @@ import {
   defaultContactFaqs,
 } from "@/data/defaultData";
 import { ContactPageDetails } from "@/types/content";
+import { useLanguage } from "@/context/LanguageContext";
 import "./contact.css";
 
 interface FormData {
@@ -57,6 +56,7 @@ const initialForm: FormData = {
 };
 
 export default function ContactView() {
+  const { t, language } = useLanguage();
   const [contactData, setContactData] = useState<ContactPageDetails>(defaultContactDetails);
 
   // Guarantee all fields are safely populated even if database/cache returns partial data
@@ -103,16 +103,18 @@ export default function ContactView() {
   const validate = (): boolean => {
     const errs: FormErrors = {};
     if (!formData.fullName.trim() || formData.fullName.trim().length < 2) {
-      errs.fullName = "Please enter your full name.";
+      errs.fullName = t.contact.form.errors.nameRequired;
     }
     if (
       !formData.email.trim() ||
       !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email.trim())
     ) {
-      errs.email = "Please provide a valid email address.";
+      errs.email = !formData.email.trim()
+        ? t.contact.form.errors.emailRequired
+        : t.contact.form.errors.emailInvalid;
     }
     if (!formData.message.trim() || formData.message.trim().length < 10) {
-      errs.message = "Message must be at least 10 characters long.";
+      errs.message = t.contact.form.errors.messageRequired;
     }
     setErrors(errs);
     return Object.keys(errs).length === 0;
@@ -185,6 +187,16 @@ export default function ContactView() {
     }
   };
 
+  const displayHeroTitle =
+    language === "en"
+      ? activeContact.heroTitle || t.contact.heroTitle
+      : t.contact.heroTitle;
+
+  const displayHeroSubtitle =
+    language === "en"
+      ? activeContact.heroSubtitle || t.contact.heroSubtitle
+      : t.contact.heroSubtitle;
+
   return (
     <div className="contact-page-wrapper">
       {/* =========================================================================
@@ -203,18 +215,17 @@ export default function ContactView() {
         <div className="contact-hero-overlay" />
 
         <div className="contact-hero-content">
+          <h1 className="contact-hero-title">{displayHeroTitle}</h1>
 
-          <h1 className="contact-hero-title">{activeContact.heroTitle || "Contact Rippon Girls' College"}</h1>
-
-          <p className="contact-hero-subtitle">
-            {activeContact.heroSubtitle ||
-              "Have a question or need more information? Get in touch with Rippon Girls' College and connect with us for inquiries, school information, admissions, events, and other matters."}
-          </p>
+          <p className="contact-hero-subtitle">{displayHeroSubtitle}</p>
 
           <div className="contact-hero-pills">
             <div className="contact-hero-pill">
               <MapPin size={15} />
-              <span>{(activeContact.address || "").split(",")[1]?.trim() || "Richmond Hill Street, Galle"}</span>
+              <span>
+                {(activeContact.address || "").split(",")[1]?.trim() ||
+                  "Richmond Hill Street, Galle"}
+              </span>
             </div>
             <div className="contact-hero-pill">
               <Phone size={15} />
@@ -222,7 +233,9 @@ export default function ContactView() {
             </div>
             <div className="contact-hero-pill">
               <Clock size={15} />
-              <span>Office: {activeContact.officeHours}</span>
+              <span>
+                {t.contact.quickCards.hoursTitle}: {activeContact.officeHours}
+              </span>
             </div>
           </div>
         </div>
@@ -239,12 +252,16 @@ export default function ContactView() {
               <div className="contact-card-icon-wrap">
                 <MapPin size={24} />
               </div>
-              <h2 className="contact-card-title">School Location</h2>
+              <h2 className="contact-card-title">
+                {t.contact.quickCards.addressTitle}
+              </h2>
               <p className="contact-card-desc">
-                {activeContact.address}
+                {language === "en"
+                  ? activeContact.address
+                  : t.footer.address}
               </p>
               <a href="#map-section" className="contact-card-action">
-                <span>View School Map</span>
+                <span>{t.contact.quickCards.addressAction}</span>
                 <ChevronDown size={16} />
               </a>
             </div>
@@ -254,13 +271,19 @@ export default function ContactView() {
               <div className="contact-card-icon-wrap">
                 <Phone size={24} />
               </div>
-              <h2 className="contact-card-title">Telephone Desk</h2>
+              <h2 className="contact-card-title">
+                {t.contact.quickCards.phoneTitle}
+              </h2>
               <p className="contact-card-desc">
-                <strong>General:</strong> {activeContact.generalPhone}<br />
-                <strong>Principal:</strong> {activeContact.principalPhone}
+                <strong>General:</strong> {activeContact.generalPhone}
+                <br />
+                <strong>Office:</strong> {activeContact.principalPhone}
               </p>
-              <a href={`tel:${(activeContact.generalPhone || "").replace(/\s+/g, "")}`} className="contact-card-action">
-                <span>Call Administrative Desk</span>
+              <a
+                href={`tel:${(activeContact.generalPhone || "").replace(/\s+/g, "")}`}
+                className="contact-card-action"
+              >
+                <span>{activeContact.generalPhone}</span>
                 <ExternalLink size={14} />
               </a>
             </div>
@@ -270,13 +293,19 @@ export default function ContactView() {
               <div className="contact-card-icon-wrap">
                 <Mail size={24} />
               </div>
-              <h2 className="contact-card-title">Email Inquiries</h2>
+              <h2 className="contact-card-title">
+                {t.contact.quickCards.emailTitle}
+              </h2>
               <p className="contact-card-desc">
-                <strong>Primary:</strong> {activeContact.primaryEmail}<br />
+                <strong>Primary:</strong> {activeContact.primaryEmail}
+                <br />
                 <strong>Official:</strong> {activeContact.officialEmail}
               </p>
-              <a href={`mailto:${activeContact.primaryEmail}`} className="contact-card-action">
-                <span>Send Direct Email</span>
+              <a
+                href={`mailto:${activeContact.primaryEmail}`}
+                className="contact-card-action"
+              >
+                <span>{activeContact.primaryEmail}</span>
                 <ExternalLink size={14} />
               </a>
             </div>
@@ -286,13 +315,16 @@ export default function ContactView() {
               <div className="contact-card-icon-wrap">
                 <Clock size={24} />
               </div>
-              <h2 className="contact-card-title">School &amp; Office Hours</h2>
+              <h2 className="contact-card-title">
+                {t.contact.quickCards.hoursTitle}
+              </h2>
               <p className="contact-card-desc">
-                <strong>School:</strong> {activeContact.schoolHours}<br />
-                <strong>Office:</strong> {activeContact.officeHours}
+                <strong>{language === "si" ? "පාසල් කාලය:" : language === "ta" ? "பாடசாலை:" : "School:"}</strong> {activeContact.schoolHours}
+                <br />
+                <strong>{language === "si" ? "කාර්යාලය:" : language === "ta" ? "அலுவலகம்:" : "Office:"}</strong> {activeContact.officeHours}
               </p>
               <a href="#visiting-guide" className="contact-card-action">
-                <span>Visitor Protocol</span>
+                <span>{t.contact.visitingTitle}</span>
                 <ChevronDown size={16} />
               </a>
             </div>
@@ -306,44 +338,44 @@ export default function ContactView() {
       <section className="contact-main-section" id="inquiry-form">
         <div className="contact-main-container">
           <div className="contact-section-header">
-            <span className="contact-badge-label">Send An Inquiry</span>
-            <h2 className="contact-main-title">We Are Here to Assist You</h2>
-            <p className="contact-main-subtitle">
-              Whether you are an alumnus reconnecting, a parent inquiring about admissions,
-              or requesting certified school records, please reach out to us below.
-            </p>
+            <span className="contact-badge-label">{t.contact.heroBadge}</span>
+            <h2 className="contact-main-title">{t.contact.form.title}</h2>
+            <p className="contact-main-subtitle">{t.contact.form.subtitle}</p>
           </div>
 
           <div className="contact-grid-layout">
             {/* Left: Contact & Inquiry Form */}
             <div className="contact-form-card">
               <div className="contact-form-header">
-                <h3 className="contact-form-heading">Send an Official Message</h3>
-                <p className="contact-form-subtext">
-                  Fill in your details and our administrative staff will respond to your message promptly.
-                </p>
+                <h3 className="contact-form-heading">{t.contact.form.title}</h3>
+                <p className="contact-form-subtext">{t.contact.form.subtitle}</p>
               </div>
 
               {isSubmitted ? (
-                <div className="contact-success-box" role="status" aria-live="polite">
+                <div
+                  className="contact-success-box"
+                  role="status"
+                  aria-live="polite"
+                >
                   <div className="contact-success-icon">
                     <CheckCircle2 size={36} />
                   </div>
-                  <h4 className="contact-success-title">Message Received!</h4>
+                  <h4 className="contact-success-title">
+                    {t.contact.form.success.title}
+                  </h4>
                   <p className="contact-success-msg">
-                    Thank you, <strong>{formData.fullName}</strong>. Your inquiry regarding{" "}
-                    <strong>{formData.subject}</strong> has been received by the administrative office. We will respond to{" "}
-                    <strong>{formData.email}</strong> shortly.
+                    {t.contact.form.success.message}
                   </p>
                   <div className="contact-success-ref">
-                    Reference ID: <strong>{submissionRef}</strong>
+                    {t.contact.form.success.refLabel}:{" "}
+                    <strong>{submissionRef}</strong>
                   </div>
                   <button
                     type="button"
                     onClick={handleReset}
                     className="contact-success-reset-btn"
                   >
-                    Send Another Message
+                    {t.contact.form.success.sendAnother}
                   </button>
                 </div>
               ) : (
@@ -352,13 +384,14 @@ export default function ContactView() {
                     {/* Full Name */}
                     <div className="contact-field-group">
                       <label htmlFor="contact-name" className="contact-field-label">
-                        Full Name <span className="contact-field-required">*</span>
+                        {t.contact.form.nameLabel}{" "}
+                        <span className="contact-field-required">*</span>
                       </label>
                       <input
                         id="contact-name"
                         type="text"
                         className="contact-input"
-                        placeholder="e.g. Priyanthi Wickramasinghe"
+                        placeholder={t.contact.form.namePlaceholder}
                         value={formData.fullName}
                         onChange={(e) =>
                           setFormData({ ...formData, fullName: e.target.value })
@@ -367,7 +400,10 @@ export default function ContactView() {
                         required
                       />
                       {errors.fullName && (
-                        <span className="contact-field-char-count" style={{ color: "#dc2626" }}>
+                        <span
+                          className="contact-field-char-count"
+                          style={{ color: "#dc2626" }}
+                        >
                           {errors.fullName}
                         </span>
                       )}
@@ -376,13 +412,14 @@ export default function ContactView() {
                     {/* Email Address */}
                     <div className="contact-field-group">
                       <label htmlFor="contact-email" className="contact-field-label">
-                        Email Address <span className="contact-field-required">*</span>
+                        {t.contact.form.emailLabel}{" "}
+                        <span className="contact-field-required">*</span>
                       </label>
                       <input
                         id="contact-email"
                         type="email"
                         className="contact-input"
-                        placeholder="e.g. priyanthi@example.com"
+                        placeholder={t.contact.form.emailPlaceholder}
                         value={formData.email}
                         onChange={(e) =>
                           setFormData({ ...formData, email: e.target.value })
@@ -391,7 +428,10 @@ export default function ContactView() {
                         required
                       />
                       {errors.email && (
-                        <span className="contact-field-char-count" style={{ color: "#dc2626" }}>
+                        <span
+                          className="contact-field-char-count"
+                          style={{ color: "#dc2626" }}
+                        >
                           {errors.email}
                         </span>
                       )}
@@ -402,13 +442,13 @@ export default function ContactView() {
                     {/* Phone Number */}
                     <div className="contact-field-group">
                       <label htmlFor="contact-phone" className="contact-field-label">
-                        Contact No <span style={{ color: "#9ca3af", fontWeight: 400 }}>(Optional)</span>
+                        {t.contact.form.phoneLabel}
                       </label>
                       <input
                         id="contact-phone"
                         type="tel"
                         className="contact-input"
-                        placeholder="e.g. +94 77 123 4567"
+                        placeholder={t.contact.form.phonePlaceholder}
                         value={formData.phone}
                         onChange={(e) =>
                           setFormData({ ...formData, phone: e.target.value })
@@ -419,7 +459,7 @@ export default function ContactView() {
                     {/* Role / Inquirer Type */}
                     <div className="contact-field-group">
                       <label htmlFor="contact-role" className="contact-field-label">
-                        I am a...
+                        {t.contact.form.roleLabel}
                       </label>
                       <select
                         id="contact-role"
@@ -429,12 +469,21 @@ export default function ContactView() {
                           setFormData({ ...formData, role: e.target.value })
                         }
                       >
-                        <option value="Parent / Guardian">Parent / Guardian</option>
-                        <option value="Current Student">Current Student</option>
-                        <option value="Alumna (Past Pupil)">Alumna (Past Pupil)</option>
-                        <option value="Prospective Student / Parent">Prospective Student / Parent</option>
-                        <option value="Academic / Teacher">Academic / Educator</option>
-                        <option value="Community Member / Visitor">Community Member / Visitor</option>
+                        <option value="Parent / Guardian">
+                          {t.contact.form.roles.parent}
+                        </option>
+                        <option value="Prospective Student">
+                          {t.contact.form.roles.prospective}
+                        </option>
+                        <option value="Alumna">
+                          {t.contact.form.roles.alumna}
+                        </option>
+                        <option value="Staff">
+                          {t.contact.form.roles.staff}
+                        </option>
+                        <option value="Community / Visitor">
+                          {t.contact.form.roles.community}
+                        </option>
                       </select>
                     </div>
                   </div>
@@ -442,7 +491,7 @@ export default function ContactView() {
                   {/* Subject */}
                   <div className="contact-field-group">
                     <label htmlFor="contact-subject" className="contact-field-label">
-                      Subject / Department
+                      {t.contact.form.subjectLabel}
                     </label>
                     <select
                       id="contact-subject"
@@ -452,26 +501,38 @@ export default function ContactView() {
                         setFormData({ ...formData, subject: e.target.value })
                       }
                     >
-                      <option value="General Inquiry">General School Inquiry</option>
-                      <option value="Admissions & Enrollment">Admissions &amp; Grade Enrollment</option>
-                      <option value="Certificates & Transcripts">Leaving Certificates &amp; Transcripts</option>
-                      <option value="Principal's Secretariat">Principal&apos;s Secretariat &amp; Appointments</option>
-                      <option value="Past Pupils' Association (PPA)">Past Pupils&apos; Association (PPA)</option>
-                      <option value="Sports & Extra-Curriculars">Sports, Bands &amp; Extra-Curriculars</option>
-                      <option value="School Welfare & Donations">Welfare &amp; School Development Projects</option>
+                      <option value="General Inquiry">
+                        {t.contact.form.subjects.general}
+                      </option>
+                      <option value="Admissions & Enrollment">
+                        {t.contact.form.subjects.admissions}
+                      </option>
+                      <option value="Academic Programs">
+                        {t.contact.form.subjects.academic}
+                      </option>
+                      <option value="Extracurricular & Sports">
+                        {t.contact.form.subjects.extracurricular}
+                      </option>
+                      <option value="Certificates & Transcripts">
+                        {t.contact.form.subjects.transcripts}
+                      </option>
+                      <option value="Other Matters">
+                        {t.contact.form.subjects.other}
+                      </option>
                     </select>
                   </div>
 
                   {/* Message */}
                   <div className="contact-field-group">
                     <label htmlFor="contact-message" className="contact-field-label">
-                      Message <span className="contact-field-required">*</span>
+                      {t.contact.form.messageLabel}{" "}
+                      <span className="contact-field-required">*</span>
                     </label>
                     <textarea
                       id="contact-message"
                       rows={5}
                       className="contact-textarea"
-                      placeholder="Please share detailed information regarding your inquiry..."
+                      placeholder={t.contact.form.messagePlaceholder}
                       value={formData.message}
                       onChange={(e) =>
                         setFormData({ ...formData, message: e.target.value })
@@ -484,7 +545,10 @@ export default function ContactView() {
                       {formData.message.length} / 1200 characters
                     </div>
                     {errors.message && (
-                      <span className="contact-field-char-count" style={{ color: "#dc2626", textAlign: "left" }}>
+                      <span
+                        className="contact-field-char-count"
+                        style={{ color: "#dc2626", textAlign: "left" }}
+                      >
                         {errors.message}
                       </span>
                     )}
@@ -499,12 +563,12 @@ export default function ContactView() {
                     {isSubmitting ? (
                       <>
                         <div className="contact-submit-spinner" />
-                        <span>Sending Inquiry...</span>
+                        <span>{t.contact.form.submittingBtn}</span>
                       </>
                     ) : (
                       <>
                         <Send size={18} />
-                        <span>Submit Official Inquiry</span>
+                        <span>{t.contact.form.submitBtn}</span>
                       </>
                     )}
                   </button>
@@ -519,16 +583,16 @@ export default function ContactView() {
                 <div className="contact-map-header">
                   <span className="contact-map-heading">
                     <MapPin size={18} color="var(--primary-blue)" />
-                    College Map Location
+                    {t.contact.mapTitle}
                   </span>
                   <a
                     href="https://www.google.com/maps/search/?api=1&query=Rippon+Girls'+College,+Richmond+Hill,+Galle"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="contact-map-external-link"
-                    title="Open in Google Maps"
+                    title={t.contact.openMap}
                   >
-                    <span>Open in Maps</span>
+                    <span>{t.contact.openMap}</span>
                     <ExternalLink size={13} />
                   </a>
                 </div>
@@ -545,11 +609,14 @@ export default function ContactView() {
 
                 <div className="contact-map-details">
                   <span className="contact-map-address">
-                    Rippon Girls&apos; College
+                    {t.nav.brandTitle}
                   </span>
-                  <span>{activeContact.address}</span>
+                  <span>
+                    {language === "en" ? activeContact.address : t.footer.address}
+                  </span>
                   <span style={{ fontSize: "0.8rem", color: "#6b7280" }}>
-                    Postal Code: {activeContact.mapPostalCode} &bull; Coordinates: {activeContact.mapCoordinates}
+                    {t.contact.postalCodeLabel}: {activeContact.mapPostalCode} &bull;{" "}
+                    {t.contact.coordinatesLabel}: {activeContact.mapCoordinates}
                   </span>
                 </div>
               </div>
@@ -558,21 +625,26 @@ export default function ContactView() {
               <div className="contact-visiting-card" id="visiting-guide">
                 <h3 className="contact-visiting-title">
                   <ShieldCheck size={20} color="var(--primary-blue)" />
-                  School Visiting Protocol
+                  {t.contact.visitingTitle}
                 </h3>
 
                 <div className="contact-visiting-list">
-                  {(activeContact.visitingGuide || defaultContactVisitingGuide).map((item) => (
-                    <div key={item.id || item.title} className="contact-visiting-item">
-                      <div className="contact-visiting-icon-badge">
-                        {renderVisitingIcon(item.iconName)}
+                  {(activeContact.visitingGuide || defaultContactVisitingGuide).map(
+                    (item) => (
+                      <div
+                        key={item.id || item.title}
+                        className="contact-visiting-item"
+                      >
+                        <div className="contact-visiting-icon-badge">
+                          {renderVisitingIcon(item.iconName)}
+                        </div>
+                        <div className="contact-visiting-text-block">
+                          <h4 className="contact-visiting-heading">{item.title}</h4>
+                          <p className="contact-visiting-desc">{item.desc}</p>
+                        </div>
                       </div>
-                      <div className="contact-visiting-text-block">
-                        <h4 className="contact-visiting-heading">{item.title}</h4>
-                        <p className="contact-visiting-desc">{item.desc}</p>
-                      </div>
-                    </div>
-                  ))}
+                    )
+                  )}
                 </div>
               </div>
             </div>
@@ -586,34 +658,41 @@ export default function ContactView() {
       <section className="contact-directory-section" id="departments">
         <div className="contact-directory-container">
           <div className="contact-section-header">
-            <span className="contact-badge-label">Directory</span>
-            <h2 className="contact-main-title">Departmental Directory</h2>
+            <span className="contact-badge-label">
+              {t.contact.departmentsTitle}
+            </span>
+            <h2 className="contact-main-title">
+              {t.contact.departmentsTitle}
+            </h2>
             <p className="contact-main-subtitle">
-              Reach the designated office directly for faster assistance with admissions,
-              academic records, alumni affairs, or sports.
+              {t.contact.departmentsSubtitle}
             </p>
           </div>
 
           <div className="contact-directory-grid">
-            {(activeContact.departments || defaultContactDepartments).map((dept) => (
-              <div key={dept.id || dept.title} className="contact-dept-card">
-                <div className="contact-dept-header">
-                  <div className="contact-dept-icon">{renderDeptIcon(dept.iconName)}</div>
-                  <h3 className="contact-dept-name">{dept.title}</h3>
-                </div>
-                <p className="contact-dept-desc">{dept.desc}</p>
-                <div className="contact-dept-contact-rows">
-                  <div className="contact-dept-row">
-                    <Phone size={14} />
-                    <span>{dept.phone}</span>
+            {(activeContact.departments || defaultContactDepartments).map(
+              (dept) => (
+                <div key={dept.id || dept.title} className="contact-dept-card">
+                  <div className="contact-dept-header">
+                    <div className="contact-dept-icon">
+                      {renderDeptIcon(dept.iconName)}
+                    </div>
+                    <h3 className="contact-dept-name">{dept.title}</h3>
                   </div>
-                  <div className="contact-dept-row">
-                    <Mail size={14} />
-                    <a href={`mailto:${dept.email}`}>{dept.email}</a>
+                  <p className="contact-dept-desc">{dept.desc}</p>
+                  <div className="contact-dept-contact-rows">
+                    <div className="contact-dept-row">
+                      <Phone size={14} />
+                      <span>{dept.phone}</span>
+                    </div>
+                    <div className="contact-dept-row">
+                      <Mail size={14} />
+                      <a href={`mailto:${dept.email}`}>{dept.email}</a>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              )
+            )}
           </div>
         </div>
       </section>
@@ -624,12 +703,9 @@ export default function ContactView() {
       <section className="contact-faq-section" id="faq">
         <div className="contact-faq-container">
           <div className="contact-section-header">
-            <span className="contact-badge-label">Common Questions</span>
-            <h2 className="contact-main-title">Frequently Asked Questions</h2>
-            <p className="contact-main-subtitle">
-              Quick answers to frequently asked questions regarding campus protocols, certificates,
-              visiting hours, and admissions.
-            </p>
+            <span className="contact-badge-label">{t.contact.faqTitle}</span>
+            <h2 className="contact-main-title">{t.contact.faqTitle}</h2>
+            <p className="contact-main-subtitle">{t.contact.faqSubtitle}</p>
           </div>
 
           <div className="contact-faq-list">
@@ -666,19 +742,39 @@ export default function ContactView() {
           ========================================================================= */}
       <section className="contact-cta-section">
         <div className="contact-cta-container">
-          <h2 className="contact-cta-title">Need Urgent School Assistance?</h2>
+          <h2 className="contact-cta-title">
+            {language === "si"
+              ? "හදිසි පාසල් සහයක් අවශ්‍යද?"
+              : language === "ta"
+                ? "அவசர பாடசாலை உதவி தேவையா?"
+                : "Need Urgent School Assistance?"}
+          </h2>
           <p className="contact-cta-sub">
-            Our general administrative desk is active during weekday school hours. Feel free to call us directly
-            or drop by the Richmond Hill campus.
+            {language === "si"
+              ? "පාසල් වේලාවන් තුළ අපගේ ප්‍රධාන පරිපාලන අංශය සක්‍රීයව පවතී. කෙලින්ම අප අමතන්න හෝ රිච්මන්ඩ් හිල් පරිශ්‍රයට පැමිණෙන්න."
+              : language === "ta"
+                ? "பாடசாலை நேரங்களில் எங்கள் பிரதான நிர்வாகப் பிரிவு செயல்படுகிறது. நேரடியாக எங்களை அழைக்கவும் அல்லது வளாகத்திற்கு வருகை தரவும்."
+                : "Our general administrative desk is active during weekday school hours. Feel free to call us directly or drop by the Richmond Hill campus."}
           </p>
           <div className="contact-cta-buttons">
-            <a href={`tel:${(activeContact.generalPhone || "").replace(/\s+/g, "")}`} className="contact-cta-btn-primary">
+            <a
+              href={`tel:${(activeContact.generalPhone || "").replace(/\s+/g, "")}`}
+              className="contact-cta-btn-primary"
+            >
               <Phone size={18} />
-              <span>Call General Desk: {activeContact.generalPhone}</span>
+              <span>
+                {language === "si" ? "ප්‍රධාන අංකය:" : language === "ta" ? "பொது எண்:" : "Call General Desk:"}{" "}
+                {activeContact.generalPhone}
+              </span>
             </a>
-            <a href={`mailto:${activeContact.primaryEmail}`} className="contact-cta-btn-secondary">
+            <a
+              href={`mailto:${activeContact.primaryEmail}`}
+              className="contact-cta-btn-secondary"
+            >
               <Mail size={18} />
-              <span>Email: {activeContact.primaryEmail}</span>
+              <span>
+                {t.footer.emailLabel}: {activeContact.primaryEmail}
+              </span>
             </a>
           </div>
         </div>
