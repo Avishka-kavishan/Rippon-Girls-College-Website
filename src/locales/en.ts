@@ -23,7 +23,9 @@ export const enTranslations: TranslationSchema = {
     quickLinks: "Quick Links",
     followUs: "Follow Us",
     socialDesc: "Stay connected with Rippon Girls' College through our official social media channels.",
-    copyright: "© 2026 Rippon Girls School, All rights reserved | Developed by AK Rathnaweera",
+    copyright: "© 2026 Rippon Girls School, All rights reserved",
+    developedBy: "Developed by",
+    developerName: "A.K.Rathnaweera",
     staffAdmin: "Staff Admin",
   },
   home: {

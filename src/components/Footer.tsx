@@ -154,17 +154,24 @@ export default function Footer() {
       {/* Bottom Copyright Bar */}
       <div className="footer-bottom">
         <p className="footer-copyright">
-          {t.footer.copyright}
-          <span style={{ margin: "0 8px", opacity: 0.4 }}>•</span>
+          <span>{t.footer.copyright}</span>
+          <span className="footer-divider">|</span>
+          <span>
+            {t.footer.developedBy}{" "}
+            <a
+              href="https://www.linkedin.com/in/avishka-kavishan-632476282?utm_source=share_via&utm_content=profile&utm_medium=member_ios"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="footer-developer-link"
+              title="A.K.Rathnaweera LinkedIn Profile"
+            >
+              {t.footer.developerName}
+            </a>
+          </span>
+          <span className="footer-divider">•</span>
           <Link
             href="/admin"
-            style={{
-              color: "inherit",
-              opacity: 0.7,
-              textDecoration: "underline",
-              fontSize: "0.85rem",
-              transition: "opacity 0.2s",
-            }}
+            className="footer-admin-link"
             title="School Administration Portal"
           >
             🔒 {t.footer.staffAdmin}

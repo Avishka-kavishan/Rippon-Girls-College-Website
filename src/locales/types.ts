@@ -37,6 +37,8 @@ export interface TranslationSchema {
     followUs: string;
     socialDesc: string;
     copyright: string;
+    developedBy: string;
+    developerName: string;
     staffAdmin: string;
   };
   home: {

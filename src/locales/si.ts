@@ -23,7 +23,9 @@ export const siTranslations: TranslationSchema = {
     quickLinks: "ක්ෂණික සබැඳි",
     followUs: "අප හා එක්වන්න",
     socialDesc: "රිපන් බාලිකා විද්‍යාලයේ නිල සමාජ මාධ්‍ය ජාලයන් ඔස්සේ අප හා නිරන්තරයෙන් සම්බන්ධ වන්න.",
-    copyright: "© 2026 රිපන් බාලිකා විද්‍යාලය, සියලුම හිමිකම් ඇවිරිණි | නිර්මාණය: ඒ.කේ. රත්නවීර",
+    copyright: "© 2026 රිපන් බාලිකා විද්‍යාලය, සියලුම හිමිකම් ඇවිරිණි",
+    developedBy: "නිර්මාණය:",
+    developerName: "A.K.Rathnaweera",
     staffAdmin: "පරිපාලන පිවිසුම",
   },
   home: {
