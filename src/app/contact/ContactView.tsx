@@ -203,10 +203,6 @@ export default function ContactView() {
         <div className="contact-hero-overlay" />
 
         <div className="contact-hero-content">
-          <div className="contact-hero-badge">
-            <Compass size={14} />
-            <span>{activeContact.heroBadge || "Connect • Richmond Hill, Galle"}</span>
-          </div>
 
           <h1 className="contact-hero-title">{activeContact.heroTitle || "Contact Rippon Girls' College"}</h1>
 

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useMemo, ChangeEvent } from "react";
+import React, { useState, useEffect, useMemo, useRef, ChangeEvent } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -9,6 +9,9 @@ import {
   Image as ImageIcon,
   Newspaper,
   Calendar,
+  CalendarDays,
+  List,
+  ChevronLeft,
   Users,
   GraduationCap,
   Settings,
@@ -46,6 +49,8 @@ import {
   Building,
   BookOpen,
   Award,
+  Bell,
+  CheckCheck,
 } from "lucide-react";
 import {
   GalleryItem,
@@ -83,6 +88,75 @@ const ADMIN_AUTH_SESSION_KEY = "rippon_admin_session";
 const ADMIN_THEME_STORAGE_KEY = "rippon_admin_theme";
 const DEFAULT_PASSKEY = "rippon2025";
 
+export const MONTH_ABBRS = [
+  "JAN", "FEB", "MAR", "APR", "MAY", "JUN",
+  "JUL", "AUG", "SEP", "OCT", "NOV", "DEC",
+];
+
+export const MONTH_NAMES_FULL = [
+  "January", "February", "March", "April", "May", "June",
+  "July", "August", "September", "October", "November", "December",
+];
+
+export function formatDateIso(year: number, monthIndex: number, day: number): string {
+  return `${year}-${String(monthIndex + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+}
+
+export function parseEventDate(
+  ev: { month?: string; day?: string; dateStr?: string },
+  fallbackYear: number = new Date().getFullYear()
+): {
+  year: number;
+  monthIndex: number;
+  monthAbbr: string;
+  monthName: string;
+  dayNum: number;
+  dateStr: string;
+} {
+  let year = fallbackYear;
+  let monthIndex = -1;
+  let dayNum = 1;
+
+  if (ev.dateStr) {
+    const parts = ev.dateStr.split("-").map(Number);
+    if (parts.length === 3 && !isNaN(parts[0]) && !isNaN(parts[1]) && !isNaN(parts[2])) {
+      year = parts[0];
+      monthIndex = parts[1] - 1;
+      dayNum = parts[2];
+    }
+  }
+
+  if (monthIndex === -1 && ev.month) {
+    const cleanMonth = ev.month.trim().toUpperCase().substring(0, 3);
+    const idx = MONTH_ABBRS.indexOf(cleanMonth);
+    if (idx !== -1) {
+      monthIndex = idx;
+    }
+  }
+
+  if (ev.day) {
+    const parsedDay = parseInt(ev.day, 10);
+    if (!isNaN(parsedDay)) {
+      dayNum = parsedDay;
+    }
+  }
+
+  if (monthIndex === -1) {
+    monthIndex = new Date().getMonth();
+  }
+
+  const dateStr = formatDateIso(year, monthIndex, dayNum);
+
+  return {
+    year,
+    monthIndex,
+    monthAbbr: MONTH_ABBRS[monthIndex] || "JAN",
+    monthName: MONTH_NAMES_FULL[monthIndex] || "January",
+    dayNum,
+    dateStr,
+  };
+}
+
 export type AdminTheme = "royal" | "light" | "maroon" | "emerald";
 
 type ActiveTab =
@@ -101,6 +175,28 @@ export type ContactSubTab =
   | "visiting"
   | "faqs"
   | "inquiries";
+
+function formatRelativeTime(dateString: string): string {
+  try {
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) return dateString;
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffSecs = Math.floor(diffMs / 1000);
+    const diffMins = Math.floor(diffSecs / 60);
+    const diffHours = Math.floor(diffMins / 60);
+    const diffDays = Math.floor(diffHours / 24);
+
+    if (diffMins < 1) return "Just now";
+    if (diffMins < 60) return `${diffMins}m ago`;
+    if (diffHours < 24) return `${diffHours}h ago`;
+    if (diffDays === 1) return "Yesterday";
+    if (diffDays < 7) return `${diffDays}d ago`;
+    return date.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+  } catch {
+    return dateString;
+  }
+}
 
 export default function AdminPage() {
   // Theme State (Default: Rippon Royal Blue & Gold - Official School Colors)
@@ -141,6 +237,9 @@ export default function AdminPage() {
 
   const [eventModalOpen, setEventModalOpen] = useState<boolean>(false);
   const [editingEventItem, setEditingEventItem] = useState<EventItem | null>(null);
+  const [eventsViewMode, setEventsViewMode] = useState<"calendar" | "list">("calendar");
+  const [calCurrentDate, setCalCurrentDate] = useState<Date>(() => new Date());
+  const [selectedCalDateStr, setSelectedCalDateStr] = useState<string | null>(null);
 
   const [adminModalOpen, setAdminModalOpen] = useState<boolean>(false);
   const [editingAdminItem, setEditingAdminItem] = useState<AdminMember | null>(null);
@@ -156,6 +255,8 @@ export default function AdminPage() {
   const [editingFaq, setEditingFaq] = useState<ContactFaq | null>(null);
   const [selectedInquiry, setSelectedInquiry] = useState<ContactInquiry | null>(null);
   const [inquiryFilter, setInquiryFilter] = useState<"all" | "unread" | "resolved">("all");
+  const [notificationsOpen, setNotificationsOpen] = useState<boolean>(false);
+  const notifRef = useRef<HTMLDivElement>(null);
 
   // Delete Confirmation Modal
   const [deleteConfirm, setDeleteConfirm] = useState<{
@@ -189,11 +290,28 @@ export default function AdminPage() {
         setFaqModalOpen(false);
         setSelectedInquiry(null);
         setDeleteConfirm(null);
+        setMobileSidebarOpen(false);
+        setNotificationsOpen(false);
       }
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, []);
+
+  // Close notifications dropdown on click outside
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (notifRef.current && !notifRef.current.contains(e.target as Node)) {
+        setNotificationsOpen(false);
+      }
+    };
+    if (notificationsOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [notificationsOpen]);
 
   // Load theme and session on load
   useEffect(() => {
@@ -395,16 +513,24 @@ export default function AdminPage() {
       return;
     }
 
+    const parsed = parseEventDate(editingEventItem);
+    const itemToSave: EventItem = {
+      ...editingEventItem,
+      dateStr: editingEventItem.dateStr || parsed.dateStr,
+      month: editingEventItem.month.trim().toUpperCase(),
+      day: String(editingEventItem.day).trim().padStart(2, "0"),
+    };
+
     const currentList = content.events || [];
     let updatedList: EventItem[];
 
-    const exists = currentList.some((item) => item.id === editingEventItem.id);
+    const exists = currentList.some((item) => item.id === itemToSave.id);
     if (exists) {
       updatedList = currentList.map((item) =>
-        item.id === editingEventItem.id ? editingEventItem : item
+        item.id === itemToSave.id ? itemToSave : item
       );
     } else {
-      updatedList = [...currentList, editingEventItem];
+      updatedList = [...currentList, itemToSave];
     }
 
     const res = await saveSection("events", updatedList);
@@ -673,6 +799,31 @@ export default function AdminPage() {
     showToast(res.usedSupabase ? "Inquiry status updated in cloud!" : "Inquiry status updated locally!");
   };
 
+  const handleMarkAllInquiriesRead = async () => {
+    if (!content) return;
+    const currentInquiries = content.contactInquiries || [];
+    const hasUnread = currentInquiries.some((inq) => inq.status === "unread");
+    if (!hasUnread) return;
+
+    const updated = currentInquiries.map((inq) => ({
+      ...inq,
+      status: (inq.status === "unread" ? "resolved" : inq.status) as "unread" | "read" | "resolved",
+    }));
+
+    const res = await saveSection("contactInquiries", updated);
+    setContent({ ...content, contactInquiries: updated });
+    if (selectedInquiry) {
+      const match = updated.find((i) => i.id === selectedInquiry.id);
+      if (match) setSelectedInquiry(match);
+    }
+    showToast(res.usedSupabase ? "All inquiries marked as resolved in cloud!" : "All inquiries marked as resolved!");
+  };
+
+  const handleOpenInquiryNotification = (inq: ContactInquiry) => {
+    setNotificationsOpen(false);
+    setSelectedInquiry(inq);
+  };
+
   const handleDeleteInquiry = (id: string) => {
     setDeleteConfirm({
       open: true,
@@ -839,9 +990,152 @@ export default function AdminPage() {
     return content.events.filter(
       (item) =>
         item.title.toLowerCase().includes(q) ||
-        item.venue.toLowerCase().includes(q)
+        item.venue.toLowerCase().includes(q) ||
+        item.month.toLowerCase().includes(q) ||
+        item.day.toLowerCase().includes(q)
     );
   }, [content?.events, searchQuery]);
+
+  // Calendar calculations & navigation
+  const calYear = calCurrentDate.getFullYear();
+  const calMonth = calCurrentDate.getMonth();
+
+  const handlePrevMonth = () => {
+    setCalCurrentDate((prev) => new Date(prev.getFullYear(), prev.getMonth() - 1, 1));
+  };
+
+  const handleNextMonth = () => {
+    setCalCurrentDate((prev) => new Date(prev.getFullYear(), prev.getMonth() + 1, 1));
+  };
+
+  const handleToday = () => {
+    const now = new Date();
+    setCalCurrentDate(now);
+    const todayStr = formatDateIso(now.getFullYear(), now.getMonth(), now.getDate());
+    setSelectedCalDateStr(todayStr);
+  };
+
+  const openNewEventModal = (prefillDate?: string) => {
+    let d = new Date();
+    if (prefillDate) {
+      const parts = prefillDate.split("-").map(Number);
+      if (parts.length === 3 && !isNaN(parts[0]) && !isNaN(parts[1]) && !isNaN(parts[2])) {
+        d = new Date(parts[0], parts[1] - 1, parts[2]);
+      }
+    }
+    const y = d.getFullYear();
+    const mIdx = d.getMonth();
+    const dayNum = d.getDate();
+    const iso = formatDateIso(y, mIdx, dayNum);
+    const mAbbr = MONTH_ABBRS[mIdx] || "OCT";
+
+    setEditingEventItem({
+      id: `event-${Date.now()}`,
+      dateStr: iso,
+      month: mAbbr,
+      day: String(dayNum).padStart(2, "0"),
+      title: "",
+      time: "9:00 AM",
+      venue: "College Main Auditorium",
+    });
+    setEventModalOpen(true);
+  };
+
+  // 35 or 42 grid cells calculation for viewed month
+  const calendarGridCells = useMemo(() => {
+    const firstDayOfWeek = new Date(calYear, calMonth, 1).getDay(); // 0 = Sun
+    const daysInCurrent = new Date(calYear, calMonth + 1, 0).getDate();
+    const daysInPrev = new Date(calYear, calMonth, 0).getDate();
+
+    const cells: {
+      year: number;
+      monthIndex: number;
+      day: number;
+      dateStr: string;
+      isCurrentMonth: boolean;
+    }[] = [];
+
+    // Previous month trailing days
+    for (let i = firstDayOfWeek - 1; i >= 0; i--) {
+      const day = daysInPrev - i;
+      const prevMonthIdx = calMonth === 0 ? 11 : calMonth - 1;
+      const prevYear = calMonth === 0 ? calYear - 1 : calYear;
+      cells.push({
+        year: prevYear,
+        monthIndex: prevMonthIdx,
+        day,
+        dateStr: formatDateIso(prevYear, prevMonthIdx, day),
+        isCurrentMonth: false,
+      });
+    }
+
+    // Current month days
+    for (let day = 1; day <= daysInCurrent; day++) {
+      cells.push({
+        year: calYear,
+        monthIndex: calMonth,
+        day,
+        dateStr: formatDateIso(calYear, calMonth, day),
+        isCurrentMonth: true,
+      });
+    }
+
+    // Next month leading days
+    const totalNeeded = cells.length <= 35 ? 35 : 42;
+    const remaining = totalNeeded - cells.length;
+    for (let day = 1; day <= remaining; day++) {
+      const nextMonthIdx = calMonth === 11 ? 0 : calMonth + 1;
+      const nextYear = calMonth === 11 ? calYear + 1 : calYear;
+      cells.push({
+        year: nextYear,
+        monthIndex: nextMonthIdx,
+        day,
+        dateStr: formatDateIso(nextYear, nextMonthIdx, day),
+        isCurrentMonth: false,
+      });
+    }
+
+    return cells;
+  }, [calYear, calMonth]);
+
+  // Group events by dateStr
+  const eventsByDate = useMemo(() => {
+    const map: Record<string, EventItem[]> = {};
+    if (!filteredEvents) return map;
+
+    filteredEvents.forEach((ev) => {
+      const parsed = parseEventDate(ev, calYear);
+      if (!map[parsed.dateStr]) {
+        map[parsed.dateStr] = [];
+      }
+      map[parsed.dateStr].push(ev);
+    });
+
+    return map;
+  }, [filteredEvents, calYear]);
+
+  // Events in this viewed month
+  const eventsThisMonth = useMemo(() => {
+    if (!filteredEvents) return [];
+    return filteredEvents.filter((ev) => {
+      const parsed = parseEventDate(ev, calYear);
+      return parsed.year === calYear && parsed.monthIndex === calMonth;
+    });
+  }, [filteredEvents, calYear, calMonth]);
+
+  // Today's date ISO string
+  const todayIso = useMemo(() => {
+    const now = new Date();
+    return formatDateIso(now.getFullYear(), now.getMonth(), now.getDate());
+  }, []);
+
+  // Events for Agenda Sidebar (selected date or all in month)
+  const agendaEvents = useMemo(() => {
+    if (selectedCalDateStr) {
+      return eventsByDate[selectedCalDateStr] || [];
+    }
+    return eventsThisMonth;
+  }, [selectedCalDateStr, eventsByDate, eventsThisMonth]);
 
   const filteredAdmin = useMemo(() => {
     if (!content?.administration) return [];
@@ -907,6 +1201,16 @@ export default function AdminPage() {
     }
     return list;
   }, [content?.contactInquiries, inquiryFilter, searchQuery]);
+
+  const unreadInquiriesCount = useMemo(() => {
+    return (content?.contactInquiries || []).filter((i) => i.status === "unread").length;
+  }, [content?.contactInquiries]);
+
+  const recentInquiries = useMemo(() => {
+    return [...(content?.contactInquiries || [])].sort(
+      (a, b) => new Date(b.submittedAt).getTime() - new Date(a.submittedAt).getTime()
+    );
+  }, [content?.contactInquiries]);
 
   // Current formatted Sri Lanka date
   const todayFormatted = new Intl.DateTimeFormat("en-US", {
@@ -1065,8 +1369,16 @@ export default function AdminPage() {
       )}
 
       {/* -------------------------------------------------------------------
-          1. PROFESSIONAL SIDEBAR NAVIGATION
+          1. PROFESSIONAL SIDEBAR NAVIGATION (HAMBURGER DRAWER)
           ------------------------------------------------------------------- */}
+      {mobileSidebarOpen && (
+        <div
+          className="adm-sidebar-backdrop"
+          onClick={() => setMobileSidebarOpen(false)}
+          aria-label="Close menu overlay"
+        />
+      )}
+
       <aside className={`adm-sidebar ${mobileSidebarOpen ? "open" : ""}`}>
         {/* Brand Header */}
         <div className="adm-sidebar-brand">
@@ -1083,6 +1395,15 @@ export default function AdminPage() {
             <h2>Rippon College</h2>
             <span className="adm-sidebar-brand-badge">CMS Portal &bull; Staff</span>
           </div>
+
+          <button
+            type="button"
+            className="adm-sidebar-close-btn"
+            onClick={() => setMobileSidebarOpen(false)}
+            aria-label="Close menu drawer"
+          >
+            <X size={18} />
+          </button>
         </div>
 
         {/* Categorized Menu Groups */}
@@ -1301,12 +1622,27 @@ export default function AdminPage() {
         <header className="adm-topbar">
           <div className="adm-topbar-left">
             <button
-              className="adm-mobile-toggle"
+              type="button"
+              className="adm-hamburger-btn"
               onClick={() => setMobileSidebarOpen(!mobileSidebarOpen)}
               aria-label="Toggle navigation menu"
             >
-              <Menu size={20} />
+              <Menu size={19} />
+              <span>Menu</span>
             </button>
+
+            <div className="adm-topbar-brand">
+              <div className="adm-topbar-logo-circle">
+                <Image
+                  src={getAssetPath("/images/sample-logo.png")}
+                  alt="Rippon Crest"
+                  width={24}
+                  height={24}
+                  style={{ objectFit: "contain" }}
+                />
+              </div>
+              <span className="adm-topbar-brand-title">Rippon College</span>
+            </div>
 
             <div className="adm-breadcrumbs">
               <span>Portal</span>
@@ -1370,6 +1706,97 @@ export default function AdminPage() {
                 />
               </div>
             )}
+
+            {/* Inquiry Notifications Dropdown */}
+            <div className="adm-notif-wrapper" ref={notifRef}>
+              <button
+                type="button"
+                className={`adm-notif-btn ${notificationsOpen ? "active" : ""}`}
+                onClick={() => setNotificationsOpen(!notificationsOpen)}
+                aria-label="View Form Inquiries Notifications"
+                title="Form Inquiries Notifications"
+              >
+                <Bell size={18} />
+                {unreadInquiriesCount > 0 && (
+                  <span className="adm-notif-badge">{unreadInquiriesCount}</span>
+                )}
+              </button>
+
+              {notificationsOpen && (
+                <div className="adm-notif-dropdown">
+                  <div className="adm-notif-dropdown-header">
+                    <div className="adm-notif-header-title">
+                      <h4>Form Inquiries</h4>
+                      {unreadInquiriesCount > 0 ? (
+                        <span className="adm-notif-unread-tag">{unreadInquiriesCount} New</span>
+                      ) : (
+                        <span className="adm-notif-all-read-tag">All Caught Up</span>
+                      )}
+                    </div>
+                    {unreadInquiriesCount > 0 && (
+                      <button
+                        type="button"
+                        className="adm-notif-mark-all"
+                        onClick={handleMarkAllInquiriesRead}
+                        title="Mark all inquiries as resolved"
+                      >
+                        <CheckCheck size={14} />
+                        <span>Mark read</span>
+                      </button>
+                    )}
+                  </div>
+
+                  <div className="adm-notif-list">
+                    {recentInquiries.length === 0 ? (
+                      <div className="adm-notif-empty">
+                        <Mail size={32} />
+                        <p>No form inquiries received yet</p>
+                      </div>
+                    ) : (
+                      recentInquiries.slice(0, 8).map((inq) => (
+                        <div
+                          key={inq.id}
+                          className={`adm-notif-item ${inq.status === "unread" ? "unread" : ""}`}
+                          onClick={() => handleOpenInquiryNotification(inq)}
+                          role="button"
+                          tabIndex={0}
+                        >
+                          <div className="adm-notif-item-top">
+                            <span className="adm-notif-sender">{inq.fullName}</span>
+                            <span className="adm-notif-time">
+                              {formatRelativeTime(inq.submittedAt)}
+                            </span>
+                          </div>
+                          <div className="adm-notif-subject">{inq.subject}</div>
+                          <p className="adm-notif-snippet">{inq.message}</p>
+                          <div className="adm-notif-footer-row">
+                            <span className="adm-notif-ref-tag">{inq.referenceId}</span>
+                            <span className={`adm-notif-status-badge ${inq.status}`}>
+                              {inq.status === "unread" ? "New / Unread" : "Resolved"}
+                            </span>
+                          </div>
+                        </div>
+                      ))
+                    )}
+                  </div>
+
+                  <div className="adm-notif-dropdown-footer">
+                    <button
+                      type="button"
+                      className="adm-notif-view-all-btn"
+                      onClick={() => {
+                        setActiveTab("contact");
+                        setContactSubTab("inquiries");
+                        setNotificationsOpen(false);
+                      }}
+                    >
+                      <span>View All Inquiries in Hub</span>
+                      <ArrowRight size={14} />
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
 
             {/* Cloud database sync status pill */}
             <div
@@ -1776,17 +2203,7 @@ export default function AdminPage() {
 
                         <button
                           className="adm-palette-btn"
-                          onClick={() => {
-                            setEditingEventItem({
-                              id: `event-${Date.now()}`,
-                              month: "NOV",
-                              day: "15",
-                              title: "",
-                              time: "9:00 AM",
-                              venue: "College Auditorium",
-                            });
-                            setEventModalOpen(true);
-                          }}
+                          onClick={() => openNewEventModal()}
                         >
                           <div className="adm-palette-content">
                             <Calendar size={18} style={{ color: "#059669" }} />
@@ -2060,83 +2477,383 @@ export default function AdminPage() {
                 <div>
                   <div className="adm-header-banner">
                     <div className="adm-section-heading">
-                      <h1>Upcoming College Events</h1>
+                      <h1>Upcoming College Events &amp; Calendar</h1>
                       <p>
-                        Keep the school calendar up to date with athletic meets, prize-giving
-                        ceremonies, and term examinations.
+                        Schedule and coordinate athletic meets, prize-giving ceremonies,
+                        examinations, and cultural festivals for Rippon Girls&apos; College.
                       </p>
                     </div>
 
-                    <button
-                      className="adm-btn-create"
-                      onClick={() => {
-                        setEditingEventItem({
-                          id: `event-${Date.now()}`,
-                          month: "NOV",
-                          day: "15",
-                          title: "",
-                          time: "9:00 AM",
-                          venue: "College Main Grounds",
-                        });
-                        setEventModalOpen(true);
-                      }}
-                    >
-                      <Plus size={18} />
-                      <span>Schedule New Event</span>
-                    </button>
+                    <div className="adm-events-header-actions">
+                      <div className="adm-view-toggle">
+                        <button
+                          type="button"
+                          className={`adm-view-toggle-btn ${eventsViewMode === "calendar" ? "active" : ""}`}
+                          onClick={() => setEventsViewMode("calendar")}
+                        >
+                          <CalendarDays size={16} />
+                          <span>Calendar</span>
+                        </button>
+                        <button
+                          type="button"
+                          className={`adm-view-toggle-btn ${eventsViewMode === "list" ? "active" : ""}`}
+                          onClick={() => setEventsViewMode("list")}
+                        >
+                          <List size={16} />
+                          <span>List ({filteredEvents.length})</span>
+                        </button>
+                      </div>
+
+                      <button
+                        type="button"
+                        className="adm-btn-create"
+                        onClick={() => openNewEventModal(selectedCalDateStr || undefined)}
+                      >
+                        <Plus size={18} />
+                        <span>Schedule New Event</span>
+                      </button>
+                    </div>
                   </div>
 
-                  <div className="adm-events-stack">
-                    {filteredEvents.map((ev) => (
-                      <div key={ev.id} className="adm-event-row">
-                        <div className="adm-cal-badge">
-                          <div className="adm-cal-month">{ev.month}</div>
-                          <div className="adm-cal-day">{ev.day}</div>
-                        </div>
+                  {/* CALENDAR VIEW */}
+                  {eventsViewMode === "calendar" && (
+                    <div className="adm-calendar-workspace">
+                      {/* LEFT PANEL: Event Schedule & Agenda Details */}
+                      <div className="adm-cal-left-panel">
+                        <div className="adm-cal-agenda-card">
+                          <div className="adm-cal-agenda-header">
+                            <div>
+                              <h3 className="adm-cal-agenda-title">
+                                {selectedCalDateStr ? (
+                                  (() => {
+                                    const parts = selectedCalDateStr.split("-").map(Number);
+                                    return `${MONTH_NAMES_FULL[parts[1] - 1]} ${parts[2]}, ${parts[0]}`;
+                                  })()
+                                ) : (
+                                  `All Events in ${MONTH_NAMES_FULL[calMonth]} ${calYear}`
+                                )}
+                              </h3>
+                              <p className="adm-cal-agenda-sub">
+                                {selectedCalDateStr ? (
+                                  (() => {
+                                    const parts = selectedCalDateStr.split("-").map(Number);
+                                    return `${new Date(parts[0], parts[1] - 1, parts[2]).toLocaleDateString("en-US", { weekday: "long" })} • ${agendaEvents.length} event${agendaEvents.length === 1 ? "" : "s"} scheduled`;
+                                  })()
+                                ) : (
+                                  `${eventsThisMonth.length} scheduled event${eventsThisMonth.length === 1 ? "" : "s"} • Click any date on the calendar to filter`
+                                )}
+                              </p>
+                            </div>
 
-                        <div className="adm-event-info">
-                          <h4 className="adm-event-title">{ev.title}</h4>
-                          <div className="adm-event-metadata">
+                            {selectedCalDateStr && (
+                              <button
+                                type="button"
+                                className="adm-cal-today-pill"
+                                style={{ fontSize: "0.74rem", padding: "0.28rem 0.65rem" }}
+                                onClick={() => setSelectedCalDateStr(null)}
+                              >
+                                View Full Month
+                              </button>
+                            )}
+                          </div>
+
+                          <button
+                            type="button"
+                            className="adm-btn-create"
+                            style={{
+                              width: "100%",
+                              justifyContent: "center",
+                              padding: "0.6rem 1rem",
+                              fontSize: "0.85rem",
+                            }}
+                            onClick={() => openNewEventModal(selectedCalDateStr || undefined)}
+                          >
+                            <Plus size={16} />
                             <span>
-                              <Clock size={14} />
-                              <span>{ev.time}</span>
+                              {selectedCalDateStr ? "Add Event on this Date" : "Schedule New Event"}
                             </span>
-                            <span>
-                              <MapPin size={14} />
-                              <span>{ev.venue}</span>
+                          </button>
+
+                          <div className="adm-cal-agenda-list">
+                            {agendaEvents.map((ev) => (
+                              <div key={ev.id} className="adm-cal-agenda-item">
+                                <div className="adm-cal-agenda-top">
+                                  <div
+                                    className="adm-cal-badge"
+                                    style={{ minWidth: 54, padding: "0.4rem 0.6rem" }}
+                                  >
+                                    <div className="adm-cal-month" style={{ fontSize: "0.68rem" }}>
+                                      {ev.month}
+                                    </div>
+                                    <div className="adm-cal-day" style={{ fontSize: "1.25rem" }}>
+                                      {ev.day}
+                                    </div>
+                                  </div>
+                                  <div className="adm-cal-agenda-info">
+                                    <h4 className="adm-cal-agenda-ev-title">{ev.title}</h4>
+                                    <div className="adm-cal-agenda-ev-meta">
+                                      <span>
+                                        <Clock size={13} />
+                                        <span>{ev.time}</span>
+                                      </span>
+                                      <span>
+                                        <MapPin size={13} />
+                                        <span>{ev.venue}</span>
+                                      </span>
+                                    </div>
+                                  </div>
+                                </div>
+
+                                <div className="adm-cal-agenda-actions">
+                                  <button
+                                    type="button"
+                                    className="adm-btn-action edit"
+                                    style={{ padding: "0.35rem 0.75rem", fontSize: "0.78rem" }}
+                                    onClick={() => {
+                                      const parsed = parseEventDate(ev, calYear);
+                                      setEditingEventItem({
+                                        ...ev,
+                                        dateStr: ev.dateStr || parsed.dateStr,
+                                        month: ev.month || parsed.monthAbbr,
+                                        day: ev.day || String(parsed.dayNum).padStart(2, "0"),
+                                      });
+                                      setEventModalOpen(true);
+                                    }}
+                                  >
+                                    <Edit size={13} />
+                                    <span>Edit</span>
+                                  </button>
+                                  <button
+                                    type="button"
+                                    className="adm-btn-action delete"
+                                    style={{ padding: "0.35rem 0.75rem", fontSize: "0.78rem" }}
+                                    onClick={() => handleDeleteEvent(ev.id)}
+                                  >
+                                    <Trash2 size={13} />
+                                    <span>Delete</span>
+                                  </button>
+                                </div>
+                              </div>
+                            ))}
+
+                            {agendaEvents.length === 0 && (
+                              <div className="adm-cal-agenda-empty">
+                                <Calendar size={32} style={{ margin: "0 auto 0.65rem", opacity: 0.35 }} />
+                                <p style={{ margin: 0, fontSize: "0.9rem", fontWeight: 700 }}>
+                                  {selectedCalDateStr
+                                    ? "No events on this date"
+                                    : "No events scheduled for this month"}
+                                </p>
+                                <p style={{ margin: "0.35rem 0 1rem", fontSize: "0.8rem" }}>
+                                  Pick a date on the calendar to see events, or click below to schedule.
+                                </p>
+                                <button
+                                  type="button"
+                                  className="adm-btn-secondary"
+                                  style={{ margin: "0 auto", fontSize: "0.82rem" }}
+                                  onClick={() => openNewEventModal(selectedCalDateStr || undefined)}
+                                >
+                                  <Plus size={14} />
+                                  <span>Schedule Event</span>
+                                </button>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* RIGHT PANEL: Monthly Interactive Calendar Widget */}
+                      <div className="adm-cal-right-panel">
+                        {/* Month / Year Navigator & KPI Bar */}
+                        <div className="adm-cal-nav-card" style={{ marginBottom: 0 }}>
+                          <div className="adm-cal-nav-left">
+                            <button
+                              type="button"
+                              className="adm-cal-nav-btn"
+                              onClick={handlePrevMonth}
+                              title="Previous Month"
+                              aria-label="Previous Month"
+                            >
+                              <ChevronLeft size={18} />
+                            </button>
+                            <h2 className="adm-cal-month-heading" style={{ minWidth: 140 }}>
+                              {MONTH_NAMES_FULL[calMonth]} {calYear}
+                            </h2>
+                            <button
+                              type="button"
+                              className="adm-cal-nav-btn"
+                              onClick={handleNextMonth}
+                              title="Next Month"
+                              aria-label="Next Month"
+                            >
+                              <ChevronRight size={18} />
+                            </button>
+                            <button
+                              type="button"
+                              className="adm-cal-today-pill"
+                              onClick={handleToday}
+                            >
+                              Today
+                            </button>
+                          </div>
+
+                          <div className="adm-cal-stats-strip">
+                            <span className="adm-cal-stat-tag">
+                              <Calendar size={13} />
+                              <span>{eventsThisMonth.length} in {MONTH_ABBRS[calMonth]}</span>
                             </span>
                           </div>
                         </div>
 
-                        <div style={{ display: "flex", gap: "0.5rem" }}>
-                          <button
-                            className="adm-btn-action edit"
-                            style={{ flex: "none", padding: "0.55rem 0.9rem" }}
-                            onClick={() => {
-                              setEditingEventItem({ ...ev });
-                              setEventModalOpen(true);
-                            }}
-                          >
-                            <Edit size={14} />
-                            <span>Edit</span>
-                          </button>
-                          <button
-                            className="adm-btn-action delete"
-                            style={{ flex: "none", padding: "0.55rem 0.9rem" }}
-                            onClick={() => handleDeleteEvent(ev.id)}
-                          >
-                            <Trash2 size={14} />
-                            <span>Delete</span>
-                          </button>
+                        {/* Calendar Grid Box */}
+                        <div className="adm-calendar-grid-card">
+                          <div className="adm-cal-weekdays">
+                            {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map(
+                              (dayName, i) => (
+                                <div
+                                  key={dayName}
+                                  className={`adm-cal-weekday-col ${i === 0 || i === 6 ? "weekend" : ""}`}
+                                >
+                                  {dayName}
+                                </div>
+                              )
+                            )}
+                          </div>
+
+                          <div className="adm-cal-days-grid">
+                            {calendarGridCells.map((c) => {
+                              const cellEvents = eventsByDate[c.dateStr] || [];
+                              const isToday = c.dateStr === todayIso;
+                              const isSelected = selectedCalDateStr === c.dateStr;
+
+                              return (
+                                <div
+                                  key={c.dateStr}
+                                  className={`adm-cal-day-cell ${
+                                    !c.isCurrentMonth ? "other-month" : ""
+                                  } ${isToday ? "is-today" : ""} ${
+                                    isSelected ? "is-selected" : ""
+                                  }`}
+                                  onClick={() => setSelectedCalDateStr(c.dateStr)}
+                                >
+                                  <div className="adm-cal-cell-top">
+                                    <span className="adm-cal-cell-num">{c.day}</span>
+                                    <button
+                                      type="button"
+                                      className="adm-cal-cell-quickadd"
+                                      title={`Schedule event on ${c.dateStr}`}
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        openNewEventModal(c.dateStr);
+                                      }}
+                                    >
+                                      <Plus size={13} />
+                                    </button>
+                                  </div>
+
+                                  <div className="adm-cal-cell-events">
+                                    {cellEvents.slice(0, 2).map((ev) => (
+                                      <div
+                                        key={ev.id}
+                                        className="adm-cal-event-pill"
+                                        title={`${ev.time} - ${ev.title} (${ev.venue})`}
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          const parsed = parseEventDate(ev, calYear);
+                                          setEditingEventItem({
+                                            ...ev,
+                                            dateStr: ev.dateStr || parsed.dateStr,
+                                            month: ev.month || parsed.monthAbbr,
+                                            day: ev.day || String(parsed.dayNum).padStart(2, "0"),
+                                          });
+                                          setEventModalOpen(true);
+                                        }}
+                                      >
+                                        <span className="adm-cal-event-pill-time">
+                                          {ev.time.split(" ")[0]}
+                                        </span>
+                                        <span className="adm-cal-event-pill-title">
+                                          {ev.title}
+                                        </span>
+                                      </div>
+                                    ))}
+                                    {cellEvents.length > 2 && (
+                                      <span className="adm-cal-more-tag">
+                                        +{cellEvents.length - 2} more
+                                      </span>
+                                    )}
+                                  </div>
+                                </div>
+                              );
+                            })}
+                          </div>
                         </div>
                       </div>
-                    ))}
-                  </div>
+                    </div>
+                  )}
 
-                  {filteredEvents.length === 0 && (
-                    <div style={{ textAlign: "center", padding: "4rem 1rem", color: "#64748b" }}>
-                      <Calendar size={36} style={{ margin: "0 auto 0.75rem", opacity: 0.4 }} />
-                      <p>No events found.</p>
+                  {/* LIST VIEW */}
+                  {eventsViewMode === "list" && (
+                    <div className="adm-events-stack">
+                      {filteredEvents.map((ev) => (
+                        <div key={ev.id} className="adm-event-row">
+                          <div className="adm-cal-badge">
+                            <div className="adm-cal-month">{ev.month}</div>
+                            <div className="adm-cal-day">{ev.day}</div>
+                          </div>
+
+                          <div className="adm-event-info">
+                            <h4 className="adm-event-title">{ev.title}</h4>
+                            <div className="adm-event-metadata">
+                              <span>
+                                <Clock size={14} />
+                                <span>{ev.time}</span>
+                              </span>
+                              <span>
+                                <MapPin size={14} />
+                                <span>{ev.venue}</span>
+                              </span>
+                            </div>
+                          </div>
+
+                          <div style={{ display: "flex", gap: "0.5rem" }}>
+                            <button
+                              type="button"
+                              className="adm-btn-action edit"
+                              style={{ flex: "none", padding: "0.55rem 0.9rem" }}
+                              onClick={() => {
+                                const parsed = parseEventDate(ev, calYear);
+                                setEditingEventItem({
+                                  ...ev,
+                                  dateStr: ev.dateStr || parsed.dateStr,
+                                  month: ev.month || parsed.monthAbbr,
+                                  day: ev.day || String(parsed.dayNum).padStart(2, "0"),
+                                });
+                                setEventModalOpen(true);
+                              }}
+                            >
+                              <Edit size={14} />
+                              <span>Edit</span>
+                            </button>
+                            <button
+                              type="button"
+                              className="adm-btn-action delete"
+                              style={{ flex: "none", padding: "0.55rem 0.9rem" }}
+                              onClick={() => handleDeleteEvent(ev.id)}
+                            >
+                              <Trash2 size={14} />
+                              <span>Delete</span>
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+
+                      {filteredEvents.length === 0 && (
+                        <div style={{ textAlign: "center", padding: "4rem 1rem", color: "#64748b" }}>
+                          <Calendar size={36} style={{ margin: "0 auto 0.75rem", opacity: 0.4 }} />
+                          <p>No events found.</p>
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>
@@ -3884,6 +4601,46 @@ export default function AdminPage() {
                 />
               </div>
 
+              <div className="adm-form-field">
+                <label className="adm-label">Calendar Date &amp; Picker *</label>
+                <div style={{ display: "flex", gap: "0.85rem", alignItems: "center" }}>
+                  <input
+                    type="date"
+                    className="adm-input"
+                    style={{ flex: 1 }}
+                    value={
+                      editingEventItem.dateStr ||
+                      parseEventDate(editingEventItem, calYear).dateStr
+                    }
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      if (val) {
+                        const parts = val.split("-").map(Number);
+                        const mAbbr = MONTH_ABBRS[parts[1] - 1] || "OCT";
+                        const dayStr = String(parts[2]).padStart(2, "0");
+                        setEditingEventItem({
+                          ...editingEventItem,
+                          dateStr: val,
+                          month: mAbbr,
+                          day: dayStr,
+                        });
+                      } else {
+                        setEditingEventItem({
+                          ...editingEventItem,
+                          dateStr: "",
+                        });
+                      }
+                    }}
+                    required
+                  />
+                  {/* Live Calendar Badge Preview */}
+                  <div className="adm-date-preview-badge" title="Website badge preview">
+                    <span className="adm-date-badge-month">{editingEventItem.month || "---"}</span>
+                    <span className="adm-date-badge-day">{editingEventItem.day || "--"}</span>
+                  </div>
+                </div>
+              </div>
+
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
                 <div className="adm-form-field">
                   <label className="adm-label">Month (3 letters) *</label>
@@ -3893,12 +4650,22 @@ export default function AdminPage() {
                     placeholder="NOV, DEC, JAN"
                     maxLength={3}
                     value={editingEventItem.month}
-                    onChange={(e) =>
+                    onChange={(e) => {
+                      const val = e.target.value.toUpperCase();
+                      const mIdx = MONTH_ABBRS.indexOf(val);
+                      let newDateStr = editingEventItem.dateStr;
+                      if (mIdx !== -1 && editingEventItem.day) {
+                        const d = parseInt(editingEventItem.day, 10);
+                        if (!isNaN(d)) {
+                          newDateStr = formatDateIso(calYear, mIdx, d);
+                        }
+                      }
                       setEditingEventItem({
                         ...editingEventItem,
-                        month: e.target.value.toUpperCase(),
-                      })
-                    }
+                        month: val,
+                        dateStr: newDateStr,
+                      });
+                    }}
                     required
                   />
                 </div>
@@ -3911,9 +4678,20 @@ export default function AdminPage() {
                     placeholder="15, 24"
                     maxLength={2}
                     value={editingEventItem.day}
-                    onChange={(e) =>
-                      setEditingEventItem({ ...editingEventItem, day: e.target.value })
-                    }
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      const d = parseInt(val, 10);
+                      let newDateStr = editingEventItem.dateStr;
+                      const mIdx = MONTH_ABBRS.indexOf(editingEventItem.month?.toUpperCase());
+                      if (!isNaN(d) && mIdx !== -1) {
+                        newDateStr = formatDateIso(calYear, mIdx, d);
+                      }
+                      setEditingEventItem({
+                        ...editingEventItem,
+                        day: val,
+                        dateStr: newDateStr,
+                      });
+                    }}
                     required
                   />
                 </div>
@@ -4446,6 +5224,20 @@ export default function AdminPage() {
                 </a>
 
                 <div style={{ display: "flex", gap: "0.5rem" }}>
+                  <button
+                    type="button"
+                    className="adm-btn-secondary"
+                    onClick={() => {
+                      setActiveTab("contact");
+                      setContactSubTab("inquiries");
+                      setSelectedInquiry(null);
+                    }}
+                    title="Open full contact inquiries manager"
+                  >
+                    <ExternalLink size={15} />
+                    <span>Inquiry Hub</span>
+                  </button>
+
                   <button
                     type="button"
                     className="adm-btn-secondary"

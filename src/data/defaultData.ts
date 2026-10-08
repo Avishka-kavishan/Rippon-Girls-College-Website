@@ -200,6 +200,7 @@ export const defaultNewsData: NewsItem[] = [
 export const defaultUpcomingEvents: EventItem[] = [
   {
     id: "event-1",
+    dateStr: "2026-10-15",
     month: "OCT",
     day: "15",
     title: "Annual Inter-House Athletic Meet",
@@ -208,6 +209,7 @@ export const defaultUpcomingEvents: EventItem[] = [
   },
   {
     id: "event-2",
+    dateStr: "2026-10-28",
     month: "OCT",
     day: "28",
     title: "Annual Speech Day & Prize Giving",
@@ -216,6 +218,7 @@ export const defaultUpcomingEvents: EventItem[] = [
   },
   {
     id: "event-3",
+    dateStr: "2026-11-08",
     month: "NOV",
     day: "08",
     title: "Founders' Day Thanksgiving Service",
@@ -224,6 +227,7 @@ export const defaultUpcomingEvents: EventItem[] = [
   },
   {
     id: "event-4",
+    dateStr: "2026-11-22",
     month: "NOV",
     day: "22",
     title: "English Literary & Drama Festival",
@@ -232,6 +236,7 @@ export const defaultUpcomingEvents: EventItem[] = [
   },
   {
     id: "event-5",
+    dateStr: "2026-12-04",
     month: "DEC",
     day: "04",
     title: "Prefects' Investiture Ceremony",
@@ -240,6 +245,7 @@ export const defaultUpcomingEvents: EventItem[] = [
   },
   {
     id: "event-6",
+    dateStr: "2026-12-18",
     month: "DEC",
     day: "18",
     title: "Science & Innovation Exhibition",
