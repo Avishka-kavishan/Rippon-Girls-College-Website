@@ -1,5 +1,53 @@
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Sinhala:wght@300;400;500;600;700&family=Noto+Sans+Tamil:wght@300;400;500;600;700&display=swap');
 
+/* ==========================================================================
+   Scolapotha / Iskoola Pota Sinhala Font Definitions
+   ========================================================================== */
+@font-face {
+  font-family: 'Iskoola Pota';
+  src: local('Iskoola Pota'),
+       local('Iskoolapotha'),
+       local('Iskole Potha'),
+       url('/fonts/iskpota.ttf') format('truetype');
+  font-weight: 300 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Iskoola Pota';
+  src: local('Iskoola Pota Bold'),
+       local('Iskoolapotha Bold'),
+       local('Iskole Potha Bold'),
+       url('/fonts/iskpotab.ttf') format('truetype');
+  font-weight: 600 800;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Scolapotha alias */
+@font-face {
+  font-family: 'Scolapotha';
+  src: local('Iskoola Pota'),
+       local('Iskoolapotha'),
+       local('Iskole Potha'),
+       url('/fonts/iskpota.ttf') format('truetype');
+  font-weight: 300 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Scolapotha';
+  src: local('Iskoola Pota Bold'),
+       local('Iskoolapotha Bold'),
+       local('Iskole Potha Bold'),
+       url('/fonts/iskpotab.ttf') format('truetype');
+  font-weight: 600 800;
+  font-style: normal;
+  font-display: swap;
+}
+
 /* Base CSS Reset & Custom Design System */
 *,
 *::before,
@@ -10,7 +58,9 @@
 }
 
 :root {
-  --font-family: var(--font-noto-sans), 'Noto Sans Sinhala', 'Noto Sans Tamil', 'Iskoola Pota', 'Latha', 'Bamini', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-sinhala: 'Iskoola Pota', 'Scolapotha', 'Iskoolapotha', 'Noto Sans Sinhala', sans-serif;
+  --font-tamil: 'Noto Sans Tamil', 'Latha', 'Bamini', sans-serif;
+  --font-family: var(--font-noto-sans), var(--font-sinhala), var(--font-tamil), system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --bg-main: #ffffff;
   --bg-page: #f5f5f5;
   --nav-bg: #0b3fa8;
@@ -44,6 +94,18 @@ body {
   flex-direction: column;
 }
 
+/* Specific styling for Sinhala language mode */
+html[lang="si"],
+html[lang="si"] body,
+html[data-lang="si"],
+html[data-lang="si"] body,
+:lang(si),
+.font-sinhala,
+.sinhala-text {
+  font-family: var(--font-sinhala);
+  line-height: 1.6;
+}
+
 main {
   flex: 1;
 }
@@ -59,11 +121,12 @@ img {
   display: block;
 }
 
-button {
+button,
+input,
+select,
+textarea {
   font-family: inherit;
-  cursor: pointer;
-  border: none;
-  background: none;
+  color: inherit;
 }
 
 /* ==========================================================================

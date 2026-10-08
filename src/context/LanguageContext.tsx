@@ -30,6 +30,7 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
       if (stored && (stored === "en" || stored === "si" || stored === "ta")) {
         setLanguageState(stored);
         document.documentElement.lang = stored;
+        document.documentElement.setAttribute("data-lang", stored);
       }
     } catch {
       // localStorage may fail in restricted/private modes
@@ -46,6 +47,7 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
     }
     if (typeof document !== "undefined") {
       document.documentElement.lang = lang;
+      document.documentElement.setAttribute("data-lang", lang);
     }
   };
 
