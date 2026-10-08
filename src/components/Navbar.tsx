@@ -13,7 +13,7 @@ const navLinks = [
   { name: "About", href: "/about" },
   { name: "News", href: "/news" },
   { name: "Gallery", href: "/gallery" },
-  { name: "Contact", href: "#contact" },
+  { name: "Contact", href: "/contact" },
 ];
 
 export default function Navbar() {
@@ -57,7 +57,7 @@ export default function Navbar() {
             <Link
               key={link.name}
               href={link.href}
-              className="navbar-link"
+              className={`navbar-link ${pathname === link.href ? "active" : ""}`}
             >
               {link.name}
             </Link>
@@ -83,7 +83,7 @@ export default function Navbar() {
             key={link.name}
             href={link.href}
             onClick={() => setIsOpen(false)}
-            className="navbar-mobile-link"
+            className={`navbar-mobile-link ${pathname === link.href ? "active" : ""}`}
           >
             {link.name}
           </Link>

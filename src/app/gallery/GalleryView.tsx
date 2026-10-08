@@ -56,7 +56,7 @@ const categoriesData: Category[] = [
   },
   {
     id: "facilities",
-    label: "Campus & Facilities",
+    label: "School & Facilities",
     icon: "🏫",
     image: "/images/about.png",
   },

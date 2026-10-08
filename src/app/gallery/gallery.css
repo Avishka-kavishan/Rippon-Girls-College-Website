@@ -87,12 +87,6 @@
   display: block;
 }
 
-/* Fallback compatibility */
-.gallery-header-section,
-.gallery-hero-section {
-  /* Common container properties */
-}
-
 /* --------------------------------------------------------------------------
    2. GALLERY CATEGORIES SECTION (TOP CARDS)
    -------------------------------------------------------------------------- */

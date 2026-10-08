@@ -101,11 +101,13 @@
   transition: width 0.2s ease;
 }
 
-.navbar-link:hover {
+.navbar-link:hover,
+.navbar-link.active {
   color: var(--color-gold, #f5a600);
 }
 
-.navbar-link:hover::after {
+.navbar-link:hover::after,
+.navbar-link.active::after {
   width: 100%;
 }
 
@@ -140,7 +142,8 @@
   transition: background-color 0.15s ease, color 0.15s ease;
 }
 
-.navbar-mobile-link:hover {
+.navbar-mobile-link:hover,
+.navbar-mobile-link.active {
   color: var(--color-gold, #f5a600);
   background-color: rgba(255, 255, 255, 0.08);
 }

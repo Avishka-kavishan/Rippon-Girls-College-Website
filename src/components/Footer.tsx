@@ -63,10 +63,10 @@ export default function Footer() {
               <Link href="/news">News</Link>
             </li>
             <li className="footer-link-item">
-              <Link href="/#gallery">Gallery</Link>
+              <Link href="/gallery">Gallery</Link>
             </li>
             <li className="footer-link-item">
-              <Link href="#contact">Contact</Link>
+              <Link href="/contact">Contact</Link>
             </li>
           </ul>
         </div>
