@@ -238,24 +238,23 @@
   overflow-y: hidden;
   scroll-snap-type: x mandatory;
   scroll-behavior: smooth;
-  -webkit-overflow-scrolling: touch;
   padding: 1.5rem 0.75rem 2.5rem;
   width: 100%;
   cursor: grab;
   justify-content: safe center;
-  scrollbar-width: thin;
-  scrollbar-color: #e59300 rgba(255, 255, 255, 0.15);
 }
 
 .about-admin-scroll-track.is-dragging {
   cursor: grabbing;
   scroll-behavior: auto;
   scroll-snap-type: none;
+  -webkit-user-select: none;
   user-select: none;
 }
 
 .about-admin-scroll-track.is-dragging * {
   pointer-events: none;
+  -webkit-user-select: none;
   user-select: none;
 }
 
@@ -306,6 +305,7 @@
   height: 270px;
   background-color: #f1f5f9;
   overflow: hidden;
+  -webkit-user-select: none;
   user-select: none;
 }
 
@@ -314,7 +314,6 @@
   object-position: center top;
   transition: transform 0.4s ease;
   pointer-events: none;
-  -webkit-user-drag: none;
 }
 
 .about-admin-card:hover .about-admin-img {
@@ -351,8 +350,8 @@
   height: 48px;
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
   border: 2px solid #e11d48;
   color: #0b3fa8;
   display: flex;

@@ -787,6 +787,7 @@ textarea {
 
 .footer-divider {
   opacity: 0.45;
+  -webkit-user-select: none;
   user-select: none;
 }
 
