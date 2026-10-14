@@ -1,13 +1,12 @@
 "use client";
 
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Menu, X, Globe, ChevronDown, Check } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import { getAssetPath } from "@/utils/assets";
 import { useLanguage } from "@/context/LanguageContext";
-import { Language } from "@/locales/types";
 import "./Navbar.css";
 
 const navItems = [
@@ -21,37 +20,12 @@ const navItems = [
 export default function Navbar() {
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
-  const [langMenuOpen, setLangMenuOpen] = useState(false);
-  const langDropdownRef = useRef<HTMLDivElement>(null);
-
-  const { language, setLanguage, t, languages } = useLanguage();
-
-  // Close language dropdown on outside click
-  useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (
-        langDropdownRef.current &&
-        !langDropdownRef.current.contains(event.target as Node)
-      ) {
-        setLangMenuOpen(false);
-      }
-    }
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
+  const { t } = useLanguage();
 
   // Hide the public website navbar on admin interface routes
   if (pathname?.startsWith("/admin")) {
     return null;
   }
-
-  const currentLangObj =
-    languages.find((l) => l.code === language) || languages[0];
-
-  const handleSelectLang = (code: Language) => {
-    setLanguage(code);
-    setLangMenuOpen(false);
-  };
 
   return (
     <header className="navbar-header">
@@ -75,7 +49,7 @@ export default function Navbar() {
           </div>
         </Link>
 
-        {/* Right Section: Desktop Navigation & Language Switcher */}
+        {/* Right Section: Desktop Navigation & Mobile Toggle */}
         <div className="navbar-right-group">
           {/* Desktop Navigation Links */}
           <nav className="navbar-links" aria-label="Main Navigation">
@@ -93,52 +67,6 @@ export default function Navbar() {
               );
             })}
           </nav>
-
-          {/* Language Selector Dropdown (Desktop) */}
-          <div className="navbar-lang-wrapper" ref={langDropdownRef}>
-            <button
-              type="button"
-              className={`navbar-lang-btn ${langMenuOpen ? "active" : ""}`}
-              onClick={() => setLangMenuOpen(!langMenuOpen)}
-              aria-label="Select Language"
-              aria-expanded={langMenuOpen}
-              aria-haspopup="true"
-            >
-              <Globe size={18} className="navbar-lang-icon" />
-              <span className="navbar-lang-name">{currentLangObj.nativeName}</span>
-              <ChevronDown
-                size={14}
-                className={`navbar-lang-chevron ${langMenuOpen ? "rotate" : ""}`}
-              />
-            </button>
-
-            {langMenuOpen && (
-              <div className="navbar-lang-menu" role="menu">
-                {languages.map((langOption) => {
-                  const isSelected = language === langOption.code;
-                  return (
-                    <button
-                      key={langOption.code}
-                      type="button"
-                      role="menuitem"
-                      className={`navbar-lang-option ${isSelected ? "selected" : ""}`}
-                      onClick={() => handleSelectLang(langOption.code)}
-                    >
-                      <span className="lang-option-native">
-                        {langOption.nativeName}
-                      </span>
-                      <span className="lang-option-english">
-                        ({langOption.name})
-                      </span>
-                      {isSelected && (
-                        <Check size={16} className="lang-check-icon" />
-                      )}
-                    </button>
-                  );
-                })}
-              </div>
-            )}
-          </div>
 
           {/* Mobile Hamburger Button */}
           <button
@@ -172,38 +100,8 @@ export default function Navbar() {
             );
           })}
         </div>
-
-        {/* Mobile Language Switcher Section */}
-        <div className="navbar-mobile-lang-box">
-          <div className="navbar-mobile-lang-title">
-            <Globe size={16} />
-            <span>{t.nav.switchLanguage}</span>
-          </div>
-          <div className="navbar-mobile-lang-pills">
-            {languages.map((langOption) => {
-              const isSelected = language === langOption.code;
-              return (
-                <button
-                  key={langOption.code}
-                  type="button"
-                  className={`navbar-mobile-lang-pill ${isSelected ? "selected" : ""}`}
-                  onClick={() => {
-                    handleSelectLang(langOption.code);
-                    setIsOpen(false);
-                  }}
-                >
-                  <span className="mobile-pill-native">
-                    {langOption.nativeName}
-                  </span>
-                  <span className="mobile-pill-short">
-                    {langOption.shortLabel}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
-        </div>
       </div>
     </header>
   );
 }
+

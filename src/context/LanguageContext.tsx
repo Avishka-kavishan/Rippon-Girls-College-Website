@@ -1,8 +1,8 @@
 "use client";
 
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, { createContext, useContext, useEffect } from "react";
 import { Language, TranslationSchema, SUPPORTED_LANGUAGES, LanguageOption } from "@/locales/types";
-import { translations, getTranslations } from "@/locales";
+import { translations } from "@/locales";
 
 interface LanguageContextType {
   language: Language;
@@ -21,44 +21,25 @@ const LanguageContext = createContext<LanguageContextType>({
 const STORAGE_KEY = "rippon_language_preference";
 
 export function LanguageProvider({ children }: { children: React.ReactNode }) {
-  const [language, setLanguageState] = useState<Language>("en");
-  const [isInitialized, setIsInitialized] = useState(false);
-
   useEffect(() => {
+    // Clear any previous language preference from localStorage so everything stays English
     try {
-      const stored = localStorage.getItem(STORAGE_KEY) as Language | null;
-      if (stored && (stored === "en" || stored === "si" || stored === "ta")) {
-        setLanguageState(stored);
-        document.documentElement.lang = stored;
-        document.documentElement.setAttribute("data-lang", stored);
-      }
-    } catch {
-      // localStorage may fail in restricted/private modes
-    }
-    setIsInitialized(true);
-  }, []);
-
-  const setLanguage = (lang: Language) => {
-    setLanguageState(lang);
-    try {
-      localStorage.setItem(STORAGE_KEY, lang);
+      localStorage.removeItem(STORAGE_KEY);
     } catch {
       // ignore
     }
     if (typeof document !== "undefined") {
-      document.documentElement.lang = lang;
-      document.documentElement.setAttribute("data-lang", lang);
+      document.documentElement.lang = "en";
+      document.documentElement.removeAttribute("data-lang");
     }
-  };
-
-  const activeTranslations = isInitialized ? getTranslations(language) : translations.en;
+  }, []);
 
   return (
     <LanguageContext.Provider
       value={{
-        language,
-        setLanguage,
-        t: activeTranslations,
+        language: "en",
+        setLanguage: () => {},
+        t: translations.en,
         languages: SUPPORTED_LANGUAGES,
       }}
     >

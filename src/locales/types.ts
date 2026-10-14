@@ -9,8 +9,6 @@ export interface LanguageOption {
 
 export const SUPPORTED_LANGUAGES: LanguageOption[] = [
   { code: "en", name: "English", nativeName: "English", shortLabel: "EN" },
-  { code: "si", name: "Sinhala", nativeName: "සිංහල", shortLabel: "සිං" },
-  { code: "ta", name: "Tamil", nativeName: "தமிழ்", shortLabel: "தம" },
 ];
 
 export interface TranslationSchema {
