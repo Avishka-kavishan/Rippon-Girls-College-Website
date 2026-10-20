@@ -13,6 +13,9 @@ import {
   List,
   ChevronLeft,
   Users,
+  Landmark,
+  ArrowUp,
+  ArrowDown,
   GraduationCap,
   Settings,
   Plus,
@@ -58,6 +61,8 @@ import {
   EventItem,
   AdminMember,
   StudentPopulationStats,
+  HeritageMilestone,
+  HeritageContent,
   ContactDepartment,
   ContactVisitingItem,
   ContactFaq,
@@ -79,7 +84,7 @@ import {
   removeStoredSupabaseConfig,
   SUPABASE_SQL_SETUP,
 } from "@/lib/supabase";
-import { defaultGalleryCategories, defaultContactDetails } from "@/data/defaultData";
+import { defaultGalleryCategories, defaultContactDetails, defaultHeritageContent } from "@/data/defaultData";
 import { getAssetPath } from "@/utils/assets";
 import "./admin.css";
 
@@ -166,6 +171,7 @@ type ActiveTab =
   | "events"
   | "administration"
   | "population"
+  | "heritage"
   | "contact"
   | "settings";
 
@@ -271,6 +277,21 @@ export default function AdminPage() {
 
   // Student Population Form Local State
   const [populationForm, setPopulationForm] = useState<StudentPopulationStats | null>(null);
+  // Heritage & Milestones Local State
+  const [heritageForm, setHeritageForm] = useState<HeritageContent | null>(null);
+  const [heritageSubTab, setHeritageSubTab] = useState<"general" | "milestones">("general");
+  const [milestoneModalOpen, setMilestoneModalOpen] = useState<boolean>(false);
+  const [editingMilestone, setEditingMilestone] = useState<HeritageMilestone | null>(null);
+  const [milestoneForm, setMilestoneForm] = useState<HeritageMilestone>({
+    id: "",
+    year: "",
+    title: "",
+    tag: "",
+    desc: "",
+    era: "founding",
+  });
+  const [milestoneEraFilter, setMilestoneEraFilter] = useState<"all" | "founding" | "modern">("all");
+  const [milestoneSearch, setMilestoneSearch] = useState<string>("");
 
   const showToast = (message: string, type: "success" | "error" = "success") => {
     setToast({ message, type });
@@ -285,6 +306,7 @@ export default function AdminPage() {
         setNewsModalOpen(false);
         setEventModalOpen(false);
         setAdminModalOpen(false);
+        setMilestoneModalOpen(false);
         setDeptModalOpen(false);
         setVisitingModalOpen(false);
         setFaqModalOpen(false);
@@ -348,6 +370,7 @@ export default function AdminPage() {
       const data = await getAllContent();
       setContent(data);
       setPopulationForm(data.studentPopulation);
+      setHeritageForm(data?.heritage || defaultHeritageContent);
       setContactForm({
         ...defaultContactDetails,
         ...(data?.contact || {}),
@@ -599,6 +622,125 @@ export default function AdminPage() {
         showToast(res.usedSupabase ? "Leader removed from Supabase." : "Leader removed locally.");
       },
     });
+  };
+
+  // -------------------------------------------------------------------------
+  // HERITAGE & MILESTONES HANDLERS
+  // -------------------------------------------------------------------------
+  const handleSaveHeritageGeneral = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!content || !heritageForm) return;
+
+    const res = await saveSection("heritage", heritageForm);
+    setContent({ ...content, heritage: heritageForm });
+    showToast(
+      res.usedSupabase
+        ? "Heritage & Archival details synced to Supabase!"
+        : "Heritage & Archival details saved locally!"
+    );
+  };
+
+  const handleOpenMilestoneModal = (milestone?: HeritageMilestone) => {
+    if (milestone) {
+      setEditingMilestone(milestone);
+      setMilestoneForm({
+        id: milestone.id,
+        year: milestone.year,
+        title: milestone.title,
+        tag: milestone.tag,
+        desc: milestone.desc,
+        era: milestone.era,
+      });
+    } else {
+      setEditingMilestone(null);
+      setMilestoneForm({
+        id: "m-" + Date.now(),
+        year: "",
+        title: "",
+        tag: "",
+        desc: "",
+        era: "founding",
+      });
+    }
+    setMilestoneModalOpen(true);
+  };
+
+  const handleSaveMilestone = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!content || !heritageForm) return;
+
+    let updatedMilestones: HeritageMilestone[];
+    if (editingMilestone) {
+      updatedMilestones = (heritageForm.milestones || []).map((m) =>
+        m.id === editingMilestone.id ? { ...m, ...milestoneForm } : m
+      );
+    } else {
+      const newMilestone: HeritageMilestone = {
+        ...milestoneForm,
+        id: milestoneForm.id || "m-" + Date.now(),
+        order: (heritageForm.milestones?.length || 0) + 1,
+      };
+      updatedMilestones = [...(heritageForm.milestones || []), newMilestone];
+    }
+
+    const updatedHeritage: HeritageContent = {
+      ...heritageForm,
+      milestones: updatedMilestones,
+    };
+
+    setHeritageForm(updatedHeritage);
+    setContent({ ...content, heritage: updatedHeritage });
+    setMilestoneModalOpen(false);
+
+    const res = await saveSection("heritage", updatedHeritage);
+    showToast(
+      res.usedSupabase
+        ? "Heritage milestone synced to Supabase!"
+        : "Heritage milestone saved locally!"
+    );
+  };
+
+  const handleDeleteMilestone = (id: string, title: string) => {
+    setDeleteConfirm({
+      open: true,
+      title: 'Delete milestone "' + title + '"? This action cannot be undone.',
+      onConfirm: async () => {
+        if (!content || !heritageForm) return;
+        const updatedMilestones = (heritageForm.milestones || []).filter((m) => m.id !== id);
+        const updatedHeritage: HeritageContent = {
+          ...heritageForm,
+          milestones: updatedMilestones,
+        };
+        setHeritageForm(updatedHeritage);
+        setContent({ ...content, heritage: updatedHeritage });
+        setDeleteConfirm(null);
+
+        const res = await saveSection("heritage", updatedHeritage);
+        showToast("Milestone deleted successfully.");
+      },
+    });
+  };
+
+  const handleMoveMilestone = async (index: number, direction: "up" | "down") => {
+    if (!content || !heritageForm || !heritageForm.milestones) return;
+    const list = [...heritageForm.milestones];
+    const targetIndex = direction === "up" ? index - 1 : index + 1;
+    if (targetIndex < 0 || targetIndex >= list.length) return;
+
+    const temp = list[index];
+    list[index] = list[targetIndex];
+    list[targetIndex] = temp;
+
+    const updatedHeritage: HeritageContent = {
+      ...heritageForm,
+      milestones: list,
+    };
+
+    setHeritageForm(updatedHeritage);
+    setContent({ ...content, heritage: updatedHeritage });
+
+    await saveSection("heritage", updatedHeritage);
+    showToast("Milestone display order updated!");
   };
 
   // -------------------------------------------------------------------------
@@ -912,6 +1054,7 @@ export default function AdminPage() {
         const fresh = await getAllContent();
         setContent(fresh);
         setPopulationForm(fresh.studentPopulation);
+        setHeritageForm(fresh?.heritage || defaultHeritageContent);
         setContactForm({
           ...defaultContactDetails,
           ...(fresh.contact || {}),
@@ -933,6 +1076,7 @@ export default function AdminPage() {
         const fresh = await getAllContent();
         setContent(fresh);
         setPopulationForm(fresh.studentPopulation);
+        setHeritageForm(fresh?.heritage || defaultHeritageContent);
         setContactForm({
           ...defaultContactDetails,
           ...(fresh.contact || {}),
@@ -1512,6 +1656,23 @@ export default function AdminPage() {
               </button>
 
               <button
+                className={`adm-nav-item ${activeTab === "heritage" ? "active" : ""}`}
+                onClick={() => {
+                  setActiveTab("heritage");
+                  setMobileSidebarOpen(false);
+                  setSearchQuery("");
+                }}
+              >
+                <div className="adm-nav-item-content">
+                  <Landmark size={18} />
+                  <span>Heritage &amp; Milestones</span>
+                </div>
+                <span className="adm-nav-badge">
+                  {content?.heritage?.milestones?.length || 0}
+                </span>
+              </button>
+
+              <button
                 className={`adm-nav-item ${activeTab === "contact" ? "active" : ""}`}
                 onClick={() => {
                   setActiveTab("contact");
@@ -1654,6 +1815,7 @@ export default function AdminPage() {
                 {activeTab === "events" && "Upcoming Events"}
                 {activeTab === "administration" && "Our Administration"}
                 {activeTab === "population" && "Student Population"}
+                {activeTab === "heritage" && "Heritage & Milestones"}
                 {activeTab === "contact" && "Contact Page Management"}
                 {activeTab === "settings" && "Database & Cloud Settings"}
               </span>
@@ -1976,6 +2138,25 @@ export default function AdminPage() {
                       </div>
                       <div className="adm-kpi-icon blue">
                         <PhoneCall size={22} />
+                      </div>
+                    </div>
+
+                    <div
+                      className="adm-kpi-card"
+                      onClick={() => setActiveTab("heritage")}
+                    >
+                      <div className="adm-kpi-info">
+                        <span className="adm-kpi-label">Heritage Milestones</span>
+                        <span className="adm-kpi-value">
+                          {content?.heritage?.milestones?.length || 0}
+                        </span>
+                        <span className="adm-kpi-jump">
+                          <span>Timeline &amp; Motto</span>
+                          <ChevronRight size={12} />
+                        </span>
+                      </div>
+                      <div className="adm-kpi-icon gold">
+                        <Landmark size={22} />
                       </div>
                     </div>
                   </div>
@@ -3124,6 +3305,612 @@ export default function AdminPage() {
                       </button>
                     </div>
                   </form>
+                </div>
+              )}
+
+              {/* -------------------------------------------------------------
+                  TAB: HERITAGE & MILESTONES MANAGEMENT
+                  ------------------------------------------------------------- */}
+              {activeTab === "heritage" && heritageForm && (
+                <div>
+                  <div className="adm-header-banner">
+                    <div className="adm-section-heading">
+                      <h1>Heritage &amp; Milestones Management</h1>
+                      <p>
+                        Manage the college historical timeline, archival campus showcase, motto,
+                        quadrant heritage metrics, and collegiate legacy quote on the About page.
+                      </p>
+                    </div>
+
+                    <div style={{ display: "flex", gap: "0.75rem", flexWrap: "wrap" }}>
+                      <Link
+                        href="/about#history"
+                        target="_blank"
+                        className="adm-btn-secondary"
+                        style={{ textDecoration: "none" }}
+                      >
+                        <ExternalLink size={15} />
+                        <span>Preview on About Page</span>
+                      </Link>
+
+                      {heritageSubTab === "milestones" && (
+                        <button
+                          type="button"
+                          className="adm-btn-create"
+                          onClick={() => handleOpenMilestoneModal()}
+                        >
+                          <Plus size={16} />
+                          <span>Add Milestone</span>
+                        </button>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Sub-navigation Tabs */}
+                  <div className="adm-contact-subtabs">
+                    <button
+                      type="button"
+                      className={`adm-contact-subtab-btn ${heritageSubTab === "general" ? "active" : ""}`}
+                      onClick={() => setHeritageSubTab("general")}
+                    >
+                      <Landmark size={16} />
+                      <span>General &amp; Archival Showcase</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      className={`adm-contact-subtab-btn ${heritageSubTab === "milestones" ? "active" : ""}`}
+                      onClick={() => setHeritageSubTab("milestones")}
+                    >
+                      <Sparkles size={16} />
+                      <span>Chronological Timeline</span>
+                      <span className="adm-contact-badge-count">
+                        {heritageForm.milestones?.length || 0}
+                      </span>
+                    </button>
+                  </div>
+
+                  {/* SUBTAB 1: GENERAL & ARCHIVAL SHOWCASE */}
+                  {heritageSubTab === "general" && (
+                    <form onSubmit={handleSaveHeritageGeneral}>
+                      {/* Section Heading Settings */}
+                      <div className="adm-card" style={{ marginBottom: "1.5rem" }}>
+                        <div className="adm-card-header">
+                          <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                            <Landmark size={18} style={{ color: "var(--adm-gold)" }} />
+                            <h3 className="adm-card-title">Section Headings</h3>
+                          </div>
+                        </div>
+
+                        <div className="adm-card-body" style={{ display: "grid", gridTemplateColumns: "1fr 2fr", gap: "1.25rem" }}>
+                          <div className="adm-form-field">
+                            <label className="adm-label">Section Eyebrow</label>
+                            <input
+                              type="text"
+                              className="adm-input"
+                              value={heritageForm.eyebrow}
+                              onChange={(e) => setHeritageForm({ ...heritageForm, eyebrow: e.target.value })}
+                              placeholder="e.g. Our Heritage & Milestones"
+                              required
+                            />
+                          </div>
+
+                          <div className="adm-form-field">
+                            <label className="adm-label">Main Heading Title</label>
+                            <input
+                              type="text"
+                              className="adm-input"
+                              value={heritageForm.title}
+                              onChange={(e) => setHeritageForm({ ...heritageForm, title: e.target.value })}
+                              placeholder="e.g. A Glorious Journey Across Generations"
+                              required
+                            />
+                          </div>
+
+                          <div className="adm-form-field" style={{ gridColumn: "1 / -1" }}>
+                            <label className="adm-label">Section Subtitle / Narrative</label>
+                            <textarea
+                              rows={2}
+                              className="adm-input"
+                              value={heritageForm.subtitle}
+                              onChange={(e) => setHeritageForm({ ...heritageForm, subtitle: e.target.value })}
+                              placeholder="Summary narrative displayed beneath the title"
+                              required
+                            />
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Archival Showcase Card & Latin Motto */}
+                      <div className="adm-card" style={{ marginBottom: "1.5rem" }}>
+                        <div className="adm-card-header">
+                          <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                            <ImageIcon size={18} style={{ color: "#2563eb" }} />
+                            <h3 className="adm-card-title">Archival Showcase Card &amp; College Motto</h3>
+                          </div>
+                        </div>
+
+                        <div className="adm-card-body" style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
+                          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.25rem" }}>
+                            <div className="adm-form-field">
+                              <label className="adm-label">Archival Image Path / URL</label>
+                              <input
+                                type="text"
+                                className="adm-input"
+                                value={heritageForm.archivalImage}
+                                onChange={(e) => setHeritageForm({ ...heritageForm, archivalImage: e.target.value })}
+                                placeholder="/images/school-building.jpg"
+                                required
+                              />
+                              <span style={{ fontSize: "0.78rem", color: "#64748b", marginTop: "0.3rem" }}>
+                                Defaults to <code>/images/school-building.jpg</code> or choose from uploaded assets.
+                              </span>
+                            </div>
+
+                            <div className="adm-form-field">
+                              <label className="adm-label">Brass Badge Text</label>
+                              <input
+                                type="text"
+                                className="adm-input"
+                                value={heritageForm.archivalBadge}
+                                onChange={(e) => setHeritageForm({ ...heritageForm, archivalBadge: e.target.value })}
+                                placeholder="Richmond Hill • Est. 1871"
+                                required
+                              />
+                            </div>
+                          </div>
+
+                          <div className="adm-form-field">
+                            <label className="adm-label">Archival Image Caption</label>
+                            <input
+                              type="text"
+                              className="adm-input"
+                              value={heritageForm.archivalCaption}
+                              onChange={(e) => setHeritageForm({ ...heritageForm, archivalCaption: e.target.value })}
+                              placeholder="Historic Main Hall & Richmond Hill Campus Grounds (Established 1871)"
+                              required
+                            />
+                          </div>
+
+                          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.25rem", background: "#f8fafc", padding: "1.25rem", borderRadius: 12 }}>
+                            <div className="adm-form-field">
+                              <label className="adm-label">College Latin Motto</label>
+                              <input
+                                type="text"
+                                className="adm-input"
+                                value={heritageForm.motto}
+                                onChange={(e) => setHeritageForm({ ...heritageForm, motto: e.target.value })}
+                                placeholder="Nisi Dominus Frustra"
+                                required
+                              />
+                            </div>
+
+                            <div className="adm-form-field">
+                              <label className="adm-label">Motto English Meaning</label>
+                              <input
+                                type="text"
+                                className="adm-input"
+                                value={heritageForm.mottoMeaning}
+                                onChange={(e) => setHeritageForm({ ...heritageForm, mottoMeaning: e.target.value })}
+                                placeholder="Unless the Lord build the house, they labor in vain"
+                                required
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* 4 Heritage Metrics Quadrants */}
+                      <div className="adm-card" style={{ marginBottom: "1.5rem" }}>
+                        <div className="adm-card-header">
+                          <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                            <Award size={18} style={{ color: "#d97706" }} />
+                            <h3 className="adm-card-title">Heritage Metric Quadrants</h3>
+                          </div>
+                        </div>
+
+                        <div className="adm-card-body">
+                          <div className="adm-quad-container">
+                            {/* Metric 1 */}
+                            <div className="adm-quad-box">
+                              <div className="adm-quad-header">
+                                <Clock size={16} style={{ color: "#2563eb" }} />
+                                <span>Metric 1: Initial Genesis</span>
+                              </div>
+                              <div className="adm-form-field" style={{ marginBottom: "0.75rem" }}>
+                                <label className="adm-label">Value / Year</label>
+                                <input
+                                  type="text"
+                                  className="adm-input"
+                                  value={heritageForm.genesisYear}
+                                  onChange={(e) => setHeritageForm({ ...heritageForm, genesisYear: e.target.value })}
+                                  required
+                                />
+                              </div>
+                              <div className="adm-form-field">
+                                <label className="adm-label">Label</label>
+                                <input
+                                  type="text"
+                                  className="adm-input"
+                                  value={heritageForm.genesisLabel}
+                                  onChange={(e) => setHeritageForm({ ...heritageForm, genesisLabel: e.target.value })}
+                                  required
+                                />
+                              </div>
+                            </div>
+
+                            {/* Metric 2 */}
+                            <div className="adm-quad-box">
+                              <div className="adm-quad-header">
+                                <Landmark size={16} style={{ color: "#059669" }} />
+                                <span>Metric 2: Boarding School</span>
+                              </div>
+                              <div className="adm-form-field" style={{ marginBottom: "0.75rem" }}>
+                                <label className="adm-label">Value / Year</label>
+                                <input
+                                  type="text"
+                                  className="adm-input"
+                                  value={heritageForm.boardingYear}
+                                  onChange={(e) => setHeritageForm({ ...heritageForm, boardingYear: e.target.value })}
+                                  required
+                                />
+                              </div>
+                              <div className="adm-form-field">
+                                <label className="adm-label">Label</label>
+                                <input
+                                  type="text"
+                                  className="adm-input"
+                                  value={heritageForm.boardingLabel}
+                                  onChange={(e) => setHeritageForm({ ...heritageForm, boardingLabel: e.target.value })}
+                                  required
+                                />
+                              </div>
+                            </div>
+
+                            {/* Metric 3 */}
+                            <div className="adm-quad-box">
+                              <div className="adm-quad-header">
+                                <Award size={16} style={{ color: "#d97706" }} />
+                                <span>Metric 3: Years of Legacy</span>
+                              </div>
+                              <div className="adm-form-field" style={{ marginBottom: "0.75rem" }}>
+                                <label className="adm-label">Value (e.g. 150+)</label>
+                                <input
+                                  type="text"
+                                  className="adm-input"
+                                  value={heritageForm.legacyYears}
+                                  onChange={(e) => setHeritageForm({ ...heritageForm, legacyYears: e.target.value })}
+                                  required
+                                />
+                              </div>
+                              <div className="adm-form-field">
+                                <label className="adm-label">Label</label>
+                                <input
+                                  type="text"
+                                  className="adm-input"
+                                  value={heritageForm.legacyLabel}
+                                  onChange={(e) => setHeritageForm({ ...heritageForm, legacyLabel: e.target.value })}
+                                  required
+                                />
+                              </div>
+                            </div>
+
+                            {/* Metric 4 */}
+                            <div className="adm-quad-box">
+                              <div className="adm-quad-header">
+                                <Building size={16} style={{ color: "#7c3aed" }} />
+                                <span>Metric 4: National Status</span>
+                              </div>
+                              <div className="adm-form-field" style={{ marginBottom: "0.75rem" }}>
+                                <label className="adm-label">Value (e.g. 1AB)</label>
+                                <input
+                                  type="text"
+                                  className="adm-input"
+                                  value={heritageForm.nationalStatus}
+                                  onChange={(e) => setHeritageForm({ ...heritageForm, nationalStatus: e.target.value })}
+                                  required
+                                />
+                              </div>
+                              <div className="adm-form-field">
+                                <label className="adm-label">Label</label>
+                                <input
+                                  type="text"
+                                  className="adm-input"
+                                  value={heritageForm.nationalLabel}
+                                  onChange={(e) => setHeritageForm({ ...heritageForm, nationalLabel: e.target.value })}
+                                  required
+                                />
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Legacy Quote Banner Settings */}
+                      <div className="adm-card" style={{ marginBottom: "1.75rem" }}>
+                        <div className="adm-card-header">
+                          <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                            <Sparkles size={18} style={{ color: "var(--adm-gold)" }} />
+                            <h3 className="adm-card-title">Legacy Quote &amp; Attribution</h3>
+                          </div>
+                        </div>
+
+                        <div className="adm-card-body" style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
+                          <div className="adm-form-field">
+                            <label className="adm-label">Inspiring Legacy Quote</label>
+                            <textarea
+                              rows={3}
+                              className="adm-input"
+                              value={heritageForm.legacyQuote}
+                              onChange={(e) => setHeritageForm({ ...heritageForm, legacyQuote: e.target.value })}
+                              required
+                            />
+                          </div>
+
+                          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.25rem" }}>
+                            <div className="adm-form-field">
+                              <label className="adm-label">Attribution Title</label>
+                              <input
+                                type="text"
+                                className="adm-input"
+                                value={heritageForm.authorTitle}
+                                onChange={(e) => setHeritageForm({ ...heritageForm, authorTitle: e.target.value })}
+                                placeholder="Rippon Girls' College, Galle"
+                                required
+                              />
+                            </div>
+
+                            <div className="adm-form-field">
+                              <label className="adm-label">Attribution Subtitle</label>
+                              <input
+                                type="text"
+                                className="adm-input"
+                                value={heritageForm.authorSubtitle}
+                                onChange={(e) => setHeritageForm({ ...heritageForm, authorSubtitle: e.target.value })}
+                                placeholder="Richmond Hill • Est. 1871"
+                                required
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div style={{ display: "flex", justifyContent: "flex-end", gap: "0.75rem" }}>
+                        <button
+                          type="submit"
+                          className="adm-btn-create"
+                          style={{ padding: "0.85rem 2.25rem", fontSize: "0.95rem" }}
+                        >
+                          <Check size={18} />
+                          <span>Save Heritage Details</span>
+                        </button>
+                      </div>
+                    </form>
+                  )}
+
+                  {/* SUBTAB 2: MILESTONES TIMELINE */}
+                  {heritageSubTab === "milestones" && (
+                    <div>
+                      {/* Filter Controls Bar */}
+                      <div
+                        style={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                          alignItems: "center",
+                          marginBottom: "1.5rem",
+                          flexWrap: "wrap",
+                          gap: "1rem",
+                          background: "#ffffff",
+                          padding: "1rem 1.25rem",
+                          borderRadius: "var(--adm-radius-md)",
+                          border: "1px solid var(--adm-border)",
+                        }}
+                      >
+                        <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
+                          <button
+                            type="button"
+                            className={`adm-filter-btn ${milestoneEraFilter === "all" ? "active" : ""}`}
+                            onClick={() => setMilestoneEraFilter("all")}
+                          >
+                            All ({heritageForm.milestones?.length || 0})
+                          </button>
+                          <button
+                            type="button"
+                            className={`adm-filter-btn ${milestoneEraFilter === "founding" ? "active" : ""}`}
+                            onClick={() => setMilestoneEraFilter("founding")}
+                          >
+                            Founding Era (1817–1879) ({heritageForm.milestones?.filter((m) => m.era === "founding").length || 0})
+                          </button>
+                          <button
+                            type="button"
+                            className={`adm-filter-btn ${milestoneEraFilter === "modern" ? "active" : ""}`}
+                            onClick={() => setMilestoneEraFilter("modern")}
+                          >
+                            Modern Legacy (1942–Present) ({heritageForm.milestones?.filter((m) => m.era === "modern").length || 0})
+                          </button>
+                        </div>
+
+                        <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+                          <div style={{ position: "relative" }}>
+                            <input
+                              type="text"
+                              className="adm-input"
+                              placeholder="Search milestones..."
+                              value={milestoneSearch}
+                              onChange={(e) => setMilestoneSearch(e.target.value)}
+                              style={{ paddingLeft: "2.25rem", width: 220, fontSize: "0.85rem" }}
+                            />
+                            <Search
+                              size={15}
+                              style={{
+                                position: "absolute",
+                                left: 10,
+                                top: "50%",
+                                transform: "translateY(-50%)",
+                                color: "#94a3b8",
+                              }}
+                            />
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Milestones List */}
+                      <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+                        {(heritageForm.milestones || [])
+                          .filter((m) => {
+                            if (milestoneEraFilter !== "all" && m.era !== milestoneEraFilter) return false;
+                            if (milestoneSearch.trim()) {
+                              const q = milestoneSearch.toLowerCase();
+                              return (
+                                m.year.toLowerCase().includes(q) ||
+                                m.title.toLowerCase().includes(q) ||
+                                m.tag.toLowerCase().includes(q) ||
+                                m.desc.toLowerCase().includes(q)
+                              );
+                            }
+                            return true;
+                          })
+                          .map((m, idx, arr) => (
+                            <div
+                              key={m.id}
+                              style={{
+                                background: "#ffffff",
+                                border: "1px solid var(--adm-border)",
+                                borderRadius: "var(--adm-radius-md)",
+                                padding: "1.25rem 1.5rem",
+                                display: "flex",
+                                alignItems: "flex-start",
+                                justifyContent: "space-between",
+                                gap: "1.5rem",
+                                transition: "all 0.2s ease",
+                                boxShadow: "var(--adm-shadow-sm)",
+                              }}
+                            >
+                              <div style={{ display: "flex", gap: "1.25rem", alignItems: "flex-start", flex: 1 }}>
+                                <div
+                                  style={{
+                                    background: "linear-gradient(135deg, #082567 0%, #0b3fa8 100%)",
+                                    color: "#fdb827",
+                                    fontWeight: 800,
+                                    fontSize: "1.25rem",
+                                    padding: "0.6rem 0.9rem",
+                                    borderRadius: 12,
+                                    minWidth: 78,
+                                    textAlign: "center",
+                                    boxShadow: "0 4px 10px rgba(8, 37, 103, 0.25)",
+                                  }}
+                                >
+                                  {m.year}
+                                </div>
+
+                                <div style={{ flex: 1 }}>
+                                  <div style={{ display: "flex", alignItems: "center", gap: "0.6rem", marginBottom: "0.4rem", flexWrap: "wrap" }}>
+                                    <h3 style={{ fontSize: "1.1rem", fontWeight: 700, margin: 0, color: "var(--adm-text-primary)" }}>
+                                      {m.title}
+                                    </h3>
+                                    <span
+                                      style={{
+                                        fontSize: "0.72rem",
+                                        fontWeight: 700,
+                                        textTransform: "uppercase",
+                                        letterSpacing: "0.04em",
+                                        padding: "0.2rem 0.55rem",
+                                        borderRadius: 9999,
+                                        background: "#fef3c7",
+                                        color: "#b45309",
+                                      }}
+                                    >
+                                      {m.tag}
+                                    </span>
+                                    <span
+                                      style={{
+                                        fontSize: "0.72rem",
+                                        fontWeight: 600,
+                                        padding: "0.2rem 0.55rem",
+                                        borderRadius: 9999,
+                                        background: m.era === "founding" ? "#e0f2fe" : "#f3e8ff",
+                                        color: m.era === "founding" ? "#0369a1" : "#7e22ce",
+                                      }}
+                                    >
+                                      {m.era === "founding" ? "Founding Era" : "Modern Legacy"}
+                                    </span>
+                                  </div>
+
+                                  <p style={{ fontSize: "0.9rem", color: "var(--adm-text-secondary)", margin: 0, lineHeight: 1.6 }}>
+                                    {m.desc}
+                                  </p>
+                                </div>
+                              </div>
+
+                              <div style={{ display: "flex", alignItems: "center", gap: "0.4rem" }}>
+                                <button
+                                  type="button"
+                                  className="adm-btn-action"
+                                  title="Move Up"
+                                  disabled={idx === 0}
+                                  onClick={() => handleMoveMilestone(idx, "up")}
+                                  style={{ opacity: idx === 0 ? 0.35 : 1 }}
+                                >
+                                  <ArrowUp size={15} />
+                                </button>
+                                <button
+                                  type="button"
+                                  className="adm-btn-action"
+                                  title="Move Down"
+                                  disabled={idx === arr.length - 1}
+                                  onClick={() => handleMoveMilestone(idx, "down")}
+                                  style={{ opacity: idx === arr.length - 1 ? 0.35 : 1 }}
+                                >
+                                  <ArrowDown size={15} />
+                                </button>
+                                <button
+                                  type="button"
+                                  className="adm-btn-action"
+                                  title="Edit Milestone"
+                                  onClick={() => handleOpenMilestoneModal(m)}
+                                >
+                                  <Edit size={15} />
+                                </button>
+                                <button
+                                  type="button"
+                                  className="adm-btn-action delete"
+                                  title="Delete Milestone"
+                                  onClick={() => handleDeleteMilestone(m.id, m.title)}
+                                >
+                                  <Trash2 size={15} />
+                                </button>
+                              </div>
+                            </div>
+                          ))}
+
+                        {(heritageForm.milestones || []).length === 0 && (
+                          <div
+                            style={{
+                              background: "#ffffff",
+                              borderRadius: "var(--adm-radius-md)",
+                              padding: "3rem 1.5rem",
+                              textAlign: "center",
+                              border: "1px dashed var(--adm-border)",
+                            }}
+                          >
+                            <Landmark size={32} style={{ color: "#94a3b8", marginBottom: "0.75rem" }} />
+                            <h4 style={{ margin: "0 0 0.4rem", color: "var(--adm-text-primary)" }}>No Milestones Found</h4>
+                            <p style={{ color: "var(--adm-text-secondary)", fontSize: "0.9rem", marginBottom: "1.25rem" }}>
+                              Get started by adding your first historical milestone.
+                            </p>
+                            <button
+                              type="button"
+                              className="adm-btn-create"
+                              onClick={() => handleOpenMilestoneModal()}
+                            >
+                              <Plus size={16} />
+                              <span>Add Milestone</span>
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
 
@@ -5260,6 +6047,112 @@ export default function AdminPage() {
                 </div>
               </div>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* =====================================================================
+          MODAL: HERITAGE MILESTONE EDIT / CREATE
+          ===================================================================== */}
+      {milestoneModalOpen && (
+        <div className="adm-modal-backdrop" onClick={() => setMilestoneModalOpen(false)}>
+          <div className="adm-modal-card" style={{ maxWidth: 560 }} onClick={(e) => e.stopPropagation()}>
+            <div className="adm-modal-topbar">
+              <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                <Landmark size={20} style={{ color: "var(--adm-gold)" }} />
+                <h3 className="adm-modal-title">
+                  {editingMilestone ? "Edit Heritage Milestone" : "Add Historical Milestone"}
+                </h3>
+              </div>
+              <button
+                type="button"
+                className="adm-modal-close-btn"
+                onClick={() => setMilestoneModalOpen(false)}
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveMilestone} style={{ display: "flex", flexDirection: "column", gap: "1.1rem" }}>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
+                <div className="adm-form-field">
+                  <label className="adm-label">Year / Timeframe *</label>
+                  <input
+                    type="text"
+                    className="adm-input"
+                    placeholder="e.g. 1817 or 1871-1875"
+                    value={milestoneForm.year}
+                    onChange={(e) => setMilestoneForm({ ...milestoneForm, year: e.target.value })}
+                    required
+                  />
+                </div>
+
+                <div className="adm-form-field">
+                  <label className="adm-label">Historical Era *</label>
+                  <select
+                    className="adm-input"
+                    value={milestoneForm.era}
+                    onChange={(e) => setMilestoneForm({ ...milestoneForm, era: e.target.value as "founding" | "modern" })}
+                    required
+                  >
+                    <option value="founding">Founding Era (1817–1920)</option>
+                    <option value="modern">Modern Legacy (1921–Present)</option>
+                  </select>
+                </div>
+              </div>
+
+              <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: "1rem" }}>
+                <div className="adm-form-field">
+                  <label className="adm-label">Milestone Title *</label>
+                  <input
+                    type="text"
+                    className="adm-input"
+                    placeholder="e.g. Richmond Hill Foundation"
+                    value={milestoneForm.title}
+                    onChange={(e) => setMilestoneForm({ ...milestoneForm, title: e.target.value })}
+                    required
+                  />
+                </div>
+
+                <div className="adm-form-field">
+                  <label className="adm-label">Badge Tag *</label>
+                  <input
+                    type="text"
+                    className="adm-input"
+                    placeholder="e.g. Genesis / Milestone"
+                    value={milestoneForm.tag}
+                    onChange={(e) => setMilestoneForm({ ...milestoneForm, tag: e.target.value })}
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="adm-form-field">
+                <label className="adm-label">Historical Narrative / Description *</label>
+                <textarea
+                  rows={4}
+                  className="adm-input"
+                  placeholder="Detail the historical significance and impact on Rippon Girls' College..."
+                  value={milestoneForm.desc}
+                  onChange={(e) => setMilestoneForm({ ...milestoneForm, desc: e.target.value })}
+                  required
+                />
+              </div>
+
+              <div className="adm-modal-footer">
+                <button
+                  type="button"
+                  className="adm-btn-secondary"
+                  onClick={() => setMilestoneModalOpen(false)}
+                >
+                  Cancel
+                </button>
+                <button type="submit" className="adm-btn-create">
+                  <CheckCircle2 size={16} />
+                  <span>{editingMilestone ? "Update Milestone" : "Add Milestone"}</span>
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}

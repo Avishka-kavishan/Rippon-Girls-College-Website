@@ -125,6 +125,39 @@ export interface ContactInquiry {
   status: "unread" | "read" | "resolved";
 }
 
+export interface HeritageMilestone {
+  id: string;
+  year: string;
+  title: string;
+  tag: string;
+  desc: string;
+  era: "founding" | "modern";
+  order?: number;
+}
+
+export interface HeritageContent {
+  eyebrow: string;
+  title: string;
+  subtitle: string;
+  archivalImage: string;
+  archivalBadge: string;
+  archivalCaption: string;
+  motto: string;
+  mottoMeaning: string;
+  genesisYear: string;
+  genesisLabel: string;
+  boardingYear: string;
+  boardingLabel: string;
+  legacyYears: string;
+  legacyLabel: string;
+  nationalStatus: string;
+  nationalLabel: string;
+  legacyQuote: string;
+  authorTitle: string;
+  authorSubtitle: string;
+  milestones: HeritageMilestone[];
+}
+
 export interface SiteContentState {
   gallery: GalleryItem[];
   news: NewsItem[];
@@ -134,4 +167,5 @@ export interface SiteContentState {
   achievements: AchievementItem[];
   contact: ContactPageDetails;
   contactInquiries?: ContactInquiry[];
+  heritage: HeritageContent;
 }

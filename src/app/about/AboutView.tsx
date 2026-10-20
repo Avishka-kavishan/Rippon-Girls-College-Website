@@ -15,9 +15,10 @@ import {
 import {
   defaultAdministration,
   defaultStudentPopulation,
+  defaultHeritageContent,
 } from "@/data/defaultData";
 import { getAllContent, onContentChange } from "@/services/contentService";
-import { AdminMember, StudentPopulationStats } from "@/types/content";
+import { AdminMember, StudentPopulationStats, HeritageContent } from "@/types/content";
 import { useLanguage } from "@/context/LanguageContext";
 import { Language } from "@/locales/types";
 import "./about.css";
@@ -46,6 +47,7 @@ export default function AboutView() {
   const { t, language } = useLanguage();
   const [adminList, setAdminList] = useState<AdminMember[]>(defaultAdministration);
   const [population, setPopulation] = useState<StudentPopulationStats>(defaultStudentPopulation);
+  const [heritage, setHeritage] = useState<HeritageContent>(defaultHeritageContent);
   const [historyEra, setHistoryEra] = useState<"all" | "founding" | "modern">("all");
 
   const adminScrollRef = useRef<HTMLDivElement>(null);
@@ -122,6 +124,9 @@ export default function AboutView() {
         if (data.studentPopulation) {
           setPopulation(data.studentPopulation);
         }
+        if (data.heritage) {
+          setHeritage(data.heritage);
+        }
       }
     });
 
@@ -133,6 +138,9 @@ export default function AboutView() {
           }
           if (data.studentPopulation) {
             setPopulation(data.studentPopulation);
+          }
+          if (data.heritage) {
+            setHeritage(data.heritage);
           }
         }
       });
@@ -221,17 +229,21 @@ export default function AboutView() {
           {/* Section Header */}
           <div className="about-history-header">
             <span className="about-section-eyebrow gold">
-              {t.about.historyEyebrow}
+              {heritage.eyebrow || t.about.historyEyebrow}
             </span>
-            <h2 className="about-history-main-title">{t.about.historyTitle}</h2>
-            <p className="about-history-subtitle">{t.about.historySubtitle}</p>
+            <h2 className="about-history-main-title">
+              {heritage.title || t.about.historyTitle}
+            </h2>
+            <p className="about-history-subtitle">
+              {heritage.subtitle || t.about.historySubtitle}
+            </p>
           </div>
 
           {/* Archival Showcase Card */}
           <div className="about-history-archival-card">
             <div className="about-history-archival-media">
               <Image
-                src={getAssetPath("/images/school-building.jpg")}
+                src={getAssetPath(heritage.archivalImage || "/images/school-building.jpg")}
                 alt="Historic Main Hall of Rippon Girls' College"
                 fill
                 className="about-history-archival-img"
@@ -240,10 +252,10 @@ export default function AboutView() {
               <div className="about-history-archival-overlay">
                 <span className="about-history-badge">
                   <Landmark size={15} />
-                  <span>Richmond Hill &bull; Est. 1871</span>
+                  <span>{heritage.archivalBadge || "Richmond Hill • Est. 1871"}</span>
                 </span>
                 <p className="about-history-media-caption">
-                  {t.about.historyArchivalCaption}
+                  {heritage.archivalCaption || t.about.historyArchivalCaption}
                 </p>
               </div>
             </div>
@@ -252,29 +264,45 @@ export default function AboutView() {
               <div className="about-history-motto-box">
                 <span className="about-history-motto-label">College Latin Motto</span>
                 <blockquote className="about-history-motto-quote">
-                  &ldquo;{t.about.historyMotto}&rdquo;
+                  &ldquo;{heritage.motto || t.about.historyMotto}&rdquo;
                 </blockquote>
                 <p className="about-history-motto-meaning">
-                  &mdash; {t.about.historyMottoMeaning}
+                  &mdash; {heritage.mottoMeaning || t.about.historyMottoMeaning}
                 </p>
               </div>
 
               <div className="about-history-stats-grid">
                 <div className="about-history-stat-box">
-                  <span className="about-history-stat-number">1817</span>
-                  <span className="about-history-stat-label">Initial Genesis</span>
+                  <span className="about-history-stat-number">
+                    {heritage.genesisYear || "1817"}
+                  </span>
+                  <span className="about-history-stat-label">
+                    {heritage.genesisLabel || "Initial Genesis"}
+                  </span>
                 </div>
                 <div className="about-history-stat-box">
-                  <span className="about-history-stat-number">1871</span>
-                  <span className="about-history-stat-label">Boarding School</span>
+                  <span className="about-history-stat-number">
+                    {heritage.boardingYear || "1871"}
+                  </span>
+                  <span className="about-history-stat-label">
+                    {heritage.boardingLabel || "Boarding School"}
+                  </span>
                 </div>
                 <div className="about-history-stat-box">
-                  <span className="about-history-stat-number">150+</span>
-                  <span className="about-history-stat-label">Years of Legacy</span>
+                  <span className="about-history-stat-number">
+                    {heritage.legacyYears || "150+"}
+                  </span>
+                  <span className="about-history-stat-label">
+                    {heritage.legacyLabel || "Years of Legacy"}
+                  </span>
                 </div>
                 <div className="about-history-stat-box">
-                  <span className="about-history-stat-number">1AB</span>
-                  <span className="about-history-stat-label">National School</span>
+                  <span className="about-history-stat-number">
+                    {heritage.nationalStatus || "1AB"}
+                  </span>
+                  <span className="about-history-stat-label">
+                    {heritage.nationalLabel || "National School"}
+                  </span>
                 </div>
               </div>
             </div>
@@ -318,9 +346,13 @@ export default function AboutView() {
           <div className="about-timeline-wrapper">
             <div className="about-timeline-spine" />
             <div className="about-timeline-list">
-              {(historyEra === "all"
-                ? t.about.historyMilestones
-                : t.about.historyMilestones.filter((m) => m.era === historyEra)
+              {((heritage.milestones && heritage.milestones.length > 0)
+                ? (historyEra === "all"
+                    ? heritage.milestones
+                    : heritage.milestones.filter((m) => m.era === historyEra))
+                : (historyEra === "all"
+                    ? t.about.historyMilestones
+                    : t.about.historyMilestones.filter((m) => m.era === historyEra))
               ).map((item, idx) => {
                 const isEven = idx % 2 === 0;
                 return (
@@ -350,10 +382,16 @@ export default function AboutView() {
           <div className="about-history-quote-banner">
             <div className="about-history-quote-content">
               <span className="about-history-quote-mark">&ldquo;</span>
-              <p className="about-history-quote-text">{t.about.historyLegacyQuote}</p>
+              <p className="about-history-quote-text">
+                {heritage.legacyQuote || t.about.historyLegacyQuote}
+              </p>
               <div className="about-history-quote-author">
-                <span className="about-history-author-title">Rippon Girls&apos; College, Galle</span>
-                <span className="about-history-author-subtitle">Richmond Hill &bull; Est. 1871</span>
+                <span className="about-history-author-title">
+                  {heritage.authorTitle || "Rippon Girls' College, Galle"}
+                </span>
+                <span className="about-history-author-subtitle">
+                  {heritage.authorSubtitle || "Richmond Hill • Est. 1871"}
+                </span>
               </div>
             </div>
           </div>

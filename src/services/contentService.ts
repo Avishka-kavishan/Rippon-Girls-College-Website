@@ -8,6 +8,7 @@ import {
   defaultAchievements,
   defaultContactDetails,
   defaultContactInquiries,
+  defaultHeritageContent,
   defaultInitialSiteContent,
 } from "@/data/defaultData";
 import {
@@ -19,6 +20,7 @@ import {
   AchievementItem,
   ContactPageDetails,
   ContactInquiry,
+  HeritageContent,
   SiteContentState,
 } from "@/types/content";
 
@@ -72,6 +74,9 @@ function getLocalCache(): SiteContentState {
         contactInquiries: Array.isArray(parsed.contactInquiries)
           ? parsed.contactInquiries
           : defaultContactInquiries,
+        heritage: parsed.heritage
+          ? { ...defaultHeritageContent, ...parsed.heritage }
+          : defaultHeritageContent,
       };
     }
   } catch (e) {
@@ -131,6 +136,9 @@ export async function getAllContent(): Promise<SiteContentState> {
         contactInquiries: Array.isArray(map["contactInquiries"])
           ? map["contactInquiries"]
           : (Array.isArray(local.contactInquiries) ? local.contactInquiries : defaultContactInquiries),
+        heritage: map["heritage"]
+          ? { ...defaultHeritageContent, ...map["heritage"] }
+          : (local.heritage ? { ...defaultHeritageContent, ...local.heritage } : defaultHeritageContent),
       };
 
       setLocalCache(merged);
@@ -203,6 +211,7 @@ export async function syncAllToSupabase(): Promise<{ success: boolean; error?: s
     { id: "achievements", data: current.achievements, updated_at: new Date().toISOString() },
     { id: "contact", data: current.contact, updated_at: new Date().toISOString() },
     { id: "contactInquiries", data: current.contactInquiries || [], updated_at: new Date().toISOString() },
+    { id: "heritage", data: current.heritage || defaultHeritageContent, updated_at: new Date().toISOString() },
   ];
 
   try {
@@ -303,6 +312,9 @@ export async function importContentFromJSON(jsonString: string): Promise<boolean
       contactInquiries: Array.isArray(parsed.contactInquiries)
         ? parsed.contactInquiries
         : defaultContactInquiries,
+      heritage: parsed.heritage
+        ? { ...defaultHeritageContent, ...parsed.heritage }
+        : defaultHeritageContent,
     };
     setLocalCache(merged);
     const supabase = getSupabaseClient();
