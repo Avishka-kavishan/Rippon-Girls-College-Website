@@ -181,6 +181,449 @@
   font-weight: 500;
 }
 
+
+/* --------------------------------------------------------------------------
+   HISTORY & HERITAGE SECTION
+   -------------------------------------------------------------------------- */
+.about-history-section {
+  width: 100%;
+  padding: 5.5rem 1.5rem 6rem;
+  background-color: #f8fafc;
+  border-top: 1px solid #e2e8f0;
+  position: relative;
+}
+
+.about-history-container {
+  max-width: 1140px;
+  margin: 0 auto;
+}
+
+.about-history-header {
+  text-align: center;
+  margin-bottom: 3.5rem;
+}
+
+.about-history-main-title {
+  font-size: 2.35rem;
+  font-weight: 800;
+  color: #082567;
+  letter-spacing: -0.02em;
+  margin-top: 0.35rem;
+  margin-bottom: 0.65rem;
+}
+
+.about-history-subtitle {
+  font-size: 1.05rem;
+  color: #475569;
+  max-width: 720px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+/* Archival Showcase Card */
+.about-history-archival-card {
+  display: grid;
+  grid-template-columns: 1.15fr 1fr;
+  gap: 2.5rem;
+  background-color: #ffffff;
+  border-radius: 28px;
+  border: 1.5px solid #e2e8f0;
+  box-shadow: 0 16px 40px rgba(8, 37, 103, 0.08);
+  overflow: hidden;
+  margin-bottom: 4rem;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.about-history-archival-card:hover {
+  box-shadow: 0 20px 48px rgba(8, 37, 103, 0.12);
+}
+
+.about-history-archival-media {
+  position: relative;
+  width: 100%;
+  min-height: 360px;
+  overflow: hidden;
+  background-color: #082567;
+}
+
+.about-history-archival-img {
+  object-fit: cover;
+  object-position: center;
+  transition: transform 0.5s ease;
+}
+
+.about-history-archival-card:hover .about-history-archival-img {
+  transform: scale(1.04);
+}
+
+.about-history-archival-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to top,
+    rgba(8, 37, 103, 0.92) 0%,
+    rgba(8, 37, 103, 0.35) 55%,
+    transparent 100%
+  );
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 1.75rem;
+  z-index: 2;
+}
+
+.about-history-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  background: #fdb827;
+  color: #082567;
+  font-weight: 700;
+  font-size: 0.82rem;
+  padding: 0.35rem 0.85rem;
+  border-radius: 9999px;
+  width: fit-content;
+  margin-bottom: 0.6rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.about-history-media-caption {
+  color: #ffffff;
+  font-size: 0.95rem;
+  font-weight: 600;
+  line-height: 1.4;
+  margin: 0;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+}
+
+.about-history-archival-content {
+  padding: 2.25rem 2.25rem 2.25rem 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 1.75rem;
+}
+
+.about-history-motto-box {
+  background: linear-gradient(135deg, rgba(253, 184, 39, 0.12) 0%, rgba(11, 63, 168, 0.05) 100%);
+  border-left: 4px solid #fdb827;
+  border-radius: 16px;
+  padding: 1.4rem 1.65rem;
+}
+
+.about-history-motto-label {
+  font-size: 0.78rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #e59300;
+  display: block;
+  margin-bottom: 0.35rem;
+}
+
+.about-history-motto-quote {
+  font-size: 1.4rem;
+  font-style: italic;
+  font-weight: 800;
+  color: #082567;
+  line-height: 1.3;
+  margin: 0 0 0.4rem;
+  font-family: Georgia, serif;
+}
+
+.about-history-motto-meaning {
+  font-size: 0.92rem;
+  color: #475569;
+  font-weight: 500;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.about-history-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.85rem;
+}
+
+.about-history-stat-box {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 0.9rem 0.5rem;
+  text-align: center;
+  transition: transform 0.25s ease, border-color 0.25s ease, background-color 0.25s ease;
+}
+
+.about-history-stat-box:hover {
+  transform: translateY(-3px);
+  border-color: #fdb827;
+  background-color: #ffffff;
+  box-shadow: 0 4px 12px rgba(8, 37, 103, 0.06);
+}
+
+.about-history-stat-number {
+  display: block;
+  font-size: 1.45rem;
+  font-weight: 800;
+  color: #082567;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+
+.about-history-stat-label {
+  display: block;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-top: 0.3rem;
+}
+
+/* Timeline Filter Tabs */
+.about-history-filters {
+  display: flex;
+  justify-content: center;
+  gap: 0.75rem;
+  margin-bottom: 3.5rem;
+  flex-wrap: wrap;
+}
+
+.about-history-filter-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.65rem 1.4rem;
+  border-radius: 9999px;
+  border: 1.5px solid #cbd5e1;
+  background: #ffffff;
+  color: #334155;
+  font-size: 0.92rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.about-history-filter-btn:hover {
+  border-color: #0b3fa8;
+  color: #0b3fa8;
+  transform: translateY(-2px);
+}
+
+.about-history-filter-btn.is-active {
+  background: #082567;
+  color: #ffffff;
+  border-color: #082567;
+  box-shadow: 0 6px 18px rgba(8, 37, 103, 0.25);
+  transform: translateY(-2px);
+}
+
+/* Interactive Timeline Track */
+.about-timeline-wrapper {
+  position: relative;
+  max-width: 980px;
+  margin: 0 auto 4.5rem;
+  padding: 1.5rem 0;
+}
+
+.about-timeline-spine {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 3px;
+  background: linear-gradient(
+    to bottom,
+    rgba(253, 184, 39, 0.5) 0%,
+    #0b3fa8 30%,
+    #082567 70%,
+    rgba(253, 184, 39, 0.5) 100%
+  );
+  border-radius: 999px;
+}
+
+.about-timeline-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
+  position: relative;
+  z-index: 2;
+}
+
+.about-timeline-item {
+  display: grid;
+  grid-template-columns: 1fr 60px 1fr;
+  align-items: center;
+  position: relative;
+}
+
+.about-timeline-item.left .about-timeline-node {
+  grid-column: 2;
+}
+
+.about-timeline-item.left .about-timeline-card {
+  grid-column: 1;
+}
+
+.about-timeline-item.right .about-timeline-node {
+  grid-column: 2;
+}
+
+.about-timeline-item.right .about-timeline-card {
+  grid-column: 3;
+}
+
+.about-timeline-node {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 3;
+}
+
+.about-timeline-dot {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #ffffff;
+  border: 4px solid #fdb827;
+  box-shadow: 0 0 0 4px rgba(253, 184, 39, 0.25), 0 4px 10px rgba(0, 0, 0, 0.15);
+  transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.about-timeline-item:hover .about-timeline-dot {
+  transform: scale(1.35);
+  border-color: #082567;
+  box-shadow: 0 0 0 6px rgba(8, 37, 103, 0.25), 0 6px 16px rgba(0, 0, 0, 0.25);
+}
+
+.about-timeline-card {
+  background: #ffffff;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 20px;
+  padding: 1.6rem 1.85rem;
+  box-shadow: 0 8px 24px rgba(8, 37, 103, 0.06);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+}
+
+.about-timeline-item:hover .about-timeline-card {
+  transform: translateY(-4px);
+  border-color: #fdb827;
+  box-shadow: 0 16px 36px rgba(8, 37, 103, 0.14);
+}
+
+.about-timeline-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.about-timeline-year {
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: #082567;
+  letter-spacing: -0.02em;
+  background: linear-gradient(135deg, rgba(8, 37, 103, 0.08) 0%, rgba(253, 184, 39, 0.18) 100%);
+  padding: 0.25rem 0.75rem;
+  border-radius: 8px;
+}
+
+.about-timeline-tag {
+  font-size: 0.76rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #b45309;
+  background: #fef3c7;
+  padding: 0.25rem 0.65rem;
+  border-radius: 9999px;
+}
+
+.about-timeline-title {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #0f172a;
+  margin-bottom: 0.5rem;
+  letter-spacing: -0.01em;
+}
+
+.about-timeline-desc {
+  font-size: 0.92rem;
+  color: #475569;
+  line-height: 1.65;
+  margin: 0;
+  text-align: justify;
+}
+
+/* Legacy Quote Banner */
+.about-history-quote-banner {
+  background: linear-gradient(135deg, #082567 0%, #0b3fa8 100%);
+  border-radius: 24px;
+  padding: 3rem 2.5rem;
+  color: #ffffff;
+  position: relative;
+  overflow: hidden;
+  box-shadow: -8px 8px 0px #fdb827;
+  margin-top: 1rem;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.about-history-quote-banner:hover {
+  transform: translate(2px, -2px);
+  box-shadow: -10px 10px 0px #fdb827;
+}
+
+.about-history-quote-content {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  max-width: 780px;
+  margin: 0 auto;
+}
+
+.about-history-quote-mark {
+  display: block;
+  font-size: 4rem;
+  line-height: 1;
+  color: #fdb827;
+  opacity: 0.85;
+  font-family: Georgia, serif;
+  margin-bottom: -1rem;
+}
+
+.about-history-quote-text {
+  font-size: 1.15rem;
+  line-height: 1.75;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.96);
+  font-style: italic;
+  margin-bottom: 1.5rem;
+}
+
+.about-history-quote-author {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.2rem;
+}
+
+.about-history-author-title {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #fdb827;
+  letter-spacing: 0.02em;
+}
+
+.about-history-author-subtitle {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.8);
+}
+
 /* --------------------------------------------------------------------------
    3. ACADEMIC STAFF / OUR ADMINISTRATION SECTION
    -------------------------------------------------------------------------- */
@@ -672,6 +1115,45 @@
     grid-template-columns: 1fr;
     gap: 0.5rem;
   }
+
+  .about-history-archival-card {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+
+  .about-history-archival-content {
+    padding: 2rem 1.5rem;
+  }
+
+  .about-history-archival-media {
+    min-height: 280px;
+  }
+
+  .about-timeline-spine {
+    left: 20px;
+  }
+
+  .about-timeline-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 1.5rem;
+  }
+
+  .about-timeline-node {
+    width: 24px;
+    flex-shrink: 0;
+    margin-top: 1.25rem;
+    margin-left: 8px;
+  }
+
+  .about-timeline-card {
+    flex: 1;
+  }
+
+  .about-timeline-item.left .about-timeline-card,
+  .about-timeline-item.right .about-timeline-card {
+    grid-column: unset;
+  }
 }
 
 @media (max-width: 640px) {
@@ -744,6 +1226,32 @@
   .about-vm-card {
     padding: 1.75rem 1.5rem;
     box-shadow: -5px 5px 0px #082567;
+  }
+
+    .about-history-section {
+    padding: 4rem 1.25rem;
+  }
+
+  .about-history-main-title {
+    font-size: 1.75rem;
+  }
+
+  .about-history-stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .about-history-quote-banner {
+    padding: 2rem 1.25rem;
+    box-shadow: -5px 5px 0px #fdb827;
+  }
+
+  .about-history-quote-text {
+    font-size: 1rem;
+  }
+
+  .about-history-filter-btn {
+    padding: 0.5rem 1rem;
+    font-size: 0.82rem;
   }
 
   .about-school-section,

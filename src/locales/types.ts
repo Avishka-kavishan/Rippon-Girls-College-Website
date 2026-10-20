@@ -80,6 +80,23 @@ export interface TranslationSchema {
     heritageP3: string;
     badgeFounded: string;
     badgeLegacy: string;
+    historyEyebrow: string;
+    historyTitle: string;
+    historySubtitle: string;
+    historyArchivalCaption: string;
+    historyMotto: string;
+    historyMottoMeaning: string;
+    historyFilterAll: string;
+    historyFilterFounding: string;
+    historyFilterModern: string;
+    historyMilestones: Array<{
+      year: string;
+      title: string;
+      tag: string;
+      desc: string;
+      era: "founding" | "modern";
+    }>;
+    historyLegacyQuote: string;
     visionBadge: string;
     visionTitle: string;
     visionText: string;

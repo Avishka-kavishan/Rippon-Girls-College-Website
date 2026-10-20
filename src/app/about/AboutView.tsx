@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import Image from "next/image";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, Landmark, Sparkles, Award } from "lucide-react";
 import { getAssetPath } from "@/utils/assets";
 import {
   LearningSpaceIcon,
@@ -46,6 +46,7 @@ export default function AboutView() {
   const { t, language } = useLanguage();
   const [adminList, setAdminList] = useState<AdminMember[]>(defaultAdministration);
   const [population, setPopulation] = useState<StudentPopulationStats>(defaultStudentPopulation);
+  const [historyEra, setHistoryEra] = useState<"all" | "founding" | "modern">("all");
 
   const adminScrollRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
@@ -206,6 +207,153 @@ export default function AboutView() {
               <div className="about-vm-row">
                 <span className="about-vm-label">{t.about.missionBadge}</span>
                 <p className="about-vm-desc">{t.about.missionText}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* =========================================================================
+          HISTORY & HERITAGE SECTION
+          ========================================================================= */}
+      <section className="about-history-section" id="history">
+        <div className="about-history-container">
+          {/* Section Header */}
+          <div className="about-history-header">
+            <span className="about-section-eyebrow gold">
+              {t.about.historyEyebrow}
+            </span>
+            <h2 className="about-history-main-title">{t.about.historyTitle}</h2>
+            <p className="about-history-subtitle">{t.about.historySubtitle}</p>
+          </div>
+
+          {/* Archival Showcase Card */}
+          <div className="about-history-archival-card">
+            <div className="about-history-archival-media">
+              <Image
+                src={getAssetPath("/images/school-building.jpg")}
+                alt="Historic Main Hall of Rippon Girls' College"
+                fill
+                className="about-history-archival-img"
+                sizes="(max-width: 960px) 100vw, 540px"
+              />
+              <div className="about-history-archival-overlay">
+                <span className="about-history-badge">
+                  <Landmark size={15} />
+                  <span>Richmond Hill &bull; Est. 1871</span>
+                </span>
+                <p className="about-history-media-caption">
+                  {t.about.historyArchivalCaption}
+                </p>
+              </div>
+            </div>
+
+            <div className="about-history-archival-content">
+              <div className="about-history-motto-box">
+                <span className="about-history-motto-label">College Latin Motto</span>
+                <blockquote className="about-history-motto-quote">
+                  &ldquo;{t.about.historyMotto}&rdquo;
+                </blockquote>
+                <p className="about-history-motto-meaning">
+                  &mdash; {t.about.historyMottoMeaning}
+                </p>
+              </div>
+
+              <div className="about-history-stats-grid">
+                <div className="about-history-stat-box">
+                  <span className="about-history-stat-number">1817</span>
+                  <span className="about-history-stat-label">Initial Genesis</span>
+                </div>
+                <div className="about-history-stat-box">
+                  <span className="about-history-stat-number">1871</span>
+                  <span className="about-history-stat-label">Boarding School</span>
+                </div>
+                <div className="about-history-stat-box">
+                  <span className="about-history-stat-number">150+</span>
+                  <span className="about-history-stat-label">Years of Legacy</span>
+                </div>
+                <div className="about-history-stat-box">
+                  <span className="about-history-stat-number">1AB</span>
+                  <span className="about-history-stat-label">National School</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Timeline Filter Controls */}
+          <div className="about-history-filters" role="tablist" aria-label="History Milestones Filter">
+            <button
+              type="button"
+              role="tab"
+              aria-selected={historyEra === "all"}
+              className={`about-history-filter-btn ${historyEra === "all" ? "is-active" : ""}`}
+              onClick={() => setHistoryEra("all")}
+            >
+              <Sparkles size={16} />
+              <span>{t.about.historyFilterAll}</span>
+            </button>
+            <button
+              type="button"
+              role="tab"
+              aria-selected={historyEra === "founding"}
+              className={`about-history-filter-btn ${historyEra === "founding" ? "is-active" : ""}`}
+              onClick={() => setHistoryEra("founding")}
+            >
+              <Landmark size={16} />
+              <span>{t.about.historyFilterFounding}</span>
+            </button>
+            <button
+              type="button"
+              role="tab"
+              aria-selected={historyEra === "modern"}
+              className={`about-history-filter-btn ${historyEra === "modern" ? "is-active" : ""}`}
+              onClick={() => setHistoryEra("modern")}
+            >
+              <Award size={16} />
+              <span>{t.about.historyFilterModern}</span>
+            </button>
+          </div>
+
+          {/* Interactive Timeline Track */}
+          <div className="about-timeline-wrapper">
+            <div className="about-timeline-spine" />
+            <div className="about-timeline-list">
+              {(historyEra === "all"
+                ? t.about.historyMilestones
+                : t.about.historyMilestones.filter((m) => m.era === historyEra)
+              ).map((item, idx) => {
+                const isEven = idx % 2 === 0;
+                return (
+                  <div
+                    key={`${item.year}-${idx}`}
+                    className={`about-timeline-item ${isEven ? "left" : "right"}`}
+                  >
+                    <div className="about-timeline-node">
+                      <div className="about-timeline-dot" />
+                    </div>
+
+                    <div className="about-timeline-card">
+                      <div className="about-timeline-card-header">
+                        <span className="about-timeline-year">{item.year}</span>
+                        <span className="about-timeline-tag">{item.tag}</span>
+                      </div>
+                      <h3 className="about-timeline-title">{item.title}</h3>
+                      <p className="about-timeline-desc">{item.desc}</p>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Legacy Quote Banner */}
+          <div className="about-history-quote-banner">
+            <div className="about-history-quote-content">
+              <span className="about-history-quote-mark">&ldquo;</span>
+              <p className="about-history-quote-text">{t.about.historyLegacyQuote}</p>
+              <div className="about-history-quote-author">
+                <span className="about-history-author-title">Rippon Girls&apos; College, Galle</span>
+                <span className="about-history-author-subtitle">Richmond Hill &bull; Est. 1871</span>
               </div>
             </div>
           </div>
