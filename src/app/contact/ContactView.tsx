@@ -56,7 +56,7 @@ const initialForm: FormData = {
 };
 
 export default function ContactView() {
-  const { t, language } = useLanguage();
+  const { t } = useLanguage();
   const [contactData, setContactData] = useState<ContactPageDetails>(defaultContactDetails);
 
   // Guarantee all fields are safely populated even if database/cache returns partial data
@@ -187,15 +187,8 @@ export default function ContactView() {
     }
   };
 
-  const displayHeroTitle =
-    language === "en"
-      ? activeContact.heroTitle || t.contact.heroTitle
-      : t.contact.heroTitle;
-
-  const displayHeroSubtitle =
-    language === "en"
-      ? activeContact.heroSubtitle || t.contact.heroSubtitle
-      : t.contact.heroSubtitle;
+  const displayHeroTitle = activeContact.heroTitle || t.contact.heroTitle;
+  const displayHeroSubtitle = activeContact.heroSubtitle || t.contact.heroSubtitle;
 
   return (
     <div className="contact-page-wrapper">
@@ -204,7 +197,7 @@ export default function ContactView() {
           ========================================================================= */}
       <section className="contact-hero-section" id="contact-hero">
         <Image
-          src={getAssetPath("/images/Hero_img.jpg")}
+          src={getAssetPath("/images/contact banner.jpg")}
           alt="Rippon Girls' College Campus Galle"
           fill
           priority
@@ -256,9 +249,7 @@ export default function ContactView() {
                 {t.contact.quickCards.addressTitle}
               </h2>
               <p className="contact-card-desc">
-                {language === "en"
-                  ? activeContact.address
-                  : t.footer.address}
+                {activeContact.address || t.footer.address}
               </p>
               <a href="#map-section" className="contact-card-action">
                 <span>{t.contact.quickCards.addressAction}</span>
@@ -319,9 +310,9 @@ export default function ContactView() {
                 {t.contact.quickCards.hoursTitle}
               </h2>
               <p className="contact-card-desc">
-                <strong>{language === "si" ? "පාසල් කාලය:" : language === "ta" ? "பாடசாலை:" : "School:"}</strong> {activeContact.schoolHours}
+                <strong>School:</strong> {activeContact.schoolHours}
                 <br />
-                <strong>{language === "si" ? "කාර්යාලය:" : language === "ta" ? "அலுவலகம்:" : "Office:"}</strong> {activeContact.officeHours}
+                <strong>Office:</strong> {activeContact.officeHours}
               </p>
               <a href="#visiting-guide" className="contact-card-action">
                 <span>{t.contact.visitingTitle}</span>
@@ -612,7 +603,7 @@ export default function ContactView() {
                     {t.nav.brandTitle}
                   </span>
                   <span>
-                    {language === "en" ? activeContact.address : t.footer.address}
+                    {activeContact.address || t.footer.address}
                   </span>
                   <span style={{ fontSize: "0.8rem", color: "#6b7280" }}>
                     {t.contact.postalCodeLabel}: {activeContact.mapPostalCode} &bull;{" "}
@@ -743,18 +734,10 @@ export default function ContactView() {
       <section className="contact-cta-section">
         <div className="contact-cta-container">
           <h2 className="contact-cta-title">
-            {language === "si"
-              ? "හදිසි පාසල් සහයක් අවශ්‍යද?"
-              : language === "ta"
-                ? "அவசர பாடசாலை உதவி தேவையா?"
-                : "Need Urgent School Assistance?"}
+            Need Urgent School Assistance?
           </h2>
           <p className="contact-cta-sub">
-            {language === "si"
-              ? "පාසල් වේලාවන් තුළ අපගේ ප්‍රධාන පරිපාලන අංශය සක්‍රීයව පවතී. කෙලින්ම අප අමතන්න හෝ රිච්මන්ඩ් හිල් පරිශ්‍රයට පැමිණෙන්න."
-              : language === "ta"
-                ? "பாடசாலை நேரங்களில் எங்கள் பிரதான நிர்வாகப் பிரிவு செயல்படுகிறது. நேரடியாக எங்களை அழைக்கவும் அல்லது வளாகத்திற்கு வருகை தரவும்."
-                : "Our general administrative desk is active during weekday school hours. Feel free to call us directly or drop by the Richmond Hill campus."}
+            Our general administrative desk is active during weekday school hours. Feel free to call us directly or drop by the Richmond Hill campus.
           </p>
           <div className="contact-cta-buttons">
             <a
@@ -763,8 +746,7 @@ export default function ContactView() {
             >
               <Phone size={18} />
               <span>
-                {language === "si" ? "ප්‍රධාන අංකය:" : language === "ta" ? "பொது எண்:" : "Call General Desk:"}{" "}
-                {activeContact.generalPhone}
+                Call General Desk: {activeContact.generalPhone}
               </span>
             </a>
             <a

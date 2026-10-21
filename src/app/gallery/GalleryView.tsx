@@ -178,7 +178,7 @@ const bentoPhotos: GalleryPhoto[] = [
 import { getAllContent, onContentChange } from "@/services/contentService";
 
 export default function GalleryView() {
-  const { t, language } = useLanguage();
+  const { t } = useLanguage();
   const [photos, setPhotos] = useState<GalleryPhoto[]>(bentoPhotos);
   // "all" or specific category ID
   const [activeCategory, setActiveCategory] = useState<string>("all");
@@ -329,7 +329,7 @@ export default function GalleryView() {
           ========================================================================= */}
       <section className="gallery-categories-section" id="gallery-categories">
         <h2 className="gallery-section-heading">
-          {language === "si" ? "කාණ්ඩය අනුව තෝරන්න" : language === "ta" ? "பிரிவுகளின் படி உலாவுக" : "Browse by Category"}
+          Browse by Category
         </h2>
 
         <div className="categories-grid">
@@ -382,7 +382,7 @@ export default function GalleryView() {
         <div className="bento-section-header">
           <div className="bento-title-group">
             <h2 className="gallery-section-heading">
-              {language === "si" ? "පාසල් ඡායාරූප" : language === "ta" ? "புகைப்பட தொகுப்பு" : "Photo Gallery"}
+              Photo Gallery
             </h2>
             <p className="bento-section-desc">
               Curated highlights of student life, cultural events, sports meets, and academic excellence.
@@ -510,9 +510,7 @@ export default function GalleryView() {
             aria-label="View all gallery images"
           >
             <span className="see-all-text">
-              {isExpanded
-                ? (language === "si" ? "අඩුවෙන් පෙන්වන්න" : language === "ta" ? "குறைவாகக் காட்டு" : "Show Less")
-                : (language === "si" ? "සියල්ල නරඹන්න" : language === "ta" ? "அனைத்தையும் காண்க" : "See All")}
+              {isExpanded ? "Show Less" : "See All"}
             </span>
           </button>
         </div>
@@ -524,14 +522,10 @@ export default function GalleryView() {
       <section className="image-lightbox-section" id="image-lightbox">
         <div className="lightbox-header-wrap">
           <h2 className="gallery-section-heading">
-            {language === "si" ? "විශේෂිත ඡායාරූප නැරඹුම" : language === "ta" ? "சிறப்புப் படக் காட்சி" : "Featured Image Viewer"}
+            Featured Image Viewer
           </h2>
           <p className="lightbox-section-desc">
-            {language === "si"
-              ? "පැහැදිලි පෙනුම සඳහා ඉහතින් ඡායාරූපයක් තෝරන්න හෝ ඊතල භාවිත කරන්න."
-              : language === "ta"
-                ? "தெளிவான பார்வைக்கு மேலே உள்ள படத்தைத் தேர்ந்தெடுக்கவும் அல்லது அம்புக்குறிகளைப் பயன்படுத்தவும்."
-                : "Click any photo from the bento grid above or use the navigation arrows below to inspect in high definition."}
+            Click any photo from the bento grid above or use the navigation arrows below to inspect in high definition.
           </p>
         </div>
 

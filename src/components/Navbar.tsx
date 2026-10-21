@@ -34,7 +34,7 @@ export default function Navbar() {
         <Link href="/" className="navbar-brand">
           <div className="navbar-logo-circle">
             <Image
-              src={getAssetPath("/images/sample-logo.png")}
+              src={getAssetPath("/images/logo.jpg")}
               alt="Rippon Girl's College Logo"
               width={64}
               height={64}

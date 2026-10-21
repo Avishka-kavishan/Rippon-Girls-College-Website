@@ -75,7 +75,16 @@ function getLocalCache(): SiteContentState {
           ? parsed.contactInquiries
           : defaultContactInquiries,
         heritage: parsed.heritage
-          ? { ...defaultHeritageContent, ...parsed.heritage }
+          ? {
+              ...defaultHeritageContent,
+              ...parsed.heritage,
+              archivalImage:
+                parsed.heritage.archivalImage &&
+                !parsed.heritage.archivalImage.includes("bird view") &&
+                !parsed.heritage.archivalImage.includes("school-building")
+                  ? parsed.heritage.archivalImage
+                  : defaultHeritageContent.archivalImage,
+            }
           : defaultHeritageContent,
       };
     }
@@ -136,9 +145,19 @@ export async function getAllContent(): Promise<SiteContentState> {
         contactInquiries: Array.isArray(map["contactInquiries"])
           ? map["contactInquiries"]
           : (Array.isArray(local.contactInquiries) ? local.contactInquiries : defaultContactInquiries),
-        heritage: map["heritage"]
-          ? { ...defaultHeritageContent, ...map["heritage"] }
-          : (local.heritage ? { ...defaultHeritageContent, ...local.heritage } : defaultHeritageContent),
+        heritage: (() => {
+          const base = map["heritage"] || local.heritage || defaultHeritageContent;
+          return {
+            ...defaultHeritageContent,
+            ...base,
+            archivalImage:
+              base.archivalImage &&
+              !base.archivalImage.includes("bird view") &&
+              !base.archivalImage.includes("school-building")
+                ? base.archivalImage
+                : defaultHeritageContent.archivalImage,
+          };
+        })(),
       };
 
       setLocalCache(merged);

@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import Image from "next/image";
-import { ChevronLeft, ChevronRight, Landmark, Sparkles, Award } from "lucide-react";
+import { ChevronLeft, ChevronRight, Landmark, Sparkles, Award, Ruler, CheckCircle2 } from "lucide-react";
 import { getAssetPath } from "@/utils/assets";
 import {
   LearningSpaceIcon,
@@ -18,33 +18,12 @@ import {
   defaultHeritageContent,
 } from "@/data/defaultData";
 import { getAllContent, onContentChange } from "@/services/contentService";
-import { AdminMember, StudentPopulationStats, HeritageContent } from "@/types/content";
+import { AdminMember, StudentPopulationStats, HeritageContent, HeritageMilestone } from "@/types/content";
 import { useLanguage } from "@/context/LanguageContext";
-import { Language } from "@/locales/types";
 import "./about.css";
 
-function translateRole(role: string, lang: Language): string {
-  if (lang === "en") return role;
-  const lower = role.toLowerCase().trim();
-  if (lang === "si") {
-    if (lower === "principal") return "විදුහල්පතිතුමිය";
-    if (lower.includes("deputy principal")) return "නියෝජ්‍ය විදුහල්පති";
-    if (lower.includes("vice principal")) return "උප විදුහල්පති";
-    if (lower.includes("sectional head")) return "අංශ ප්‍රධානී";
-    return role;
-  }
-  if (lang === "ta") {
-    if (lower === "principal") return "அதிபர்";
-    if (lower.includes("deputy principal")) return "பிரதி அதிபர்";
-    if (lower.includes("vice principal")) return "உப அதிபர்";
-    if (lower.includes("sectional head")) return "பிரிவுத் தலைவர்";
-    return role;
-  }
-  return role;
-}
-
 export default function AboutView() {
-  const { t, language } = useLanguage();
+  const { t } = useLanguage();
   const [adminList, setAdminList] = useState<AdminMember[]>(defaultAdministration);
   const [population, setPopulation] = useState<StudentPopulationStats>(defaultStudentPopulation);
   const [heritage, setHeritage] = useState<HeritageContent>(defaultHeritageContent);
@@ -159,7 +138,7 @@ export default function AboutView() {
           ========================================================================= */}
       <section className="about-hero-section" id="about-hero">
         <Image
-          src={getAssetPath("/images/image 4.png")}
+          src={getAssetPath("/images/baner 2.jpeg")}
           alt="Rippon Girls' College Campus Facade"
           fill
           priority
@@ -188,7 +167,7 @@ export default function AboutView() {
             {/* Left Column: Campus Building Image */}
             <div className="about-school-media">
               <Image
-                src={getAssetPath("/images/about.png")}
+                src={getAssetPath("/images/bird view.jpeg")}
                 alt="Rippon Girls' College Historic Building"
                 fill
                 className="about-school-img"
@@ -243,7 +222,13 @@ export default function AboutView() {
           <div className="about-history-archival-card">
             <div className="about-history-archival-media">
               <Image
-                src={getAssetPath(heritage.archivalImage || "/images/school-building.jpg")}
+                src={getAssetPath(
+                  heritage.archivalImage &&
+                  !heritage.archivalImage.includes("bird view") &&
+                  !heritage.archivalImage.includes("school-building")
+                    ? heritage.archivalImage
+                    : "/images/OGA.jpg"
+                )}
                 alt="Historic Main Hall of Rippon Girls' College"
                 fill
                 className="about-history-archival-img"
@@ -346,14 +331,19 @@ export default function AboutView() {
           <div className="about-timeline-wrapper">
             <div className="about-timeline-spine" />
             <div className="about-timeline-list">
-              {((heritage.milestones && heritage.milestones.length > 0)
+              {((heritage.milestones && heritage.milestones.length > 0
                 ? (historyEra === "all"
                     ? heritage.milestones
                     : heritage.milestones.filter((m) => m.era === historyEra))
                 : (historyEra === "all"
                     ? t.about.historyMilestones
-                    : t.about.historyMilestones.filter((m) => m.era === historyEra))
-              ).map((item, idx) => {
+                    : t.about.historyMilestones.filter((m) => m.era === historyEra))) as Array<{
+                year: string;
+                title: string;
+                tag: string;
+                desc: string;
+                era: string;
+              }>).map((item, idx: number) => {
                 const isEven = idx % 2 === 0;
                 return (
                   <div
@@ -444,9 +434,7 @@ export default function AboutView() {
                     />
                   </div>
                   <div className="about-admin-body">
-                    <p className="about-admin-role">
-                      {translateRole(admin.role, language)}
-                    </p>
+                    <p className="about-admin-role">{admin.role}</p>
                     <h3 className="about-admin-name">{admin.name}</h3>
                   </div>
                 </div>
@@ -522,7 +510,86 @@ export default function AboutView() {
       </section>
 
       {/* =========================================================================
-          5. SUPPORTING EVERY STUDENT / OUR FACILITIES SECTION
+          5. COLLEGE UNIFORM & STUDENT CODE SECTION
+          ========================================================================= */}
+      <section className="about-uniform-section" id="uniform">
+        <div className="about-uniform-container">
+          <div className="about-uniform-header">
+            <span className="about-section-eyebrow gold">
+              {t.about.uniformEyebrow}
+            </span>
+            <h2 className="about-uniform-title">{t.about.uniformTitle}</h2>
+            <p className="about-uniform-subtitle">
+              {t.about.uniformSubtitle}
+            </p>
+          </div>
+
+          <div className="about-uniform-grid">
+            {/* Left Column: Official Uniform Pattern Blueprint Card */}
+            <div className="about-uniform-media-card">
+              <div className="about-uniform-media-wrapper">
+                <Image
+                  src={getAssetPath("/images/uniform.jpg")}
+                  alt="Official Rippon Girls' College Uniform Tailoring Pattern & Dimensions"
+                  width={460}
+                  height={800}
+                  className="about-uniform-blueprint-img"
+                  priority={false}
+                />
+              </div>
+            </div>
+
+            {/* Right Column: Regulations & Guidelines */}
+            <div className="about-uniform-content">
+              <div className="about-uniform-content-header">
+                <h3 className="about-uniform-content-heading">
+                  {t.about.uniformGuidelinesTitle}
+                </h3>
+                <p className="about-uniform-content-intro">
+                  Every student of Rippon Girls&apos; College adheres to standardized uniform specifications to maintain our timeless heritage of discipline, equality, and pride.
+                </p>
+              </div>
+
+              <div className="about-uniform-cards-list">
+                {t.about.uniformFeatures.map((feature: { title: string; desc: string }, i: number) => (
+                  <div key={i} className="about-uniform-feature-card">
+                    <div className="about-uniform-feature-icon">
+                      <CheckCircle2 size={20} className="gold-icon" />
+                    </div>
+                    <div className="about-uniform-feature-body">
+                      <h4 className="about-uniform-feature-title">{feature.title}</h4>
+                      <p className="about-uniform-feature-desc">{feature.desc}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Technical Measurements Highlight Banner */}
+              <div className="about-uniform-spec-banner">
+                <div className="about-uniform-spec-chip">
+                  <span className="spec-label">Pocket Size</span>
+                  <span className="spec-val">3″ × 3¼″</span>
+                </div>
+                <div className="about-uniform-spec-chip">
+                  <span className="spec-label">Skirt Hem</span>
+                  <span className="spec-val">2″ Below Knee</span>
+                </div>
+                <div className="about-uniform-spec-chip">
+                  <span className="spec-label">Sleeve Hem</span>
+                  <span className="spec-val">¾″ Fold</span>
+                </div>
+                <div className="about-uniform-spec-chip">
+                  <span className="spec-label">Pocket Inset</span>
+                  <span className="spec-val">½″ from Neck</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* =========================================================================
+          6. SUPPORTING EVERY STUDENT / OUR FACILITIES SECTION
           ========================================================================= */}
       <section className="about-facilities-section" id="facilities">
         <div className="about-facilities-container">

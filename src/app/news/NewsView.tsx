@@ -13,29 +13,10 @@ import {
 import { getAllContent, onContentChange } from "@/services/contentService";
 import { NewsItem, EventItem, AchievementItem } from "@/types/content";
 import { useLanguage } from "@/context/LanguageContext";
-import { Language } from "@/locales/types";
 import "./news.css";
 
-function translateMonth(month: string, lang: Language): string {
-  if (lang === "en") return month;
-  const m = month.toUpperCase().trim();
-  const siMonths: Record<string, string> = {
-    JAN: "ජන", FEB: "පෙබ", MAR: "මාර්තු", APR: "අප්‍රේල්",
-    MAY: "මැයි", JUN: "ජූනි", JUL: "ජූලි", AUG: "අගෝ",
-    SEP: "සැප්", OCT: "ඔක්", NOV: "නොවැ", DEC: "දෙසැ",
-  };
-  const taMonths: Record<string, string> = {
-    JAN: "ஜன", FEB: "பிப்", MAR: "மார்ச்", APR: "ஏப்",
-    MAY: "மே", JUN: "ஜூன்", JUL: "ஜூலை", AUG: "ஆக",
-    SEP: "செப்", OCT: "அக்", NOV: "நவ", DEC: "டிச",
-  };
-  if (lang === "si" && siMonths[m]) return siMonths[m];
-  if (lang === "ta" && taMonths[m]) return taMonths[m];
-  return month;
-}
-
 export default function NewsView() {
-  const { t, language } = useLanguage();
+  const { t } = useLanguage();
   const [newsList, setNewsList] = useState<NewsItem[]>(defaultNewsData);
   const [eventsList, setEventsList] = useState<EventItem[]>(defaultUpcomingEvents);
   const [achievementsList, setAchievementsList] = useState<AchievementItem[]>(defaultAchievements);
@@ -93,7 +74,7 @@ export default function NewsView() {
           ========================================================================= */}
       <section className="news-hero-section" id="news-hero">
         <Image
-          src={getAssetPath("/images/news-hero-bg.jpg")}
+          src={getAssetPath("/images/news banner.jpg")}
           alt="Rippon Girls' College Historic Archives and News"
           fill
           priority
@@ -230,7 +211,7 @@ export default function NewsView() {
                 <div className="event-card-left">
                   <div className="event-date-badge">
                     <span className="event-date-month">
-                      {translateMonth(event.month, language)}
+                      {event.month}
                     </span>
                     <span className="event-date-day">{event.day}</span>
                   </div>

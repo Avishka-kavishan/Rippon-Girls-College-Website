@@ -18,7 +18,7 @@ export default function Footer() {
           <div className="footer-brand">
             <div className="footer-logo-circle">
               <Image
-                src={getAssetPath("/images/sample-logo.png")}
+                src={getAssetPath("/images/logo.jpg")}
                 alt="Rippon Girl's College Crest"
                 width={56}
                 height={56}

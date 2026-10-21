@@ -1,4 +1,4 @@
-export type Language = "en" | "si" | "ta";
+export type Language = "en";
 
 export interface LanguageOption {
   code: Language;
@@ -134,6 +134,16 @@ export interface TranslationSchema {
       clubs: { title: string; desc: string };
       arts: { title: string; desc: string };
     };
+    uniformEyebrow: string;
+    uniformTitle: string;
+    uniformSubtitle: string;
+    uniformDiagramBadge: string;
+    uniformDiagramCaption: string;
+    uniformGuidelinesTitle: string;
+    uniformFeatures: Array<{
+      title: string;
+      desc: string;
+    }>;
   };
   news: {
     heroTitle: string;

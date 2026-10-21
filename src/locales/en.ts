@@ -204,6 +204,30 @@ export const enTranslations: TranslationSchema = {
         desc: "A dedicated auditorium and creative halls nurturing eastern and western music, drama, dancing, and fine arts.",
       },
     },
+    uniformEyebrow: "Student Identity & Dress Code",
+    uniformTitle: "Official College Uniform Specifications",
+    uniformSubtitle: "A symbol of dignity, discipline, and unity worn with immense pride by generations of Ripponites.",
+    uniformDiagramBadge: "Official Tailoring Pattern & Dimensions",
+    uniformDiagramCaption: "Standard pattern sheet specifying front and back pleats, square bodice, collar cut, sleeve hem, and left crest pocket.",
+    uniformGuidelinesTitle: "Uniform Standards & Regulations",
+    uniformFeatures: [
+      {
+        title: "Classic White Pleated Dress",
+        desc: "Crafted from durable white cotton/linen fabric with symmetric box pleats falling gracefully two inches below the knees, featuring a modest square-cut front neckline.",
+      },
+      {
+        title: "Embroidered College Crest Pocket",
+        desc: "Left breast pocket (strictly 3″ × 3¼″) positioned over the heart, bearing the historic crest and Latin motto of Rippon Girls' College.",
+      },
+      {
+        title: "Footwear & Grooming Standards",
+        desc: "Polished black school shoes paired with neat white ankle-length socks. Hair neatly styled in two plaits tied with white ribbons for all grades.",
+      },
+      {
+        title: "Senior & Prefect Regalia",
+        desc: "Prefects and senior student leaders proudly wear the official college blazer, badge of distinction, and traditional formal attire during collegiate ceremonies.",
+      },
+    ],
   },
   news: {
     heroTitle: "News & Events",

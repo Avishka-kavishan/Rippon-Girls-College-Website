@@ -3439,11 +3439,11 @@ export default function AdminPage() {
                                 className="adm-input"
                                 value={heritageForm.archivalImage}
                                 onChange={(e) => setHeritageForm({ ...heritageForm, archivalImage: e.target.value })}
-                                placeholder="/images/school-building.jpg"
+                                placeholder="/images/OGA.jpg"
                                 required
                               />
                               <span style={{ fontSize: "0.78rem", color: "#64748b", marginTop: "0.3rem" }}>
-                                Defaults to <code>/images/school-building.jpg</code> or choose from uploaded assets.
+                                Defaults to <code>/images/OGA.jpg</code> or choose from uploaded assets.
                               </span>
                             </div>
 
