@@ -1319,6 +1319,7 @@
   box-shadow: 0 12px 35px rgba(8, 37, 103, 0.08);
   overflow: hidden;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
+  margin-top: 90;
 }
 
 .about-uniform-media-card:hover {

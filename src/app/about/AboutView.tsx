@@ -525,7 +525,6 @@ export default function AboutView() {
           </div>
 
           <div className="about-uniform-grid">
-            {/* Left Column: Official Uniform Pattern Blueprint Card */}
             <div className="about-uniform-media-card">
               <div className="about-uniform-media-wrapper">
                 <Image
