@@ -306,7 +306,7 @@ export default function GalleryView() {
           ========================================================================= */}
       <section className="gallery-hero-section" id="gallery-hero">
         <Image
-          src={getAssetPath("/images/primary.jpg")}
+          src={getAssetPath("/images/baner 1.jpeg")}
           alt="Rippon Girls' College Gallery - Primary Students"
           fill
           priority
