@@ -49,7 +49,7 @@ export const defaultGalleryCategories: GalleryCategory[] = [
   },
   {
     id: "facilities",
-    label: "Campus & Facilities",
+    label: "School & Facilities",
     icon: "🏫",
     image: "/images/about.png",
   },
@@ -103,11 +103,11 @@ export const defaultGalleryPhotos: GalleryItem[] = [
   },
   {
     id: "photo-6",
-    title: "Historic Campus Heritage Architecture",
+    title: "Historic School Heritage Architecture",
     subtitle: "Est. 1899 — Rich Tradition in Richmond Hill, Galle",
     category: "facilities",
     image: "/images/image 4.png",
-    alt: "Historic campus buildings under bright sky",
+    alt: "Historic school buildings under bright sky",
     span: "standard",
   },
   {
@@ -152,7 +152,7 @@ export const defaultGalleryPhotos: GalleryItem[] = [
     subtitle: "Nurturing Values from Foundation Years",
     category: "events",
     image: "/images/primary.jpg",
-    alt: "Primary school assembly and campus life",
+    alt: "Primary school assembly and school life",
     span: "standard",
   },
   {
@@ -402,7 +402,7 @@ export const defaultContactDepartments: ContactDepartment[] = [
   {
     id: "dept-6",
     title: "General Reception Desk",
-    desc: "Public inquiries, campus visits, general front-desk assistance, and visitor gate passes.",
+    desc: "Public inquiries, school visits, general front-desk assistance, and visitor gate passes.",
     phone: "+94 91 223 4769",
     email: "ripponbalika@gmail.com",
     iconName: "Phone",
@@ -454,7 +454,7 @@ export const defaultContactFaqs: ContactFaq[] = [
   {
     id: "faq-5",
     q: "How can alumni register with the Past Pupils' Association (PPA)?",
-    a: "Former students who have completed their education at Rippon Girls' College can join the PPA by registering online or at the PPA Secretariat on campus. For membership forms and upcoming alumni reunions, email ppa@rippongirlscollege.lk.",
+    a: "Former students who have completed their education at Rippon Girls' College can join the PPA by registering online or at the PPA Secretariat at the school. For membership forms and upcoming alumni reunions, email ppa@rippongirlscollege.lk.",
   },
 ];
 
@@ -587,7 +587,7 @@ export const defaultHeritageContent: HeritageContent = {
   subtitle: "From pioneering female education in 1817 to becoming one of Sri Lanka's leading 1AB National Schools on Richmond Hill.",
   archivalImage: "/images/OGA.jpg",
   archivalBadge: "Richmond Hill • Est. 1871",
-  archivalCaption: "Historic Main Hall & Richmond Hill Campus Grounds (Established 1871)",
+  archivalCaption: "Historic Main Hall & Richmond Hill School Grounds (Established 1871)",
   motto: "Nisi Dominus Frustra",
   mottoMeaning: "Unless the Lord build the house, they labor in vain",
   genesisYear: "1817",

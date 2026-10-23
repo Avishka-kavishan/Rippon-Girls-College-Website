@@ -18,7 +18,7 @@ export default function HomePage() {
       <section className="hero-section" id="hero">
         <Image
           src={getAssetPath("/images/baner 3.jpeg")}
-          alt="Rippon Girls' College Campus"
+          alt="Rippon Girls' College School Grounds"
           fill
           priority
           className="hero-bg-image"

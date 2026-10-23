@@ -112,11 +112,11 @@ const bentoPhotos: GalleryPhoto[] = [
   },
   {
     id: "photo-6",
-    title: "Historic Campus Heritage Architecture",
+    title: "Historic School Heritage Architecture",
     subtitle: "Est. 1899 — Rich Tradition in Richmond Hill, Galle",
     category: "facilities",
     image: "/images/image 4.png",
-    alt: "Historic campus buildings under bright sky",
+    alt: "Historic school buildings under bright sky",
     span: "standard",
   },
   {
@@ -161,7 +161,7 @@ const bentoPhotos: GalleryPhoto[] = [
     subtitle: "Nurturing Values from Foundation Years",
     category: "events",
     image: "/images/primary.jpg",
-    alt: "Primary school assembly and campus life",
+    alt: "Primary school assembly and school life",
     span: "standard",
   },
   {

@@ -198,7 +198,7 @@ export default function ContactView() {
       <section className="contact-hero-section" id="contact-hero">
         <Image
           src={getAssetPath("/images/contact banner.jpg")}
-          alt="Rippon Girls' College Campus Galle"
+          alt="Rippon Girls' College School Galle"
           fill
           priority
           className="contact-hero-bg-img"
@@ -240,7 +240,7 @@ export default function ContactView() {
       <section className="contact-cards-section" aria-label="Key Contact Channels">
         <div className="contact-cards-container">
           <div className="contact-cards-grid">
-            {/* Card 1: Campus Address */}
+            {/* Card 1: School Address */}
             <div className="contact-card">
               <div className="contact-card-icon-wrap">
                 <MapPin size={24} />
@@ -737,7 +737,7 @@ export default function ContactView() {
             Need Urgent School Assistance?
           </h2>
           <p className="contact-cta-sub">
-            Our general administrative desk is active during weekday school hours. Feel free to call us directly or drop by the Richmond Hill campus.
+            Our general administrative desk is active during weekday school hours. Feel free to call us directly or drop by the Richmond Hill school.
           </p>
           <div className="contact-cta-buttons">
             <a

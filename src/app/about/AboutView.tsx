@@ -139,7 +139,7 @@ export default function AboutView() {
       <section className="about-hero-section" id="about-hero">
         <Image
           src={getAssetPath("/images/baner 2.jpeg")}
-          alt="Rippon Girls' College Campus Facade"
+          alt="Rippon Girls' College School Facade"
           fill
           priority
           className="about-hero-bg-img"
@@ -164,7 +164,7 @@ export default function AboutView() {
           <h2 className="about-main-heading">{t.about.heritageTitle}</h2>
 
           <div className="about-school-grid">
-            {/* Left Column: Campus Building Image */}
+            {/* Left Column: School Building Image */}
             <div className="about-school-media">
               <Image
                 src={getAssetPath("/images/bird view.jpeg")}

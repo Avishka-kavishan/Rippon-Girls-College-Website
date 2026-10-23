@@ -3317,7 +3317,7 @@ export default function AdminPage() {
                     <div className="adm-section-heading">
                       <h1>Heritage &amp; Milestones Management</h1>
                       <p>
-                        Manage the college historical timeline, archival campus showcase, motto,
+                        Manage the college historical timeline, archival school showcase, motto,
                         quadrant heritage metrics, and collegiate legacy quote on the About page.
                       </p>
                     </div>
@@ -3467,7 +3467,7 @@ export default function AdminPage() {
                               className="adm-input"
                               value={heritageForm.archivalCaption}
                               onChange={(e) => setHeritageForm({ ...heritageForm, archivalCaption: e.target.value })}
-                              placeholder="Historic Main Hall & Richmond Hill Campus Grounds (Established 1871)"
+                              placeholder="Historic Main Hall & Richmond Hill School Grounds (Established 1871)"
                               required
                             />
                           </div>

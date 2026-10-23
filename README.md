@@ -32,10 +32,10 @@
 
 ---
 
-## 🏛️ Campus Overview
+## 🏛️ School Overview
 
 <p align="center">
-  <img src="public/images/Hero_img.jpg" alt="Rippon Girls' College Richmond Hill Campus" width="100%" style="border-radius: 12px; box-shadow: 0 8px 30px rgba(0,0,0,0.15);" />
+  <img src="public/images/Hero_img.jpg" alt="Rippon Girls' College Richmond Hill School" width="100%" style="border-radius: 12px; box-shadow: 0 8px 30px rgba(0,0,0,0.15);" />
 </p>
 
 ---
@@ -44,7 +44,7 @@
 
 Explore key sections and collegiate highlights from the Rippon Girls' College web platform:
 
-### 🏫 Heritage & Campus Facilities
+### 🏫 Heritage & School Facilities
 <table>
   <tr>
     <td width="50%" align="center">
@@ -53,9 +53,9 @@ Explore key sections and collegiate highlights from the Rippon Girls' College we
       <strong>Historic College Main Hall & Grounds (Est. 1871)</strong>
     </td>
     <td width="50%" align="center">
-      <img src="public/images/about-hero-bg.jpg" alt="Richmond Hill Campus Scenery" style="border-radius: 8px;" />
+      <img src="public/images/about-hero-bg.jpg" alt="Richmond Hill School Scenery" style="border-radius: 8px;" />
       <br />
-      <strong>Richmond Hill Scenic Campus & Learning Environment</strong>
+      <strong>Richmond Hill Scenic School & Learning Environment</strong>
     </td>
   </tr>
 </table>
@@ -128,7 +128,7 @@ Explore key sections and collegiate highlights from the Rippon Girls' College we
   </tr>
 </table>
 
-### 📰 News & Campus Events
+### 📰 News & School Events
 <table>
   <tr>
     <td width="50%" align="center">
@@ -150,7 +150,7 @@ Explore key sections and collegiate highlights from the Rippon Girls' College we
 
 | Module | Route | Highlights & Features |
 | :--- | :--- | :--- |
-| **Homepage** | `/` | Hero video/imagery, school motto, principal's greeting, interactive stats counters, academic pathway highlights, campus gallery preview. |
+| **Homepage** | `/` | Hero video/imagery, school motto, principal's greeting, interactive stats counters, academic pathway highlights, school gallery preview. |
 | **About Us** | `/about` | 150+ year historical timeline (1871–Present), Vision & Mission, College Anthem with bilingual translations, student population metrics, executive leadership carousel. |
 | **News & Events** | `/news` | Category filters, real-time search, interactive read modal, priority pinned articles, and academic calendar dates. |
 | **Gallery** | `/gallery` | Multi-category media browser (Academic, Sports, Arts, Events, Facilities), interactive full-screen lightbox modal with caption details. |
@@ -195,13 +195,13 @@ Rippon-Girls-College-Website/
 │   │   ├── news/                  # News cover images & event photos
 │   │   ├── about-crest-oval.png   # Official college crest emblem
 │   │   ├── Hero_img.jpg           # High-resolution hero banner
-│   │   ├── school-building.jpg    # Historic campus architecture
+│   │   ├── school-building.jpg    # Historic school architecture
 │   │   ├── primary.jpg            # Primary education showcase
 │   │   ├── second.jpg             # Secondary education showcase
 │   │   ├── advance.jpeg           # Advanced Level education showcase
 │   │   ├── band.jpg / band2.jpg   # Western brass band & extracurriculars
 │   │   ├── music.jpg              # Aesthetic arts & cultural performances
-│   │   └── gallery*.jpg           # Campus gallery & lab photographs
+│   │   └── gallery*.jpg           # School gallery & lab photographs
 │   └── fonts/                     # Self-hosted typography assets
 ├── src/
 │   ├── app/
