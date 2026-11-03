@@ -1,4 +1,5 @@
-import { getSupabaseClient } from "@/lib/supabase";
+import { getFirestoreDb } from "@/lib/firebase";
+import { collection, doc, getDoc, getDocs, setDoc } from "firebase/firestore";
 import {
   defaultGalleryPhotos,
   defaultNewsData,
@@ -12,15 +13,7 @@ import {
   defaultInitialSiteContent,
 } from "@/data/defaultData";
 import {
-  GalleryItem,
-  NewsItem,
-  EventItem,
-  AdminMember,
-  StudentPopulationStats,
-  AchievementItem,
-  ContactPageDetails,
   ContactInquiry,
-  HeritageContent,
   SiteContentState,
 } from "@/types/content";
 
@@ -108,28 +101,25 @@ function setLocalCache(data: SiteContentState): void {
 }
 
 /**
- * Fetch all content (tries Supabase first, falls back to LocalStorage & defaults)
+ * Fetch all content (tries Firebase Firestore first, falls back to LocalStorage & defaults)
  */
 export async function getAllContent(): Promise<SiteContentState> {
   const local = getLocalCache();
-  const supabase = getSupabaseClient();
+  const db = getFirestoreDb();
 
-  if (!supabase) {
+  if (!db) {
     return local;
   }
 
   try {
-    const { data, error } = await supabase.from("site_content").select("id, data");
+    const colRef = collection(db, "site_content");
+    const snapshot = await getDocs(colRef);
 
-    if (error) {
-      console.warn("Supabase fetch warning, falling back to local:", error.message);
-      return local;
-    }
-
-    if (data && data.length > 0) {
+    if (!snapshot.empty) {
       const map: Record<string, any> = {};
-      data.forEach((row) => {
-        map[row.id] = row.data;
+      snapshot.forEach((docSnap) => {
+        const val = docSnap.data();
+        map[docSnap.id] = val && val.data !== undefined ? val.data : val;
       });
 
       const merged: SiteContentState = {
@@ -162,13 +152,13 @@ export async function getAllContent(): Promise<SiteContentState> {
 
       setLocalCache(merged);
       return merged;
-    } else if (data && data.length === 0) {
-      // Table exists but is empty; auto-seed with default initial content
-      syncAllToSupabase().catch((e) => console.warn("Auto-seed error:", e));
+    } else {
+      // Collection exists but is empty; auto-seed with default content
+      syncAllToFirebase().catch((e) => console.warn("Firebase auto-seed error:", e));
       return local;
     }
   } catch (err) {
-    console.warn("Supabase query error:", err);
+    console.warn("Firebase fetch warning, falling back to local cache:", err);
   }
 
   return local;
@@ -180,7 +170,7 @@ export async function getAllContent(): Promise<SiteContentState> {
 export async function saveSection<K extends keyof SiteContentState>(
   section: K,
   value: SiteContentState[K]
-): Promise<{ success: boolean; error?: string; usedSupabase: boolean }> {
+): Promise<{ success: boolean; error?: string; usedSupabase: boolean; usedFirebase?: boolean }> {
   const current = getLocalCache();
   const updated: SiteContentState = {
     ...current,
@@ -188,55 +178,53 @@ export async function saveSection<K extends keyof SiteContentState>(
   };
   setLocalCache(updated);
 
-  const supabase = getSupabaseClient();
-  if (!supabase) {
-    return { success: true, usedSupabase: false };
+  const db = getFirestoreDb();
+  if (!db) {
+    return { success: true, usedSupabase: false, usedFirebase: false };
   }
 
   try {
-    const { error } = await supabase.from("site_content").upsert({
-      id: section,
+    const docRef = doc(db, "site_content", section);
+    await setDoc(docRef, {
       data: value,
       updated_at: new Date().toISOString(),
     });
-
-    if (error) {
-      console.error("Supabase upsert error:", error);
-      return { success: true, usedSupabase: false, error: error.message };
-    }
-
-    return { success: true, usedSupabase: true };
+    return { success: true, usedSupabase: true, usedFirebase: true };
   } catch (err: any) {
-    return { success: true, usedSupabase: false, error: err.message };
+    console.error("Firebase save error:", err);
+    return { success: true, usedSupabase: false, usedFirebase: false, error: err?.message };
   }
 }
 
 /**
- * Initialize / Seed Supabase with current content
+ * Initialize / Seed Firebase Firestore with current content
  */
-export async function syncAllToSupabase(): Promise<{ success: boolean; error?: string }> {
-  const supabase = getSupabaseClient();
-  if (!supabase) {
-    return { success: false, error: "Supabase is not configured." };
+export async function syncAllToFirebase(): Promise<{ success: boolean; error?: string }> {
+  const db = getFirestoreDb();
+  if (!db) {
+    return { success: false, error: "Firebase is not configured." };
   }
 
   const current = getLocalCache();
-  const rows = [
-    { id: "gallery", data: current.gallery, updated_at: new Date().toISOString() },
-    { id: "news", data: current.news, updated_at: new Date().toISOString() },
-    { id: "events", data: current.events, updated_at: new Date().toISOString() },
-    { id: "administration", data: current.administration, updated_at: new Date().toISOString() },
-    { id: "studentPopulation", data: current.studentPopulation, updated_at: new Date().toISOString() },
-    { id: "achievements", data: current.achievements, updated_at: new Date().toISOString() },
-    { id: "contact", data: current.contact, updated_at: new Date().toISOString() },
-    { id: "contactInquiries", data: current.contactInquiries || [], updated_at: new Date().toISOString() },
-    { id: "heritage", data: current.heritage || defaultHeritageContent, updated_at: new Date().toISOString() },
+  const sections: Array<{ id: string; data: any }> = [
+    { id: "gallery", data: current.gallery },
+    { id: "news", data: current.news },
+    { id: "events", data: current.events },
+    { id: "administration", data: current.administration },
+    { id: "studentPopulation", data: current.studentPopulation },
+    { id: "achievements", data: current.achievements },
+    { id: "contact", data: current.contact },
+    { id: "contactInquiries", data: current.contactInquiries || [] },
+    { id: "heritage", data: current.heritage || defaultHeritageContent },
   ];
 
   try {
-    const { error } = await supabase.from("site_content").upsert(rows);
-    if (error) {
-      return { success: false, error: error.message };
+    for (const item of sections) {
+      const docRef = doc(db, "site_content", item.id);
+      await setDoc(docRef, {
+        data: item.data,
+        updated_at: new Date().toISOString(),
+      });
     }
     return { success: true };
   } catch (err: any) {
@@ -244,62 +232,61 @@ export async function syncAllToSupabase(): Promise<{ success: boolean; error?: s
   }
 }
 
+/** Backward compatibility alias */
+export const syncAllToSupabase = syncAllToFirebase;
+
 /**
- * Test Supabase Connection
+ * Test Firebase Connection
  */
-export async function testSupabaseConnection(): Promise<{
+export async function testFirebaseConnection(): Promise<{
   connected: boolean;
   tableExists: boolean;
   message: string;
 }> {
-  const supabase = getSupabaseClient();
-  if (!supabase) {
+  const db = getFirestoreDb();
+  if (!db) {
     return {
       connected: false,
       tableExists: false,
-      message: "Supabase URL and Anon Key not configured.",
+      message: "Firebase API key and project ID are not configured.",
     };
   }
 
   try {
-    const { data, error } = await supabase.from("site_content").select("id").limit(1);
-    if (error) {
-      if (error.code === "42P01" || error.message.includes("relation \"public.site_content\" does not exist")) {
-        return {
-          connected: true,
-          tableExists: false,
-          message: "Connected to Supabase, but the table 'site_content' has not been created yet. Please execute the SQL setup script.",
-        };
-      }
-      return {
-        connected: false,
-        tableExists: false,
-        message: `Connection failed: ${error.message}`,
-      };
-    }
-
+    const testDoc = doc(db, "site_content", "gallery");
+    await getDoc(testDoc);
     return {
       connected: true,
       tableExists: true,
-      message: "Successfully connected to Supabase and verified 'site_content' table!",
+      message: "Successfully connected to Firebase Firestore!",
     };
   } catch (err: any) {
+    if (err?.code === "permission-denied") {
+      return {
+        connected: false,
+        tableExists: false,
+        message: "Connected to Firebase, but rules denied access. Make sure Firestore rules are set to Test mode (allow read, write: if true;).",
+      };
+    }
     return {
       connected: false,
       tableExists: false,
-      message: `Connection exception: ${err.message}`,
+      message: `Connection error: ${err.message || err}`,
     };
   }
 }
+
+/** Backward compatibility alias */
+export const testSupabaseConnection = testFirebaseConnection;
 
 /**
  * Reset all content to default
  */
 export async function resetContentToDefault(): Promise<void> {
   setLocalCache(defaultInitialSiteContent);
-  const supabase = getSupabaseClient();
-  if (supabase) {
-    await syncAllToSupabase();
+  const db = getFirestoreDb();
+  if (db) {
+    await syncAllToFirebase();
   }
 }
 
@@ -336,9 +323,9 @@ export async function importContentFromJSON(jsonString: string): Promise<boolean
         : defaultHeritageContent,
     };
     setLocalCache(merged);
-    const supabase = getSupabaseClient();
-    if (supabase) {
-      await syncAllToSupabase();
+    const db = getFirestoreDb();
+    if (db) {
+      await syncAllToFirebase();
     }
     return true;
   } catch (err) {
@@ -352,7 +339,7 @@ export async function importContentFromJSON(jsonString: string): Promise<boolean
  */
 export async function submitContactInquiry(
   inquiry: Omit<ContactInquiry, "id" | "submittedAt" | "status" | "referenceId">
-): Promise<{ success: boolean; referenceId: string; usedSupabase: boolean }> {
+): Promise<{ success: boolean; referenceId: string; usedSupabase: boolean; usedFirebase?: boolean }> {
   const referenceId = `RGC-${new Date().getFullYear()}-${Math.floor(
     1000 + Math.random() * 9000
   )}`;
@@ -374,5 +361,6 @@ export async function submitContactInquiry(
     success: res.success,
     referenceId,
     usedSupabase: res.usedSupabase,
+    usedFirebase: res.usedFirebase,
   };
 }

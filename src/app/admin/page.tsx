@@ -76,14 +76,19 @@ import {
   resetContentToDefault,
   exportContentAsJSON,
   importContentFromJSON,
-  testSupabaseConnection,
+  testFirebaseConnection,
 } from "@/services/contentService";
 import {
-  getStoredSupabaseConfig,
-  saveStoredSupabaseConfig,
-  removeStoredSupabaseConfig,
-  SUPABASE_SQL_SETUP,
-} from "@/lib/supabase";
+  getStoredFirebaseConfig,
+  saveStoredFirebaseConfig,
+  removeStoredFirebaseConfig,
+  uploadFileToStorage,
+  DEFAULT_FIREBASE_CONFIG,
+  FIREBASE_RULES_SETUP,
+
+
+
+} from "@/lib/firebase";
 import { defaultGalleryCategories, defaultContactDetails, defaultHeritageContent } from "@/data/defaultData";
 import { getAssetPath } from "@/utils/assets";
 import "./admin.css";
@@ -376,13 +381,13 @@ export default function AdminPage() {
         ...(data?.contact || {}),
       });
 
-      const existingConfig = getStoredSupabaseConfig();
+      const existingConfig = getStoredFirebaseConfig();
       if (existingConfig) {
-        setSbUrlInput(existingConfig.url);
-        setSbKeyInput(existingConfig.anonKey);
+        setSbUrlInput(existingConfig.projectId);
+        setSbKeyInput(existingConfig.apiKey);
       }
 
-      const check = await testSupabaseConnection();
+      const check = await testFirebaseConnection();
       setSupabaseConnected(check.connected && check.tableExists);
       setSupabaseStatusMsg(check.message);
       setLoading(false);
@@ -411,7 +416,7 @@ export default function AdminPage() {
   };
 
   // Helper for image upload to base64
-  const handleImageFileUpload = (
+  const handleImageFileUpload = async (
     e: ChangeEvent<HTMLInputElement>,
     callback: (val: string) => void
   ) => {
@@ -421,6 +426,15 @@ export default function AdminPage() {
     if (file.size > 3.5 * 1024 * 1024) {
       showToast("File size too large. Please select an image under 3.5MB.", "error");
       return;
+    }
+
+    try {
+      const downloadUrl = await uploadFileToStorage(file, "images");
+      callback(downloadUrl);
+      showToast("Image uploaded to Firebase Storage!", "success");
+      return;
+    } catch (err: any) {
+      console.warn("Firebase Storage upload fallback:", err);
     }
 
     const reader = new FileReader();
@@ -460,7 +474,7 @@ export default function AdminPage() {
     setContent({ ...content, gallery: updatedList });
     setGalleryModalOpen(false);
     setEditingGalleryItem(null);
-    showToast(res.usedSupabase ? "Saved to Supabase cloud!" : "Saved to local storage!");
+    showToast(res.usedSupabase ? "Saved to Firebase cloud!" : "Saved to local storage!");
   };
 
   const handleDeleteGallery = (id: string) => {
@@ -473,7 +487,7 @@ export default function AdminPage() {
         const res = await saveSection("gallery", updated);
         setContent({ ...content, gallery: updated });
         setDeleteConfirm(null);
-        showToast(res.usedSupabase ? "Photo removed from Supabase." : "Photo removed locally.");
+        showToast(res.usedSupabase ? "Photo removed from cloud." : "Photo removed locally.");
       },
     });
   };
@@ -506,7 +520,7 @@ export default function AdminPage() {
     setContent({ ...content, news: updatedList });
     setNewsModalOpen(false);
     setEditingNewsItem(null);
-    showToast(res.usedSupabase ? "News published to Supabase!" : "News published locally!");
+    showToast(res.usedSupabase ? "News published to cloud!" : "News published locally!");
   };
 
   const handleDeleteNews = (id: string) => {
@@ -519,7 +533,7 @@ export default function AdminPage() {
         const res = await saveSection("news", updated);
         setContent({ ...content, news: updated });
         setDeleteConfirm(null);
-        showToast(res.usedSupabase ? "Article deleted from Supabase." : "Article deleted locally.");
+        showToast(res.usedSupabase ? "Article deleted from cloud." : "Article deleted locally.");
       },
     });
   };
@@ -560,7 +574,7 @@ export default function AdminPage() {
     setContent({ ...content, events: updatedList });
     setEventModalOpen(false);
     setEditingEventItem(null);
-    showToast(res.usedSupabase ? "Event scheduled in Supabase!" : "Event scheduled locally!");
+    showToast(res.usedSupabase ? "Event scheduled in cloud!" : "Event scheduled locally!");
   };
 
   const handleDeleteEvent = (id: string) => {
@@ -573,7 +587,7 @@ export default function AdminPage() {
         const res = await saveSection("events", updated);
         setContent({ ...content, events: updated });
         setDeleteConfirm(null);
-        showToast(res.usedSupabase ? "Event removed from Supabase." : "Event removed locally.");
+        showToast(res.usedSupabase ? "Event removed from cloud." : "Event removed locally.");
       },
     });
   };
@@ -606,7 +620,7 @@ export default function AdminPage() {
     setContent({ ...content, administration: updatedList });
     setAdminModalOpen(false);
     setEditingAdminItem(null);
-    showToast(res.usedSupabase ? "Staff profile saved to Supabase!" : "Staff profile saved locally!");
+    showToast(res.usedSupabase ? "Staff profile saved to cloud!" : "Staff profile saved locally!");
   };
 
   const handleDeleteAdmin = (id: string) => {
@@ -619,7 +633,7 @@ export default function AdminPage() {
         const res = await saveSection("administration", updated);
         setContent({ ...content, administration: updated });
         setDeleteConfirm(null);
-        showToast(res.usedSupabase ? "Leader removed from Supabase." : "Leader removed locally.");
+        showToast(res.usedSupabase ? "Leader removed from cloud." : "Leader removed locally.");
       },
     });
   };
@@ -635,7 +649,7 @@ export default function AdminPage() {
     setContent({ ...content, heritage: heritageForm });
     showToast(
       res.usedSupabase
-        ? "Heritage & Archival details synced to Supabase!"
+        ? "Heritage & Archival details synced to Firebase cloud!"
         : "Heritage & Archival details saved locally!"
     );
   };
@@ -695,7 +709,7 @@ export default function AdminPage() {
     const res = await saveSection("heritage", updatedHeritage);
     showToast(
       res.usedSupabase
-        ? "Heritage milestone synced to Supabase!"
+        ? "Heritage milestone synced to cloud!"
         : "Heritage milestone saved locally!"
     );
   };
@@ -753,7 +767,7 @@ export default function AdminPage() {
     const res = await saveSection("studentPopulation", populationForm);
     setContent({ ...content, studentPopulation: populationForm });
     showToast(
-      res.usedSupabase ? "Student statistics saved to Supabase!" : "Student statistics saved locally!"
+      res.usedSupabase ? "Student statistics saved to cloud!" : "Student statistics saved locally!"
     );
   };
 
@@ -767,7 +781,7 @@ export default function AdminPage() {
     const res = await saveSection("contact", contactForm);
     setContent({ ...content, contact: contactForm });
     showToast(
-      res.usedSupabase ? "Contact details synced to Supabase!" : "Contact details saved locally!"
+      res.usedSupabase ? "Contact details synced to cloud!" : "Contact details saved locally!"
     );
   };
 
@@ -990,23 +1004,29 @@ export default function AdminPage() {
   const handleSaveSupabaseConfig = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!sbUrlInput.trim() || !sbKeyInput.trim()) {
-      showToast("Both Supabase Project URL and Anon Key are required.", "error");
+      showToast("Both Firebase Project ID and API Key are required.", "error");
       return;
     }
 
     setTestingConnection(true);
-    saveStoredSupabaseConfig({
-      url: sbUrlInput.trim(),
-      anonKey: sbKeyInput.trim(),
+    saveStoredFirebaseConfig({
+      projectId: sbUrlInput.trim(),
+      apiKey: sbKeyInput.trim(),
+      authDomain: `${sbUrlInput.trim()}.firebaseapp.com`,
+      storageBucket: `${sbUrlInput.trim()}.firebasestorage.app`,
+      messagingSenderId: DEFAULT_FIREBASE_CONFIG.messagingSenderId,
+      appId: DEFAULT_FIREBASE_CONFIG.appId,
     });
 
-    const check = await testSupabaseConnection();
+
+
+    const check = await testFirebaseConnection();
     setSupabaseConnected(check.connected && check.tableExists);
     setSupabaseStatusMsg(check.message);
     setTestingConnection(false);
 
     if (check.connected && check.tableExists) {
-      showToast("Connected to Supabase live cloud database!", "success");
+      showToast("Connected to Firebase live cloud database!", "success");
       const fresh = await getAllContent();
       setContent(fresh);
       setContactForm({
@@ -1019,12 +1039,12 @@ export default function AdminPage() {
   };
 
   const handleDisconnectSupabase = () => {
-    removeStoredSupabaseConfig();
+    removeStoredFirebaseConfig();
     setSbUrlInput("");
     setSbKeyInput("");
     setSupabaseConnected(false);
     setSupabaseStatusMsg("Disconnected. Running in local storage mode.");
-    showToast("Supabase disconnected. Switched to browser local storage.");
+    showToast("Firebase disconnected. Switched to browser local storage.");
   };
 
   // -------------------------------------------------------------------------
@@ -1045,6 +1065,7 @@ export default function AdminPage() {
   const handleImportJSON = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+
 
     const reader = new FileReader();
     reader.onload = async (evt) => {
@@ -1968,7 +1989,7 @@ export default function AdminPage() {
               title={supabaseStatusMsg}
             >
               <div className="adm-status-dot" />
-              <span>{supabaseConnected ? "Supabase Live" : "Local Fallback"}</span>
+              <span>{supabaseConnected ? "Firebase Live" : "Local Fallback"}</span>
             </div>
           </div>
         </header>
@@ -4723,7 +4744,7 @@ export default function AdminPage() {
                   {/* Card 1: Supabase Connection */}
                   <div className="adm-settings-panel">
                     <div className="adm-panel-head-row">
-                      <h3>Supabase Cloud Synchronization</h3>
+                      <h3>Firebase Cloud &amp; Storage Synchronization</h3>
                       <div
                         className={`adm-status-pill ${
                           supabaseConnected ? "connected" : "local"
@@ -4734,27 +4755,27 @@ export default function AdminPage() {
                       </div>
                     </div>
                     <p className="adm-settings-desc">
-                      Connecting Supabase persists all content changes to a live cloud PostgreSQL
-                      database so they publish instantly to all visitors across the web. You can
-                      create a free database at{" "}
+                      Connecting Firebase persists all content changes to Google Cloud Firestore and uploads photos to Firebase Storage. Manage your project at{" "}
+
+
                       <a
-                        href="https://supabase.com/dashboard"
+                        href="https://console.firebase.google.com/"
                         target="_blank"
                         rel="noreferrer"
                         style={{ color: "#2563eb", textDecoration: "underline", fontWeight: 600 }}
                       >
-                        supabase.com
+                        console.firebase.google.com
                       </a>
                       .
                     </p>
 
                     <form onSubmit={handleSaveSupabaseConfig} style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
                       <div className="adm-form-field">
-                        <label className="adm-label">Supabase Project URL</label>
+                        <label className="adm-label">Firebase Project ID</label>
                         <input
-                          type="url"
+                          type="text"
                           className="adm-input"
-                          placeholder="https://xyzcompany.supabase.co"
+                          placeholder="rippon-girls-college"
                           value={sbUrlInput}
                           onChange={(e) => setSbUrlInput(e.target.value)}
                           required
@@ -4762,11 +4783,11 @@ export default function AdminPage() {
                       </div>
 
                       <div className="adm-form-field">
-                        <label className="adm-label">Supabase Public Anon Key</label>
+                        <label className="adm-label">Firebase Web API Key</label>
                         <input
                           type="password"
                           className="adm-input"
-                          placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                          placeholder="AIzaSy..."
                           value={sbKeyInput}
                           onChange={(e) => setSbKeyInput(e.target.value)}
                           required
@@ -4781,11 +4802,11 @@ export default function AdminPage() {
                             <Database size={16} />
                           )}
                           <span>
-                            {testingConnection ? "Verifying..." : "Save & Connect Supabase"}
+                            {testingConnection ? "Verifying..." : "Save & Connect Firebase"}
                           </span>
                         </button>
 
-                        {getStoredSupabaseConfig() && (
+                        {getStoredFirebaseConfig() && (
                           <button
                             type="button"
                             className="adm-btn-secondary"
@@ -4801,24 +4822,24 @@ export default function AdminPage() {
 
                   {/* Card 2: One-Click SQL Setup Script */}
                   <div className="adm-settings-panel">
-                    <h3>One-Click Supabase SQL Setup</h3>
+                    <h3>Firebase Security Rules (Test Mode)</h3>
                     <p className="adm-settings-desc">
-                      Paste and run this SQL script in your Supabase Dashboard under <strong>SQL Editor</strong>{" "}
-                      to create the content table and set public access policies:
+                      Paste these rules in Firebase Console under <strong>Firestore &gt; Rules</strong> and <strong>Storage &gt; Rules</strong>:
+                      to allow read and write operations during testing:
                     </p>
                     <div className="adm-code-block">
                       <button
                         type="button"
                         className="adm-copy-code-btn"
                         onClick={() => {
-                          navigator.clipboard.writeText(SUPABASE_SQL_SETUP);
-                          showToast("SQL script copied to clipboard!");
+                          navigator.clipboard.writeText(FIREBASE_RULES_SETUP);
+                          showToast("Firebase rules copied to clipboard!");
                         }}
                       >
                         <Copy size={13} />
-                        <span>Copy SQL</span>
+                        <span>Copy Rules</span>
                       </button>
-                      <pre style={{ margin: 0 }}>{SUPABASE_SQL_SETUP}</pre>
+                      <pre style={{ margin: 0 }}>{FIREBASE_RULES_SETUP}</pre>
                     </div>
                   </div>
 
